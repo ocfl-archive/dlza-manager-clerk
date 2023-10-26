@@ -1,0 +1,97 @@
+package controller
+
+import (
+	"context"
+	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
+	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
+
+type StorageLocationController struct {
+	ClientClerkIngestHandler pb.ClerkHandlerServiceClient
+}
+
+func NewStorageLocationController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) *StorageLocationController {
+	return &StorageLocationController{ClientClerkIngestHandler: clientClerkIngestHandler}
+}
+
+// SaveStorageLocation godoc
+// @Summary		Create storageLocation
+// @Description	Add a new storageLocation
+// @Security 	 ApiKeyAuth
+// @ID create-storageLocation
+// @Param		storageLocation's body models.StorageLocation true "Create storageLocation"
+// @Produce		json
+// @Success		200
+// @Failure 	400
+// @Router		/storage-location [post]
+func (s *StorageLocationController) SaveStorageLocation(ctx *gin.Context) {
+	storageLocation := pb.StorageLocation{}
+	err := ctx.ShouldBindJSON(&storageLocation)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"message": "request failed"})
+		return
+	}
+	c := context.Background()
+	cont, cancel := context.WithTimeout(c, 10000*time.Second)
+	defer cancel()
+	_, err = s.ClientClerkIngestHandler.SaveStorageLocation(cont, &storageLocation)
+	if err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, storageLocation.Alias)
+}
+
+// DeleteStorageLocationById godoc
+// @Summary		Delete storageLocation
+// @Description	Delete a storageLocation
+// @Security 	 ApiKeyAuth
+// @ID 			delete-storageLocation
+// @Param		id path string true "storage-location ID"
+// @Produce		json
+// @Success		200
+// @Failure 	400
+// @Router		/storage-location/{id} [delete]
+func (s *StorageLocationController) DeleteStorageLocationById(ctx *gin.Context) {
+	c := context.Background()
+	cont, cancel := context.WithTimeout(c, 10000*time.Second)
+	defer cancel()
+	id := ctx.Param("id")
+
+	_, err := s.ClientClerkIngestHandler.DeleteStorageLocationById(cont, &pb.Id{Id: id})
+	if err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Ok"})
+}
+
+// GetStorageLocationsByTenantId godoc
+// @Summary		Find all storageLocations for tenant ID
+// @Description	Finding all storageLocations for tenant ID
+// @Security 	 ApiKeyAuth
+// @ID 			find-all-storageLocations-for-tenant-id
+// @Param		id path string true "tenant ID"
+// @Produce		json
+// @Success		200 {object} []models.StorageLocation
+// @Failure 	400
+// @Router		/storage-location/{id} [get]
+func (s *StorageLocationController) GetStorageLocationsByTenantId(ctx *gin.Context) {
+	c := context.Background()
+	cont, cancel := context.WithTimeout(c, 10000*time.Second)
+	defer cancel()
+	id := ctx.Param("id")
+	storageLocations, err := s.ClientClerkIngestHandler.GetStorageLocationsByTenantId(cont, &pb.Id{Id: id})
+	if err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, storageLocations.StorageLocations)
+}

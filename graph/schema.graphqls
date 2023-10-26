@@ -1,0 +1,274 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+#go run github.com/99designs/gqlgen generate
+
+interface Node {
+  id: ID!
+}
+interface PaginatedList {
+  items: [Node!]!
+  totalItems: Int!
+}
+enum SortDirection {
+  ASCENDING
+  DESCENDING
+}
+
+type TenantList implements PaginatedList {
+  items: [Tenant!]!
+  totalItems: Int!
+}
+type CollectionList implements PaginatedList {
+  items: [Collection!]!
+  totalItems: Int!
+}
+type StorageLocationList implements PaginatedList {
+  items: [StorageLocation!]!
+  totalItems: Int!
+}
+type StoragePartitionList implements PaginatedList {
+  items: [StoragePartition!]!
+  totalItems: Int!
+}
+type ObjectList implements PaginatedList {
+  items: [Object!]!
+  totalItems: Int!
+}
+type ObjectInstanceList implements PaginatedList {
+  items: [ObjectInstance!]!
+  totalItems: Int!
+}
+type ObjectInstanceCheckList implements PaginatedList {
+  items: [ObjectInstanceCheck!]!
+  totalItems: Int!
+}
+type FileList implements PaginatedList {
+  items: [File!]!
+  totalItems: Int!
+}
+
+input TenantListOptions {
+  # Skips the first n results, for use in pagination
+  skip: Int
+
+  # Takes n results, for use in pagination
+  take: Int
+
+  # Specifies the sort direction
+  sortDirection: SortDirection
+
+  # Specifies the sort key
+  sortKey: TenantSortKey
+}
+input CollectionListOptions {
+  tenantId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: CollectionSortKey
+}
+input StorageLocationListOptions {
+  tenantId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: StorageLocationSortKey
+}
+input StoragePartitionListOptions {
+  storageLocationId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: StoragePartitionSortKey
+}
+input ObjectListOptions {
+  collectionId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: ObjectSortKey
+}
+input ObjectInstanceListOptions {
+  ObjectId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: ObjectInstanceSortKey
+}
+input ObjectInstanceCheckListOptions {
+  ObjectId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: ObjectInstanceCheckSortKey
+}
+input FileListOptions {
+  ObjectId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: FileSortKey
+}
+
+enum TenantSortKey {
+  ID,
+  NAME,
+  ALIAS,
+  PERSON,
+  EMAIL
+}
+enum CollectionSortKey {
+  NAME
+}
+enum StorageLocationSortKey {
+  ALIAS
+}
+enum StoragePartitionSortKey {
+  ALIAS
+}
+enum ObjectSortKey {
+  ID
+}
+enum ObjectInstanceSortKey {
+  ID
+}
+enum ObjectInstanceCheckSortKey {
+  ID
+}
+enum FileSortKey {
+  NAME
+}
+
+type Tenant implements Node {
+  id: ID!
+  name: String!
+  alias: String!
+  person: String!
+  email: String!
+  collections(options: CollectionListOptions): CollectionList!
+  storageLocations(options: StorageLocationListOptions): StorageLocationList!
+}
+
+type Collection implements Node {
+  id: ID!
+  alias: String!
+  description: String!
+  owner: String!
+  ownerMail: String!
+  name: String!
+  quality: Int!
+  tenantId: ID!
+  tenant: Tenant!
+  objects(options: ObjectListOptions): ObjectList!
+}
+type StorageLocation implements Node {
+  id: ID!
+  alias: String!
+  type: String!
+  vault: String!
+  connection: String!
+  quality: Int!
+  price: Int!
+  securityCompliency: String!
+  fillFirst: Boolean!
+  ocflType: String!
+  tenantId: ID!
+  tenant: Tenant!
+  numberOfThreads: Int!
+  storagePartitions(options: StoragePartitionListOptions): StoragePartitionList!
+}
+type StoragePartition implements Node {
+  id: ID!
+  alias: String!
+  name: String!
+  maxSize: Int!
+  maxObjects: Int!
+  currentSize: Int!
+  currentObjects: Int!
+  storageLocationId: ID!
+  storageLocation: StorageLocation!
+  objectInstances(options: ObjectInstanceListOptions):ObjectInstanceList!
+}
+type Object implements Node {
+  id: ID!
+  signature: String!
+  sets: [String!]!
+  identifiers: [String!]!
+  title: Int!
+  alternativeTitles: [String!]!
+  description: String!
+  keywords: [String!]!
+  references: [String!]!
+  ingestWorkflow: String!
+  user: String!
+  address: String!
+  created: String!
+  lastChanges: String!
+  size: Int!
+  collectionId: ID!
+  collection: Collection!
+  checksum: String!
+  objectInstances(options: ObjectInstanceListOptions): ObjectInstanceList!
+  files(options: FileListOptions): FileList!
+}
+type ObjectInstance implements Node {
+  id: ID!
+  path: String!
+  created: String!
+  status: String!
+  size: Int!
+  storagePartitionId: ID!
+  storagePartition: StoragePartition!
+  objectId: ID!
+  object: Object!
+  objectInstanceChecks(options: ObjectInstanceCheckListOptions): ObjectInstanceCheckList!
+}
+type File implements Node {
+  id: ID!
+  checksum: String!
+  name: String!
+  mimetype: String!
+  size: Int!
+  pronom: String!
+  width: Int!
+  height: Int!
+  duration: Int!
+  objectId: ID!
+  object: Object!
+}
+
+type ObjectInstanceCheck implements Node {
+  id: ID!
+  checktime: String!
+  error: Boolean!
+  message: String!
+  objectInstanceId: ID!
+  objectInstance: ObjectInstance!
+}
+type Query {
+  tenants(options: TenantListOptions): TenantList!
+  tenant(id: ID!): Tenant
+
+  collections(options: CollectionListOptions): CollectionList!
+  collection(id: ID!): Collection
+
+  objects(options: ObjectListOptions): ObjectList!
+  object(id: ID!): Object
+
+  objectInstances(options: ObjectInstanceListOptions): ObjectInstanceList!
+  objectInstance(id: ID!): ObjectInstance
+
+  objectInstanceChecks(options: ObjectInstanceCheckListOptions): ObjectInstanceCheckList!
+  objectInstanceCheck(id: ID!): ObjectInstanceCheck
+
+  files(options: FileListOptions): FileList!
+  file(id: ID!): File
+
+  storageLocations(options: StorageLocationListOptions!): StorageLocationList!
+  storageLocation(id: ID!): StorageLocation
+
+  storagePartitions(options: StoragePartitionListOptions): StoragePartitionList!
+  storagePartition(id: ID!): StoragePartition
+}
