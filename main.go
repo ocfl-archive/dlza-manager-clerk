@@ -7,6 +7,13 @@ import (
 	"encoding/pem"
 	"flag"
 	"fmt"
+	"io/fs"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/certs"
@@ -17,12 +24,6 @@ import (
 	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server/configstruct"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/service"
-	"io/fs"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"emperror.dev/emperror"
 	"emperror.dev/errors"
@@ -56,13 +57,29 @@ func main() {
 	// }
 
 	//////ClerkIngest gRPC connection
-	connectionClerkIngest, err := grpc.Dial("dlza-manager-ingester-svc:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// connectionClerkIngest, err := grpc.Dial("dlza-manager-ingester-svc:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// if err != nil {
+	// 	log.Fatalf("did not connect: %v", err)
+	// }
+
+	// //////ClerkHandler gRPC connection
+	// connectionClerkHandler, err := grpc.Dial("dlza-manager-handler-svc:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// if err != nil {
+	// 	log.Fatalf("did not connect: %v", err)
+	// }
+
+	conf, err := config.GetConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	connectionClerkIngest, err := grpc.Dial(conf.Handler, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 
 	//////ClerkHandler gRPC connection
-	connectionClerkHandler, err := grpc.Dial("dlza-manager-handler-svc:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connectionClerkHandler, err := grpc.Dial(conf.Ingester, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -80,7 +97,7 @@ func main() {
 	routes := router.NewRouter(orderController, tenantController, storageLocationController, collectionController, storagePartitionController)
 
 	server := &http.Server{
-		Addr:    "localhost:8085",
+		Addr:    "localhost:8086",
 		Handler: routes,
 	}
 	go func() {
