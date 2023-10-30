@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
@@ -22,8 +23,8 @@ import (
 	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
 	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server/configstruct"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/service"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/ub-license/pkg/configstruct"
 
 	"emperror.dev/emperror"
 	"emperror.dev/errors"
@@ -73,13 +74,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	connectionClerkIngest, err := grpc.Dial(conf.Handler, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connectionClerkIngest, err := grpc.Dial(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 
 	//////ClerkHandler gRPC connection
-	connectionClerkHandler, err := grpc.Dial(conf.Ingester, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connectionClerkHandler, err := grpc.Dial(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -97,7 +98,7 @@ func main() {
 	routes := router.NewRouter(orderController, tenantController, storageLocationController, collectionController, storagePartitionController)
 
 	server := &http.Server{
-		Addr:    "localhost:8086",
+		Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
 		Handler: routes,
 	}
 	go func() {
@@ -130,13 +131,9 @@ func main() {
 		emperror.Panic(errors.Wrap(err, "cannot decode config file"))
 	}
 
-	logger, logStash, logFile := ubLogger.CreateUbMultiLogger(
-		cfg.Logging.StashHost,
-		cfg.Logging.StashPortNb,
-		cfg.Logging.TraceLevel,
-		cfg.Logging.StashTraceLevel,
-		cfg.Logging.Filename,
-		cfg.Logging.Filename)
+	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
+		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
+		ubLogger.SetLogStash(conf.GraphQLConfig.Logging.StashHost, conf.GraphQLConfig.Logging.StashPortNb, conf.GraphQLConfig.Logging.Namespace, conf.GraphQLConfig.Logging.StashTraceLevel))
 	if logStash != nil {
 		defer logStash.Close()
 	}
@@ -144,23 +141,37 @@ func main() {
 		defer logFile.Close()
 	}
 
+	// logger, logStash, logFile := ubLogger.CreateUbMultiLogger(
+	// 	cfg.Logging.StashHost,
+	// 	cfg.Logging.StashPortNb,
+	// 	cfg.Logging.TraceLevel,
+	// 	cfg.Logging.StashTraceLevel,
+	// 	cfg.Logging.Filename,
+	// 	cfg.Logging.Filename)
+	// if logStash != nil {
+	// 	defer logStash.Close()
+	// }
+	// if logFile != nil {
+	// 	defer logFile.Close()
+	// }
+
 	// output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
 	// logger := zerolog.New(output).With().Str("timestamp", time.Now().String()).Logger()
 
 	// find static fs
 	var staticFS fs.FS
-	if cfg.WebStatic == "" {
+	if conf.GraphQLConfig.WebStatic == "" {
 		staticFS, err = fs.Sub(web.WebFS, "ui/build")
 		if err != nil {
 			emperror.Panic(errors.Wrapf(err, "cannot create subFS of %v/%s", web.WebFS, "ui/build"))
 		}
 	} else {
-		staticFS = os.DirFS(cfg.WebStatic)
+		staticFS = os.DirFS(conf.GraphQLConfig.WebStatic)
 	}
 
 	var cert tls.Certificate
 	var addCA = []*x509.Certificate{}
-	if cfg.TLSCert == "" {
+	if conf.GraphQLConfig.TLSCert == "" {
 		certBytes, err := fs.ReadFile(certs.CertFS, "localhost.cert.pem")
 		if err != nil {
 			emperror.Panic(errors.Wrapf(err, "cannot read internal cert %v/%s", certs.CertFS, "localhost.cert.pem"))
@@ -187,11 +198,11 @@ func main() {
 		}
 		addCA = append(addCA, rootCA)
 	} else {
-		if cert, err = tls.LoadX509KeyPair(cfg.TLSCert, cfg.TLSKey); err != nil {
-			emperror.Panic(errors.Wrapf(err, "cannot load key pair %s - %s", cfg.TLSCert, cfg.TLSKey))
+		if cert, err = tls.LoadX509KeyPair(conf.GraphQLConfig.TLSCert, conf.GraphQLConfig.TLSKey); err != nil {
+			emperror.Panic(errors.Wrapf(err, "cannot load key pair %s - %s", conf.GraphQLConfig.TLSCert, conf.GraphQLConfig.TLSKey))
 		}
 		if cfg.RootCA != nil {
-			for _, caName := range cfg.RootCA {
+			for _, caName := range conf.GraphQLConfig.RootCA {
 				rootCABytes, err := os.ReadFile(caName)
 				if err != nil {
 					emperror.Panic(errors.Wrapf(err, "cannot read root ca %s", caName))
@@ -209,12 +220,12 @@ func main() {
 		}
 	}
 	graphqlServer.UiFS = uiFS
-	srv, err := graphqlServer.NewServer(cfg.Addr, cfg.ExtAddr, cert, addCA, staticFS, logger, models.Keycloak{
-		Addr:         cfg.Keycloak.Addr,
-		Realm:        cfg.Keycloak.Realm,
-		Callback:     cfg.Keycloak.Callback,
-		ClientId:     cfg.Keycloak.ClientId,
-		ClientSecret: cfg.Keycloak.ClientSecret,
+	srv, err := graphqlServer.NewServer(conf.GraphQLConfig.Addr, conf.GraphQLConfig.ExtAddr, cert, addCA, staticFS, logger, models.Keycloak{
+		Addr:         conf.GraphQLConfig.Keycloak.Addr,
+		Realm:        conf.GraphQLConfig.Keycloak.Realm,
+		Callback:     conf.GraphQLConfig.Keycloak.Callback,
+		ClientId:     conf.GraphQLConfig.Keycloak.ClientId,
+		ClientSecret: conf.GraphQLConfig.Keycloak.ClientSecret,
 	}, clerkHandlerServiceClient)
 	if err != nil {
 		emperror.Panic(errors.Wrap(err, "cannot create server"))

@@ -8,11 +8,16 @@ import (
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
 )
 
+type HostPort struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+}
+
 type Config struct {
-	Server   models.Server        `yaml:"server"`
-	Logger   models.LoggingConfig `yaml:"logger"`
-	Handler  string               `yaml:"handler"`
-	Ingester string               `yaml:"ingester"`
+	GraphQLConfig models.GraphQLConfig `yaml:"graphql_config"`
+	Handler       HostPort             `yaml:"handler"`
+	Ingester      HostPort             `yaml:"ingester"`
+	Clerk         HostPort             `yaml:"clerk"`
 }
 
 // GetConfig creates a new config from a given environment
