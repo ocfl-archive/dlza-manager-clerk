@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -24,7 +23,6 @@ import (
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
 	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/service"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/ub-license/pkg/configstruct"
 
 	"emperror.dev/emperror"
 	"emperror.dev/errors"
@@ -74,13 +72,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	connectionClerkIngest, err := grpc.Dial(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connectionClerkIngest, err := grpc.Dial(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 
 	//////ClerkHandler gRPC connection
-	connectionClerkHandler, err := grpc.Dial(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connectionClerkHandler, err := grpc.Dial(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -97,39 +95,39 @@ func main() {
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
 	routes := router.NewRouter(orderController, tenantController, storageLocationController, collectionController, storagePartitionController)
 
-	server := &http.Server{
-		Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
-		Handler: routes,
-	}
-	go func() {
-		err = server.ListenAndServe()
+	// server := &http.Server{
+	// 	Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
+	// 	Handler: routes,
+	// }
+	// go func() {
+	// 	err = server.ListenAndServe()
 
-		if err != nil {
-			log.Fatalf("error: %s", err.Error())
-		}
-	}()
+	// 	if err != nil {
+	// 		log.Fatalf("error: %s", err.Error())
+	// 	}
+	// }()
 
-	//////GraphQl
-	flag.Parse()
+	// //////GraphQl
+	// flag.Parse()
 
-	var cfgData []byte
-	// read embedded toml if no external one is given
-	if *configParam == "" {
-		cfgData, err = fs.ReadFile(config.ConfigFS, "server.toml")
-		if err != nil {
-			emperror.Panic(errors.Wrapf(err, "cannot read %v/%s", config.ConfigFS, "server.toml"))
-		}
-	} else {
-		cfgData, err = os.ReadFile(*configParam)
-		if err != nil {
-			emperror.Panic(errors.Wrapf(err, "cannot read %s", *configParam))
-		}
-	}
-	// load config file
-	cfg, err := configstruct.LoadGraphQLConfig(cfgData)
-	if err != nil {
-		emperror.Panic(errors.Wrap(err, "cannot decode config file"))
-	}
+	// var cfgData []byte
+	// // read embedded toml if no external one is given
+	// if *configParam == "" {
+	// 	cfgData, err = fs.ReadFile(config.ConfigFS, "server.toml")
+	// 	if err != nil {
+	// 		emperror.Panic(errors.Wrapf(err, "cannot read %v/%s", config.ConfigFS, "server.toml"))
+	// 	}
+	// } else {
+	// 	cfgData, err = os.ReadFile(*configParam)
+	// 	if err != nil {
+	// 		emperror.Panic(errors.Wrapf(err, "cannot read %s", *configParam))
+	// 	}
+	// }
+	// // load config file
+	// cfg, err := configstruct.LoadGraphQLConfig(cfgData)
+	// if err != nil {
+	// 	emperror.Panic(errors.Wrap(err, "cannot decode config file"))
+	// }
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
@@ -201,7 +199,7 @@ func main() {
 		if cert, err = tls.LoadX509KeyPair(conf.GraphQLConfig.TLSCert, conf.GraphQLConfig.TLSKey); err != nil {
 			emperror.Panic(errors.Wrapf(err, "cannot load key pair %s - %s", conf.GraphQLConfig.TLSCert, conf.GraphQLConfig.TLSKey))
 		}
-		if cfg.RootCA != nil {
+		if conf.GraphQLConfig.RootCA != nil {
 			for _, caName := range conf.GraphQLConfig.RootCA {
 				rootCABytes, err := os.ReadFile(caName)
 				if err != nil {
@@ -226,7 +224,7 @@ func main() {
 		Callback:     conf.GraphQLConfig.Keycloak.Callback,
 		ClientId:     conf.GraphQLConfig.Keycloak.ClientId,
 		ClientSecret: conf.GraphQLConfig.Keycloak.ClientSecret,
-	}, clerkHandlerServiceClient)
+	}, clerkHandlerServiceClient, routes)
 	if err != nil {
 		emperror.Panic(errors.Wrap(err, "cannot create server"))
 	}

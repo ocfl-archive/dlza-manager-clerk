@@ -5,21 +5,20 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"embed"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
 	"io/fs"
 	"net/http"
 
-	"emperror.dev/errors"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/tbaehler/gin-keycloak/pkg/ginkeycloak"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
-	"golang.org/x/net/http2"
 )
 
-func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger *ubLogger.Logger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient) (*Server, error) {
+func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger *ubLogger.Logger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, router *gin.Engine) (*Server, error) {
 	server := &Server{
 		addr:               addr,
 		extAddr:            extAddr,
@@ -29,6 +28,7 @@ func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certif
 		logger:             logger,
 		keycloak:           keycloak,
 		ClientClerkHandler: clientClerkHandler,
+		router:             router,
 	}
 	return server, nil
 }
@@ -43,6 +43,7 @@ type Server struct {
 	logger             *ubLogger.Logger
 	keycloak           models.Keycloak
 	ClientClerkHandler pb.ClerkHandlerServiceClient
+	router             *gin.Engine
 }
 
 var UiFS embed.FS
@@ -57,16 +58,17 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		rootCAs.AddCert(ca)
 	}
 
-	var tlsConfig = &tls.Config{
-		Certificates: []tls.Certificate{srv.cert},
-		RootCAs:      rootCAs,
-	}
+	// var tlsConfig = &tls.Config{
+	// 	Certificates: []tls.Certificate{srv.cert},
+	// 	RootCAs:      rootCAs,
+	// }
 	var keycloakConfig = ginkeycloak.KeycloakConfig{
 		Url:   srv.keycloak.Addr,
 		Realm: srv.keycloak.Realm,
 	}
 
-	router := gin.Default()
+	// router := gin.Default()
+	router := srv.router
 	router.GET("/graphql", func(ctx *gin.Context) {
 		ctx.FileFromFS("ui/build/playground.html", http.FS(UiFS))
 	})
@@ -82,22 +84,27 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	})
 
 	srv.server = http.Server{
-		Addr:      srv.addr,
-		Handler:   router,
-		TLSConfig: tlsConfig,
+		Addr:    srv.addr,
+		Handler: router,
+		// TLSConfig: tlsConfig,
 	}
 
-	if err := http2.ConfigureServer(&srv.server, nil); err != nil {
-		return nil, errors.Wrap(err, "cannot configure http2 server")
-	}
+	// if err := http2.ConfigureServer(&srv.server, nil); err != nil {
+	// 	return nil, errors.Wrap(err, "cannot configure http2 server")
+	// }
 
 	go func() {
 		srv.logger.Info().Msgf("Starting server (%s): %s", srv.addr, srv.extAddr)
-		if err := srv.server.ListenAndServeTLS("", ""); err != nil {
+		if err := srv.server.ListenAndServe(); err != nil {
 			srv.logger.Error().Msgf("server stopped: %v", err)
 		} else {
 			srv.logger.Info().Msg("server shut down")
 		}
+		// if err := srv.server.ListenAndServeTLS("", ""); err != nil {
+		// 	srv.logger.Error().Msgf("server stopped: %v", err)
+		// } else {
+		// 	srv.logger.Info().Msg("server shut down")
+		// }
 	}()
 	return func() {
 		if err := srv.server.Close(); err != nil {

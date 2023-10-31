@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/jinzhu/configor"
@@ -26,6 +25,5 @@ func GetConfig() (config Config, err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("config", config)
 	return
 }
