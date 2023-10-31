@@ -54,7 +54,9 @@ RUN go mod download
 # RUN bash ./build.sh
 RUN go build 
 
-FROM scratch
+
+FROM alpine:latest
+RUN apk update && apk add tzdata ca-certificates
 WORKDIR /
 COPY --from=builder /dlza-manager-clerk /
 EXPOSE 8080
