@@ -62,17 +62,17 @@ type CollectionListOptions struct {
 }
 
 type File struct {
-	ID       string  `json:"id"`
-	Checksum string  `json:"checksum"`
-	Name     string  `json:"name"`
-	Mimetype string  `json:"mimetype"`
-	Size     int     `json:"size"`
-	Pronom   string  `json:"pronom"`
-	Width    int     `json:"width"`
-	Height   int     `json:"height"`
-	Duration int     `json:"duration"`
-	ObjectID string  `json:"objectId"`
-	Object   *Object `json:"object"`
+	ID       string   `json:"id"`
+	Checksum string   `json:"checksum"`
+	Name     []string `json:"name"`
+	Mimetype string   `json:"mimetype"`
+	Size     int      `json:"size"`
+	Pronom   string   `json:"pronom"`
+	Width    int      `json:"width"`
+	Height   int      `json:"height"`
+	Duration int      `json:"duration"`
+	ObjectID string   `json:"objectId"`
+	Object   *Object  `json:"object"`
 }
 
 func (File) IsNode()            {}
@@ -109,7 +109,7 @@ type Object struct {
 	Signature         string              `json:"signature"`
 	Sets              []string            `json:"sets"`
 	Identifiers       []string            `json:"identifiers"`
-	Title             int                 `json:"title"`
+	Title             string              `json:"title"`
 	AlternativeTitles []string            `json:"alternativeTitles"`
 	Description       string              `json:"description"`
 	Keywords          []string            `json:"keywords"`
@@ -118,7 +118,7 @@ type Object struct {
 	User              string              `json:"user"`
 	Address           string              `json:"address"`
 	Created           string              `json:"created"`
-	LastChanges       string              `json:"lastChanges"`
+	LastChanged       string              `json:"lastChanged"`
 	Size              int                 `json:"size"`
 	CollectionID      string              `json:"collectionId"`
 	Collection        *Collection         `json:"collection"`
@@ -177,11 +177,11 @@ func (this ObjectInstanceCheckList) GetItems() []Node {
 func (this ObjectInstanceCheckList) GetTotalItems() int { return this.TotalItems }
 
 type ObjectInstanceCheckListOptions struct {
-	ObjectID      *string                     `json:"ObjectId,omitempty"`
-	Skip          *int                        `json:"skip,omitempty"`
-	Take          *int                        `json:"take,omitempty"`
-	SortDirection *SortDirection              `json:"sortDirection,omitempty"`
-	SortKey       *ObjectInstanceCheckSortKey `json:"sortKey,omitempty"`
+	ObjectInstanceID *string                     `json:"ObjectInstanceId,omitempty"`
+	Skip             *int                        `json:"skip,omitempty"`
+	Take             *int                        `json:"take,omitempty"`
+	SortDirection    *SortDirection              `json:"sortDirection,omitempty"`
+	SortKey          *ObjectInstanceCheckSortKey `json:"sortKey,omitempty"`
 }
 
 type ObjectInstanceList struct {

@@ -5,7 +5,6 @@ package graph
 import (
 	"bytes"
 	"context"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
 	"embed"
 	"errors"
 	"fmt"
@@ -17,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -102,7 +102,7 @@ type ComplexityRoot struct {
 		Identifiers       func(childComplexity int) int
 		IngestWorkflow    func(childComplexity int) int
 		Keywords          func(childComplexity int) int
-		LastChanges       func(childComplexity int) int
+		LastChanged       func(childComplexity int) int
 		ObjectInstances   func(childComplexity int, options *model.ObjectInstanceListOptions) int
 		References        func(childComplexity int) int
 		Sets              func(childComplexity int) int
@@ -161,7 +161,7 @@ type ComplexityRoot struct {
 		ObjectInstances      func(childComplexity int, options *model.ObjectInstanceListOptions) int
 		Objects              func(childComplexity int, options *model.ObjectListOptions) int
 		StorageLocation      func(childComplexity int, id string) int
-		StorageLocations     func(childComplexity int, options model.StorageLocationListOptions) int
+		StorageLocations     func(childComplexity int, options *model.StorageLocationListOptions) int
 		StoragePartition     func(childComplexity int, id string) int
 		StoragePartitions    func(childComplexity int, options *model.StoragePartitionListOptions) int
 		Tenant               func(childComplexity int, id string) int
@@ -247,7 +247,7 @@ type QueryResolver interface {
 	ObjectInstanceCheck(ctx context.Context, id string) (*model.ObjectInstanceCheck, error)
 	Files(ctx context.Context, options *model.FileListOptions) (*model.FileList, error)
 	File(ctx context.Context, id string) (*model.File, error)
-	StorageLocations(ctx context.Context, options model.StorageLocationListOptions) (*model.StorageLocationList, error)
+	StorageLocations(ctx context.Context, options *model.StorageLocationListOptions) (*model.StorageLocationList, error)
 	StorageLocation(ctx context.Context, id string) (*model.StorageLocation, error)
 	StoragePartitions(ctx context.Context, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error)
 	StoragePartition(ctx context.Context, id string) (*model.StoragePartition, error)
@@ -551,12 +551,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Object.Keywords(childComplexity), true
 
-	case "Object.lastChanges":
-		if e.complexity.Object.LastChanges == nil {
+	case "Object.lastChanged":
+		if e.complexity.Object.LastChanged == nil {
 			break
 		}
 
-		return e.complexity.Object.LastChanges(childComplexity), true
+		return e.complexity.Object.LastChanged(childComplexity), true
 
 	case "Object.objectInstances":
 		if e.complexity.Object.ObjectInstances == nil {
@@ -913,7 +913,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.StorageLocations(childComplexity, args["options"].(model.StorageLocationListOptions)), true
+		return e.complexity.Query.StorageLocations(childComplexity, args["options"].(*model.StorageLocationListOptions)), true
 
 	case "Query.storagePartition":
 		if e.complexity.Query.StoragePartition == nil {
@@ -1365,7 +1365,7 @@ func (ec *executionContext) field_Collection_objects_args(ctx context.Context, r
 	var arg0 *model.ObjectListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOObjectListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOObjectListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1380,7 +1380,7 @@ func (ec *executionContext) field_ObjectInstance_objectInstanceChecks_args(ctx c
 	var arg0 *model.ObjectInstanceCheckListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOObjectInstanceCheckListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOObjectInstanceCheckListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1395,7 +1395,7 @@ func (ec *executionContext) field_Object_files_args(ctx context.Context, rawArgs
 	var arg0 *model.FileListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOFileListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOFileListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1410,7 +1410,7 @@ func (ec *executionContext) field_Object_objectInstances_args(ctx context.Contex
 	var arg0 *model.ObjectInstanceListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOObjectInstanceListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOObjectInstanceListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1455,7 +1455,7 @@ func (ec *executionContext) field_Query_collections_args(ctx context.Context, ra
 	var arg0 *model.CollectionListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOCollectionListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOCollectionListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1485,7 +1485,7 @@ func (ec *executionContext) field_Query_files_args(ctx context.Context, rawArgs 
 	var arg0 *model.FileListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOFileListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOFileListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1515,7 +1515,7 @@ func (ec *executionContext) field_Query_objectInstanceChecks_args(ctx context.Co
 	var arg0 *model.ObjectInstanceCheckListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOObjectInstanceCheckListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOObjectInstanceCheckListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1545,7 +1545,7 @@ func (ec *executionContext) field_Query_objectInstances_args(ctx context.Context
 	var arg0 *model.ObjectInstanceListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOObjectInstanceListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOObjectInstanceListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1575,7 +1575,7 @@ func (ec *executionContext) field_Query_objects_args(ctx context.Context, rawArg
 	var arg0 *model.ObjectListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOObjectListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOObjectListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1602,10 +1602,10 @@ func (ec *executionContext) field_Query_storageLocation_args(ctx context.Context
 func (ec *executionContext) field_Query_storageLocations_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.StorageLocationListOptions
+	var arg0 *model.StorageLocationListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalNStorageLocationListOptions2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOStorageLocationListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1635,7 +1635,7 @@ func (ec *executionContext) field_Query_storagePartitions_args(ctx context.Conte
 	var arg0 *model.StoragePartitionListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOStoragePartitionListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOStoragePartitionListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1665,7 +1665,7 @@ func (ec *executionContext) field_Query_tenants_args(ctx context.Context, rawArg
 	var arg0 *model.TenantListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOTenantListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOTenantListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1680,7 +1680,7 @@ func (ec *executionContext) field_StorageLocation_storagePartitions_args(ctx con
 	var arg0 *model.StoragePartitionListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOStoragePartitionListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOStoragePartitionListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1695,7 +1695,7 @@ func (ec *executionContext) field_StoragePartition_objectInstances_args(ctx cont
 	var arg0 *model.ObjectInstanceListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOObjectInstanceListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOObjectInstanceListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1710,7 +1710,7 @@ func (ec *executionContext) field_Tenant_collections_args(ctx context.Context, r
 	var arg0 *model.CollectionListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOCollectionListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOCollectionListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1725,7 +1725,7 @@ func (ec *executionContext) field_Tenant_storageLocations_args(ctx context.Conte
 	var arg0 *model.StorageLocationListOptions
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
-		arg0, err = ec.unmarshalOStorageLocationListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx, tmp)
+		arg0, err = ec.unmarshalOStorageLocationListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2152,7 +2152,7 @@ func (ec *executionContext) _Collection_tenant(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.Tenant)
 	fc.Result = res
-	return ec.marshalNTenant2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenant(ctx, field.Selections, res)
+	return ec.marshalNTenant2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenant(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Collection_tenant(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2212,7 +2212,7 @@ func (ec *executionContext) _Collection_objects(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.ObjectList)
 	fc.Result = res
-	return ec.marshalNObjectList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectList(ctx, field.Selections, res)
+	return ec.marshalNObjectList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Collection_objects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2273,7 +2273,7 @@ func (ec *executionContext) _CollectionList_items(ctx context.Context, field gra
 	}
 	res := resTmp.([]*model.Collection)
 	fc.Result = res
-	return ec.marshalNCollection2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionᚄ(ctx, field.Selections, res)
+	return ec.marshalNCollection2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CollectionList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2469,9 +2469,9 @@ func (ec *executionContext) _File_name(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_File_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2823,7 +2823,7 @@ func (ec *executionContext) _File_object(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(*model.Object)
 	fc.Result = res
-	return ec.marshalNObject2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObject(ctx, field.Selections, res)
+	return ec.marshalNObject2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_File_object(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2860,8 +2860,8 @@ func (ec *executionContext) fieldContext_File_object(ctx context.Context, field 
 				return ec.fieldContext_Object_address(ctx, field)
 			case "created":
 				return ec.fieldContext_Object_created(ctx, field)
-			case "lastChanges":
-				return ec.fieldContext_Object_lastChanges(ctx, field)
+			case "lastChanged":
+				return ec.fieldContext_Object_lastChanged(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -2909,7 +2909,7 @@ func (ec *executionContext) _FileList_items(ctx context.Context, field graphql.C
 	}
 	res := resTmp.([]*model.File)
 	fc.Result = res
-	return ec.marshalNFile2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileᚄ(ctx, field.Selections, res)
+	return ec.marshalNFile2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FileList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3195,9 +3195,9 @@ func (ec *executionContext) _Object_title(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Object_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3207,7 +3207,7 @@ func (ec *executionContext) fieldContext_Object_title(ctx context.Context, field
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3565,8 +3565,8 @@ func (ec *executionContext) fieldContext_Object_created(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Object_lastChanges(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Object_lastChanges(ctx, field)
+func (ec *executionContext) _Object_lastChanged(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_lastChanged(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3579,7 +3579,7 @@ func (ec *executionContext) _Object_lastChanges(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastChanges, nil
+		return obj.LastChanged, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3596,7 +3596,7 @@ func (ec *executionContext) _Object_lastChanges(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Object_lastChanges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Object_lastChanged(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Object",
 		Field:      field,
@@ -3725,7 +3725,7 @@ func (ec *executionContext) _Object_collection(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.Collection)
 	fc.Result = res
-	return ec.marshalNCollection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+	return ec.marshalNCollection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Object_collection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3835,7 +3835,7 @@ func (ec *executionContext) _Object_objectInstances(ctx context.Context, field g
 	}
 	res := resTmp.(*model.ObjectInstanceList)
 	fc.Result = res
-	return ec.marshalNObjectInstanceList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx, field.Selections, res)
+	return ec.marshalNObjectInstanceList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Object_objectInstances(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3896,7 +3896,7 @@ func (ec *executionContext) _Object_files(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.FileList)
 	fc.Result = res
-	return ec.marshalNFileList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileList(ctx, field.Selections, res)
+	return ec.marshalNFileList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Object_files(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4221,7 +4221,7 @@ func (ec *executionContext) _ObjectInstance_storagePartition(ctx context.Context
 	}
 	res := resTmp.(*model.StoragePartition)
 	fc.Result = res
-	return ec.marshalNStoragePartition2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartition(ctx, field.Selections, res)
+	return ec.marshalNStoragePartition2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectInstance_storagePartition(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4331,7 +4331,7 @@ func (ec *executionContext) _ObjectInstance_object(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Object)
 	fc.Result = res
-	return ec.marshalNObject2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObject(ctx, field.Selections, res)
+	return ec.marshalNObject2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectInstance_object(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4368,8 +4368,8 @@ func (ec *executionContext) fieldContext_ObjectInstance_object(ctx context.Conte
 				return ec.fieldContext_Object_address(ctx, field)
 			case "created":
 				return ec.fieldContext_Object_created(ctx, field)
-			case "lastChanges":
-				return ec.fieldContext_Object_lastChanges(ctx, field)
+			case "lastChanged":
+				return ec.fieldContext_Object_lastChanged(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -4417,7 +4417,7 @@ func (ec *executionContext) _ObjectInstance_objectInstanceChecks(ctx context.Con
 	}
 	res := resTmp.(*model.ObjectInstanceCheckList)
 	fc.Result = res
-	return ec.marshalNObjectInstanceCheckList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx, field.Selections, res)
+	return ec.marshalNObjectInstanceCheckList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectInstance_objectInstanceChecks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4698,7 +4698,7 @@ func (ec *executionContext) _ObjectInstanceCheck_objectInstance(ctx context.Cont
 	}
 	res := resTmp.(*model.ObjectInstance)
 	fc.Result = res
-	return ec.marshalNObjectInstance2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstance(ctx, field.Selections, res)
+	return ec.marshalNObjectInstance2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstance(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectInstanceCheck_objectInstance(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4764,7 +4764,7 @@ func (ec *executionContext) _ObjectInstanceCheckList_items(ctx context.Context, 
 	}
 	res := resTmp.([]*model.ObjectInstanceCheck)
 	fc.Result = res
-	return ec.marshalNObjectInstanceCheck2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckᚄ(ctx, field.Selections, res)
+	return ec.marshalNObjectInstanceCheck2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectInstanceCheckList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4866,7 +4866,7 @@ func (ec *executionContext) _ObjectInstanceList_items(ctx context.Context, field
 	}
 	res := resTmp.([]*model.ObjectInstance)
 	fc.Result = res
-	return ec.marshalNObjectInstance2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceᚄ(ctx, field.Selections, res)
+	return ec.marshalNObjectInstance2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectInstanceList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4976,7 +4976,7 @@ func (ec *executionContext) _ObjectList_items(ctx context.Context, field graphql
 	}
 	res := resTmp.([]*model.Object)
 	fc.Result = res
-	return ec.marshalNObject2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectᚄ(ctx, field.Selections, res)
+	return ec.marshalNObject2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5013,8 +5013,8 @@ func (ec *executionContext) fieldContext_ObjectList_items(ctx context.Context, f
 				return ec.fieldContext_Object_address(ctx, field)
 			case "created":
 				return ec.fieldContext_Object_created(ctx, field)
-			case "lastChanges":
-				return ec.fieldContext_Object_lastChanges(ctx, field)
+			case "lastChanged":
+				return ec.fieldContext_Object_lastChanged(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -5106,7 +5106,7 @@ func (ec *executionContext) _Query_tenants(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.TenantList)
 	fc.Result = res
-	return ec.marshalNTenantList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantList(ctx, field.Selections, res)
+	return ec.marshalNTenantList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_tenants(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5164,7 +5164,7 @@ func (ec *executionContext) _Query_tenant(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.Tenant)
 	fc.Result = res
-	return ec.marshalOTenant2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenant(ctx, field.Selections, res)
+	return ec.marshalOTenant2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenant(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_tenant(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5235,7 +5235,7 @@ func (ec *executionContext) _Query_collections(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.CollectionList)
 	fc.Result = res
-	return ec.marshalNCollectionList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionList(ctx, field.Selections, res)
+	return ec.marshalNCollectionList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_collections(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5293,7 +5293,7 @@ func (ec *executionContext) _Query_collection(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.Collection)
 	fc.Result = res
-	return ec.marshalOCollection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+	return ec.marshalOCollection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_collection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5370,7 +5370,7 @@ func (ec *executionContext) _Query_objects(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.ObjectList)
 	fc.Result = res
-	return ec.marshalNObjectList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectList(ctx, field.Selections, res)
+	return ec.marshalNObjectList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_objects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5428,7 +5428,7 @@ func (ec *executionContext) _Query_object(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.Object)
 	fc.Result = res
-	return ec.marshalOObject2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObject(ctx, field.Selections, res)
+	return ec.marshalOObject2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_object(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5465,8 +5465,8 @@ func (ec *executionContext) fieldContext_Query_object(ctx context.Context, field
 				return ec.fieldContext_Object_address(ctx, field)
 			case "created":
 				return ec.fieldContext_Object_created(ctx, field)
-			case "lastChanges":
-				return ec.fieldContext_Object_lastChanges(ctx, field)
+			case "lastChanged":
+				return ec.fieldContext_Object_lastChanged(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -5525,7 +5525,7 @@ func (ec *executionContext) _Query_objectInstances(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.ObjectInstanceList)
 	fc.Result = res
-	return ec.marshalNObjectInstanceList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx, field.Selections, res)
+	return ec.marshalNObjectInstanceList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_objectInstances(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5583,7 +5583,7 @@ func (ec *executionContext) _Query_objectInstance(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.ObjectInstance)
 	fc.Result = res
-	return ec.marshalOObjectInstance2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstance(ctx, field.Selections, res)
+	return ec.marshalOObjectInstance2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstance(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_objectInstance(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5660,7 +5660,7 @@ func (ec *executionContext) _Query_objectInstanceChecks(ctx context.Context, fie
 	}
 	res := resTmp.(*model.ObjectInstanceCheckList)
 	fc.Result = res
-	return ec.marshalNObjectInstanceCheckList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx, field.Selections, res)
+	return ec.marshalNObjectInstanceCheckList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_objectInstanceChecks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5718,7 +5718,7 @@ func (ec *executionContext) _Query_objectInstanceCheck(ctx context.Context, fiel
 	}
 	res := resTmp.(*model.ObjectInstanceCheck)
 	fc.Result = res
-	return ec.marshalOObjectInstanceCheck2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx, field.Selections, res)
+	return ec.marshalOObjectInstanceCheck2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_objectInstanceCheck(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5787,7 +5787,7 @@ func (ec *executionContext) _Query_files(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(*model.FileList)
 	fc.Result = res
-	return ec.marshalNFileList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileList(ctx, field.Selections, res)
+	return ec.marshalNFileList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_files(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5845,7 +5845,7 @@ func (ec *executionContext) _Query_file(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(*model.File)
 	fc.Result = res
-	return ec.marshalOFile2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFile(ctx, field.Selections, res)
+	return ec.marshalOFile2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_file(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5910,7 +5910,7 @@ func (ec *executionContext) _Query_storageLocations(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().StorageLocations(rctx, fc.Args["options"].(model.StorageLocationListOptions))
+		return ec.resolvers.Query().StorageLocations(rctx, fc.Args["options"].(*model.StorageLocationListOptions))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5924,7 +5924,7 @@ func (ec *executionContext) _Query_storageLocations(ctx context.Context, field g
 	}
 	res := resTmp.(*model.StorageLocationList)
 	fc.Result = res
-	return ec.marshalNStorageLocationList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationList(ctx, field.Selections, res)
+	return ec.marshalNStorageLocationList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_storageLocations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5982,7 +5982,7 @@ func (ec *executionContext) _Query_storageLocation(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.StorageLocation)
 	fc.Result = res
-	return ec.marshalOStorageLocation2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocation(ctx, field.Selections, res)
+	return ec.marshalOStorageLocation2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_storageLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6067,7 +6067,7 @@ func (ec *executionContext) _Query_storagePartitions(ctx context.Context, field 
 	}
 	res := resTmp.(*model.StoragePartitionList)
 	fc.Result = res
-	return ec.marshalNStoragePartitionList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx, field.Selections, res)
+	return ec.marshalNStoragePartitionList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_storagePartitions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6125,7 +6125,7 @@ func (ec *executionContext) _Query_storagePartition(ctx context.Context, field g
 	}
 	res := resTmp.(*model.StoragePartition)
 	fc.Result = res
-	return ec.marshalOStoragePartition2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartition(ctx, field.Selections, res)
+	return ec.marshalOStoragePartition2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_storagePartition(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6815,7 +6815,7 @@ func (ec *executionContext) _StorageLocation_tenant(ctx context.Context, field g
 	}
 	res := resTmp.(*model.Tenant)
 	fc.Result = res
-	return ec.marshalNTenant2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenant(ctx, field.Selections, res)
+	return ec.marshalNTenant2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenant(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StorageLocation_tenant(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6919,7 +6919,7 @@ func (ec *executionContext) _StorageLocation_storagePartitions(ctx context.Conte
 	}
 	res := resTmp.(*model.StoragePartitionList)
 	fc.Result = res
-	return ec.marshalNStoragePartitionList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx, field.Selections, res)
+	return ec.marshalNStoragePartitionList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StorageLocation_storagePartitions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6980,7 +6980,7 @@ func (ec *executionContext) _StorageLocationList_items(ctx context.Context, fiel
 	}
 	res := resTmp.([]*model.StorageLocation)
 	fc.Result = res
-	return ec.marshalNStorageLocation2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationᚄ(ctx, field.Selections, res)
+	return ec.marshalNStorageLocation2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StorageLocationList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7450,7 +7450,7 @@ func (ec *executionContext) _StoragePartition_storageLocation(ctx context.Contex
 	}
 	res := resTmp.(*model.StorageLocation)
 	fc.Result = res
-	return ec.marshalNStorageLocation2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocation(ctx, field.Selections, res)
+	return ec.marshalNStorageLocation2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StoragePartition_storageLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7524,7 +7524,7 @@ func (ec *executionContext) _StoragePartition_objectInstances(ctx context.Contex
 	}
 	res := resTmp.(*model.ObjectInstanceList)
 	fc.Result = res
-	return ec.marshalNObjectInstanceList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx, field.Selections, res)
+	return ec.marshalNObjectInstanceList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StoragePartition_objectInstances(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7585,7 +7585,7 @@ func (ec *executionContext) _StoragePartitionList_items(ctx context.Context, fie
 	}
 	res := resTmp.([]*model.StoragePartition)
 	fc.Result = res
-	return ec.marshalNStoragePartition2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionᚄ(ctx, field.Selections, res)
+	return ec.marshalNStoragePartition2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StoragePartitionList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7915,7 +7915,7 @@ func (ec *executionContext) _Tenant_collections(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.CollectionList)
 	fc.Result = res
-	return ec.marshalNCollectionList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionList(ctx, field.Selections, res)
+	return ec.marshalNCollectionList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Tenant_collections(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7976,7 +7976,7 @@ func (ec *executionContext) _Tenant_storageLocations(ctx context.Context, field 
 	}
 	res := resTmp.(*model.StorageLocationList)
 	fc.Result = res
-	return ec.marshalNStorageLocationList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationList(ctx, field.Selections, res)
+	return ec.marshalNStorageLocationList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Tenant_storageLocations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8037,7 +8037,7 @@ func (ec *executionContext) _TenantList_items(ctx context.Context, field graphql
 	}
 	res := resTmp.([]*model.Tenant)
 	fc.Result = res
-	return ec.marshalNTenant2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantᚄ(ctx, field.Selections, res)
+	return ec.marshalNTenant2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TenantList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9931,7 +9931,7 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9940,7 +9940,7 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOCollectionSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionSortKey(ctx, v)
+			data, err := ec.unmarshalOCollectionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9996,7 +9996,7 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10005,7 +10005,7 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOFileSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileSortKey(ctx, v)
+			data, err := ec.unmarshalOFileSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10023,22 +10023,22 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ObjectId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"ObjectInstanceId", "skip", "take", "sortDirection", "sortKey"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "ObjectId":
+		case "ObjectInstanceId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ObjectId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ObjectInstanceId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ObjectID = data
+			it.ObjectInstanceID = data
 		case "skip":
 			var err error
 
@@ -10061,7 +10061,7 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10070,7 +10070,7 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOObjectInstanceCheckSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckSortKey(ctx, v)
+			data, err := ec.unmarshalOObjectInstanceCheckSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10126,7 +10126,7 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10135,7 +10135,7 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOObjectInstanceSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceSortKey(ctx, v)
+			data, err := ec.unmarshalOObjectInstanceSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10191,7 +10191,7 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10200,7 +10200,7 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOObjectSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectSortKey(ctx, v)
+			data, err := ec.unmarshalOObjectSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10256,7 +10256,7 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10265,7 +10265,7 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOStorageLocationSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationSortKey(ctx, v)
+			data, err := ec.unmarshalOStorageLocationSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10321,7 +10321,7 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10330,7 +10330,7 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOStoragePartitionSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionSortKey(ctx, v)
+			data, err := ec.unmarshalOStoragePartitionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10377,7 +10377,7 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
-			data, err := ec.unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10386,7 +10386,7 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
-			data, err := ec.unmarshalOTenantSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantSortKey(ctx, v)
+			data, err := ec.unmarshalOTenantSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantSortKey(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10903,8 +10903,8 @@ func (ec *executionContext) _Object(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "lastChanges":
-			out.Values[i] = ec._Object_lastChanges(ctx, field, obj)
+		case "lastChanged":
+			out.Values[i] = ec._Object_lastChanged(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -12566,7 +12566,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCollection2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Collection) graphql.Marshaler {
+func (ec *executionContext) marshalNCollection2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Collection) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -12590,7 +12590,7 @@ func (ec *executionContext) marshalNCollection2ᚕᚖdlzaᚑmanagerᚋpkgᚋcler
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCollection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollection(ctx, sel, v[i])
+			ret[i] = ec.marshalNCollection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -12610,7 +12610,7 @@ func (ec *executionContext) marshalNCollection2ᚕᚖdlzaᚑmanagerᚋpkgᚋcler
 	return ret
 }
 
-func (ec *executionContext) marshalNCollection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v *model.Collection) graphql.Marshaler {
+func (ec *executionContext) marshalNCollection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v *model.Collection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12620,11 +12620,11 @@ func (ec *executionContext) marshalNCollection2ᚖdlzaᚑmanagerᚋpkgᚋclerk�
 	return ec._Collection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCollectionList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionList(ctx context.Context, sel ast.SelectionSet, v model.CollectionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCollectionList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionList(ctx context.Context, sel ast.SelectionSet, v model.CollectionList) graphql.Marshaler {
 	return ec._CollectionList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCollectionList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionList(ctx context.Context, sel ast.SelectionSet, v *model.CollectionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCollectionList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionList(ctx context.Context, sel ast.SelectionSet, v *model.CollectionList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12634,7 +12634,7 @@ func (ec *executionContext) marshalNCollectionList2ᚖdlzaᚑmanagerᚋpkgᚋcle
 	return ec._CollectionList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFile2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.File) graphql.Marshaler {
+func (ec *executionContext) marshalNFile2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.File) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -12658,7 +12658,7 @@ func (ec *executionContext) marshalNFile2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgr
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNFile2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFile(ctx, sel, v[i])
+			ret[i] = ec.marshalNFile2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFile(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -12678,7 +12678,7 @@ func (ec *executionContext) marshalNFile2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgr
 	return ret
 }
 
-func (ec *executionContext) marshalNFile2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v *model.File) graphql.Marshaler {
+func (ec *executionContext) marshalNFile2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v *model.File) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12688,11 +12688,11 @@ func (ec *executionContext) marshalNFile2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraph
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFileList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileList(ctx context.Context, sel ast.SelectionSet, v model.FileList) graphql.Marshaler {
+func (ec *executionContext) marshalNFileList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileList(ctx context.Context, sel ast.SelectionSet, v model.FileList) graphql.Marshaler {
 	return ec._FileList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNFileList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileList(ctx context.Context, sel ast.SelectionSet, v *model.FileList) graphql.Marshaler {
+func (ec *executionContext) marshalNFileList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileList(ctx context.Context, sel ast.SelectionSet, v *model.FileList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12732,7 +12732,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNObject2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Object) graphql.Marshaler {
+func (ec *executionContext) marshalNObject2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Object) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -12756,7 +12756,7 @@ func (ec *executionContext) marshalNObject2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNObject2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObject(ctx, sel, v[i])
+			ret[i] = ec.marshalNObject2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObject(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -12776,7 +12776,7 @@ func (ec *executionContext) marshalNObject2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNObject2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObject(ctx context.Context, sel ast.SelectionSet, v *model.Object) graphql.Marshaler {
+func (ec *executionContext) marshalNObject2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObject(ctx context.Context, sel ast.SelectionSet, v *model.Object) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12786,7 +12786,7 @@ func (ec *executionContext) marshalNObject2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgra
 	return ec._Object(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNObjectInstance2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ObjectInstance) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstance2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ObjectInstance) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -12810,7 +12810,7 @@ func (ec *executionContext) marshalNObjectInstance2ᚕᚖdlzaᚑmanagerᚋpkgᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNObjectInstance2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstance(ctx, sel, v[i])
+			ret[i] = ec.marshalNObjectInstance2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstance(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -12830,7 +12830,7 @@ func (ec *executionContext) marshalNObjectInstance2ᚕᚖdlzaᚑmanagerᚋpkgᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNObjectInstance2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstance(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstance) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstance2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstance(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstance) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12840,7 +12840,7 @@ func (ec *executionContext) marshalNObjectInstance2ᚖdlzaᚑmanagerᚋpkgᚋcle
 	return ec._ObjectInstance(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNObjectInstanceCheck2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ObjectInstanceCheck) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstanceCheck2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ObjectInstanceCheck) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -12864,7 +12864,7 @@ func (ec *executionContext) marshalNObjectInstanceCheck2ᚕᚖdlzaᚑmanagerᚋp
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNObjectInstanceCheck2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx, sel, v[i])
+			ret[i] = ec.marshalNObjectInstanceCheck2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -12884,7 +12884,7 @@ func (ec *executionContext) marshalNObjectInstanceCheck2ᚕᚖdlzaᚑmanagerᚋp
 	return ret
 }
 
-func (ec *executionContext) marshalNObjectInstanceCheck2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheck) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstanceCheck2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheck) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12894,11 +12894,11 @@ func (ec *executionContext) marshalNObjectInstanceCheck2ᚖdlzaᚑmanagerᚋpkg�
 	return ec._ObjectInstanceCheck(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNObjectInstanceCheckList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx context.Context, sel ast.SelectionSet, v model.ObjectInstanceCheckList) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstanceCheckList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx context.Context, sel ast.SelectionSet, v model.ObjectInstanceCheckList) graphql.Marshaler {
 	return ec._ObjectInstanceCheckList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNObjectInstanceCheckList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheckList) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstanceCheckList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckList(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheckList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12908,11 +12908,11 @@ func (ec *executionContext) marshalNObjectInstanceCheckList2ᚖdlzaᚑmanagerᚋ
 	return ec._ObjectInstanceCheckList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNObjectInstanceList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx context.Context, sel ast.SelectionSet, v model.ObjectInstanceList) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstanceList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx context.Context, sel ast.SelectionSet, v model.ObjectInstanceList) graphql.Marshaler {
 	return ec._ObjectInstanceList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNObjectInstanceList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceList) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectInstanceList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceList(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12922,11 +12922,11 @@ func (ec *executionContext) marshalNObjectInstanceList2ᚖdlzaᚑmanagerᚋpkg�
 	return ec._ObjectInstanceList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNObjectList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectList(ctx context.Context, sel ast.SelectionSet, v model.ObjectList) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectList(ctx context.Context, sel ast.SelectionSet, v model.ObjectList) graphql.Marshaler {
 	return ec._ObjectList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNObjectList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectList(ctx context.Context, sel ast.SelectionSet, v *model.ObjectList) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectList(ctx context.Context, sel ast.SelectionSet, v *model.ObjectList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12936,7 +12936,7 @@ func (ec *executionContext) marshalNObjectList2ᚖdlzaᚑmanagerᚋpkgᚋclerk�
 	return ec._ObjectList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNStorageLocation2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.StorageLocation) graphql.Marshaler {
+func (ec *executionContext) marshalNStorageLocation2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.StorageLocation) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -12960,7 +12960,7 @@ func (ec *executionContext) marshalNStorageLocation2ᚕᚖdlzaᚑmanagerᚋpkg�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNStorageLocation2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocation(ctx, sel, v[i])
+			ret[i] = ec.marshalNStorageLocation2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -12980,7 +12980,7 @@ func (ec *executionContext) marshalNStorageLocation2ᚕᚖdlzaᚑmanagerᚋpkg�
 	return ret
 }
 
-func (ec *executionContext) marshalNStorageLocation2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocation(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocation) graphql.Marshaler {
+func (ec *executionContext) marshalNStorageLocation2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocation) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -12990,11 +12990,11 @@ func (ec *executionContext) marshalNStorageLocation2ᚖdlzaᚑmanagerᚋpkgᚋcl
 	return ec._StorageLocation(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNStorageLocationList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationList(ctx context.Context, sel ast.SelectionSet, v model.StorageLocationList) graphql.Marshaler {
+func (ec *executionContext) marshalNStorageLocationList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationList(ctx context.Context, sel ast.SelectionSet, v model.StorageLocationList) graphql.Marshaler {
 	return ec._StorageLocationList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNStorageLocationList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationList(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocationList) graphql.Marshaler {
+func (ec *executionContext) marshalNStorageLocationList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationList(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocationList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -13004,12 +13004,7 @@ func (ec *executionContext) marshalNStorageLocationList2ᚖdlzaᚑmanagerᚋpkg�
 	return ec._StorageLocationList(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNStorageLocationListOptions2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx context.Context, v interface{}) (model.StorageLocationListOptions, error) {
-	res, err := ec.unmarshalInputStorageLocationListOptions(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNStoragePartition2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.StoragePartition) graphql.Marshaler {
+func (ec *executionContext) marshalNStoragePartition2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.StoragePartition) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -13033,7 +13028,7 @@ func (ec *executionContext) marshalNStoragePartition2ᚕᚖdlzaᚑmanagerᚋpkg�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNStoragePartition2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartition(ctx, sel, v[i])
+			ret[i] = ec.marshalNStoragePartition2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -13053,7 +13048,7 @@ func (ec *executionContext) marshalNStoragePartition2ᚕᚖdlzaᚑmanagerᚋpkg�
 	return ret
 }
 
-func (ec *executionContext) marshalNStoragePartition2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartition(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartition) graphql.Marshaler {
+func (ec *executionContext) marshalNStoragePartition2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartition) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -13063,11 +13058,11 @@ func (ec *executionContext) marshalNStoragePartition2ᚖdlzaᚑmanagerᚋpkgᚋc
 	return ec._StoragePartition(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNStoragePartitionList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx context.Context, sel ast.SelectionSet, v model.StoragePartitionList) graphql.Marshaler {
+func (ec *executionContext) marshalNStoragePartitionList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx context.Context, sel ast.SelectionSet, v model.StoragePartitionList) graphql.Marshaler {
 	return ec._StoragePartitionList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNStoragePartitionList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartitionList) graphql.Marshaler {
+func (ec *executionContext) marshalNStoragePartitionList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionList(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartitionList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -13124,7 +13119,7 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) marshalNTenant2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Tenant) graphql.Marshaler {
+func (ec *executionContext) marshalNTenant2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Tenant) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -13148,7 +13143,7 @@ func (ec *executionContext) marshalNTenant2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTenant2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenant(ctx, sel, v[i])
+			ret[i] = ec.marshalNTenant2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenant(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -13168,7 +13163,7 @@ func (ec *executionContext) marshalNTenant2ᚕᚖdlzaᚑmanagerᚋpkgᚋclerkᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNTenant2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenant(ctx context.Context, sel ast.SelectionSet, v *model.Tenant) graphql.Marshaler {
+func (ec *executionContext) marshalNTenant2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenant(ctx context.Context, sel ast.SelectionSet, v *model.Tenant) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -13178,11 +13173,11 @@ func (ec *executionContext) marshalNTenant2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgra
 	return ec._Tenant(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNTenantList2dlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantList(ctx context.Context, sel ast.SelectionSet, v model.TenantList) graphql.Marshaler {
+func (ec *executionContext) marshalNTenantList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantList(ctx context.Context, sel ast.SelectionSet, v model.TenantList) graphql.Marshaler {
 	return ec._TenantList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNTenantList2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantList(ctx context.Context, sel ast.SelectionSet, v *model.TenantList) graphql.Marshaler {
+func (ec *executionContext) marshalNTenantList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantList(ctx context.Context, sel ast.SelectionSet, v *model.TenantList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -13471,14 +13466,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOCollection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v *model.Collection) graphql.Marshaler {
+func (ec *executionContext) marshalOCollection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v *model.Collection) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Collection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOCollectionListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionListOptions(ctx context.Context, v interface{}) (*model.CollectionListOptions, error) {
+func (ec *executionContext) unmarshalOCollectionListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionListOptions(ctx context.Context, v interface{}) (*model.CollectionListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13486,7 +13481,7 @@ func (ec *executionContext) unmarshalOCollectionListOptions2ᚖdlzaᚑmanagerᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOCollectionSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionSortKey(ctx context.Context, v interface{}) (*model.CollectionSortKey, error) {
+func (ec *executionContext) unmarshalOCollectionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionSortKey(ctx context.Context, v interface{}) (*model.CollectionSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13495,21 +13490,21 @@ func (ec *executionContext) unmarshalOCollectionSortKey2ᚖdlzaᚑmanagerᚋpkg�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOCollectionSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐCollectionSortKey(ctx context.Context, sel ast.SelectionSet, v *model.CollectionSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOCollectionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionSortKey(ctx context.Context, sel ast.SelectionSet, v *model.CollectionSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOFile2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v *model.File) graphql.Marshaler {
+func (ec *executionContext) marshalOFile2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v *model.File) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOFileListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileListOptions(ctx context.Context, v interface{}) (*model.FileListOptions, error) {
+func (ec *executionContext) unmarshalOFileListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileListOptions(ctx context.Context, v interface{}) (*model.FileListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13517,7 +13512,7 @@ func (ec *executionContext) unmarshalOFileListOptions2ᚖdlzaᚑmanagerᚋpkgᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOFileSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileSortKey(ctx context.Context, v interface{}) (*model.FileSortKey, error) {
+func (ec *executionContext) unmarshalOFileSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileSortKey(ctx context.Context, v interface{}) (*model.FileSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13526,7 +13521,7 @@ func (ec *executionContext) unmarshalOFileSortKey2ᚖdlzaᚑmanagerᚋpkgᚋcler
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOFileSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐFileSortKey(ctx context.Context, sel ast.SelectionSet, v *model.FileSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOFileSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileSortKey(ctx context.Context, sel ast.SelectionSet, v *model.FileSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -13565,28 +13560,28 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOObject2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObject(ctx context.Context, sel ast.SelectionSet, v *model.Object) graphql.Marshaler {
+func (ec *executionContext) marshalOObject2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObject(ctx context.Context, sel ast.SelectionSet, v *model.Object) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Object(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOObjectInstance2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstance(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstance) graphql.Marshaler {
+func (ec *executionContext) marshalOObjectInstance2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstance(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstance) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ObjectInstance(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOObjectInstanceCheck2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheck) graphql.Marshaler {
+func (ec *executionContext) marshalOObjectInstanceCheck2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheck(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheck) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ObjectInstanceCheck(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOObjectInstanceCheckListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckListOptions(ctx context.Context, v interface{}) (*model.ObjectInstanceCheckListOptions, error) {
+func (ec *executionContext) unmarshalOObjectInstanceCheckListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckListOptions(ctx context.Context, v interface{}) (*model.ObjectInstanceCheckListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13594,7 +13589,7 @@ func (ec *executionContext) unmarshalOObjectInstanceCheckListOptions2ᚖdlzaᚑm
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOObjectInstanceCheckSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckSortKey(ctx context.Context, v interface{}) (*model.ObjectInstanceCheckSortKey, error) {
+func (ec *executionContext) unmarshalOObjectInstanceCheckSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckSortKey(ctx context.Context, v interface{}) (*model.ObjectInstanceCheckSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13603,14 +13598,14 @@ func (ec *executionContext) unmarshalOObjectInstanceCheckSortKey2ᚖdlzaᚑmanag
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOObjectInstanceCheckSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceCheckSortKey(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheckSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOObjectInstanceCheckSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckSortKey(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceCheckSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOObjectInstanceListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx context.Context, v interface{}) (*model.ObjectInstanceListOptions, error) {
+func (ec *executionContext) unmarshalOObjectInstanceListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceListOptions(ctx context.Context, v interface{}) (*model.ObjectInstanceListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13618,7 +13613,7 @@ func (ec *executionContext) unmarshalOObjectInstanceListOptions2ᚖdlzaᚑmanage
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOObjectInstanceSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceSortKey(ctx context.Context, v interface{}) (*model.ObjectInstanceSortKey, error) {
+func (ec *executionContext) unmarshalOObjectInstanceSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceSortKey(ctx context.Context, v interface{}) (*model.ObjectInstanceSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13627,14 +13622,14 @@ func (ec *executionContext) unmarshalOObjectInstanceSortKey2ᚖdlzaᚑmanagerᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOObjectInstanceSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectInstanceSortKey(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOObjectInstanceSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceSortKey(ctx context.Context, sel ast.SelectionSet, v *model.ObjectInstanceSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOObjectListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectListOptions(ctx context.Context, v interface{}) (*model.ObjectListOptions, error) {
+func (ec *executionContext) unmarshalOObjectListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectListOptions(ctx context.Context, v interface{}) (*model.ObjectListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13642,7 +13637,7 @@ func (ec *executionContext) unmarshalOObjectListOptions2ᚖdlzaᚑmanagerᚋpkg�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOObjectSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectSortKey(ctx context.Context, v interface{}) (*model.ObjectSortKey, error) {
+func (ec *executionContext) unmarshalOObjectSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectSortKey(ctx context.Context, v interface{}) (*model.ObjectSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13651,14 +13646,14 @@ func (ec *executionContext) unmarshalOObjectSortKey2ᚖdlzaᚑmanagerᚋpkgᚋcl
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOObjectSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐObjectSortKey(ctx context.Context, sel ast.SelectionSet, v *model.ObjectSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOObjectSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectSortKey(ctx context.Context, sel ast.SelectionSet, v *model.ObjectSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx context.Context, v interface{}) (*model.SortDirection, error) {
+func (ec *executionContext) unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx context.Context, v interface{}) (*model.SortDirection, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13667,21 +13662,21 @@ func (ec *executionContext) unmarshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋcl
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOSortDirection2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐSortDirection(ctx context.Context, sel ast.SelectionSet, v *model.SortDirection) graphql.Marshaler {
+func (ec *executionContext) marshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx context.Context, sel ast.SelectionSet, v *model.SortDirection) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOStorageLocation2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocation(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocation) graphql.Marshaler {
+func (ec *executionContext) marshalOStorageLocation2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocation) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._StorageLocation(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOStorageLocationListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx context.Context, v interface{}) (*model.StorageLocationListOptions, error) {
+func (ec *executionContext) unmarshalOStorageLocationListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx context.Context, v interface{}) (*model.StorageLocationListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13689,7 +13684,7 @@ func (ec *executionContext) unmarshalOStorageLocationListOptions2ᚖdlzaᚑmanag
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOStorageLocationSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationSortKey(ctx context.Context, v interface{}) (*model.StorageLocationSortKey, error) {
+func (ec *executionContext) unmarshalOStorageLocationSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationSortKey(ctx context.Context, v interface{}) (*model.StorageLocationSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13698,21 +13693,21 @@ func (ec *executionContext) unmarshalOStorageLocationSortKey2ᚖdlzaᚑmanager�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOStorageLocationSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStorageLocationSortKey(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocationSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOStorageLocationSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationSortKey(ctx context.Context, sel ast.SelectionSet, v *model.StorageLocationSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOStoragePartition2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartition(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartition) graphql.Marshaler {
+func (ec *executionContext) marshalOStoragePartition2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartition) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._StoragePartition(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOStoragePartitionListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionListOptions(ctx context.Context, v interface{}) (*model.StoragePartitionListOptions, error) {
+func (ec *executionContext) unmarshalOStoragePartitionListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionListOptions(ctx context.Context, v interface{}) (*model.StoragePartitionListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13720,7 +13715,7 @@ func (ec *executionContext) unmarshalOStoragePartitionListOptions2ᚖdlzaᚑmana
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOStoragePartitionSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionSortKey(ctx context.Context, v interface{}) (*model.StoragePartitionSortKey, error) {
+func (ec *executionContext) unmarshalOStoragePartitionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionSortKey(ctx context.Context, v interface{}) (*model.StoragePartitionSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13729,7 +13724,7 @@ func (ec *executionContext) unmarshalOStoragePartitionSortKey2ᚖdlzaᚑmanager�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOStoragePartitionSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐStoragePartitionSortKey(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartitionSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOStoragePartitionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionSortKey(ctx context.Context, sel ast.SelectionSet, v *model.StoragePartitionSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -13752,14 +13747,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOTenant2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenant(ctx context.Context, sel ast.SelectionSet, v *model.Tenant) graphql.Marshaler {
+func (ec *executionContext) marshalOTenant2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenant(ctx context.Context, sel ast.SelectionSet, v *model.Tenant) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Tenant(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOTenantListOptions2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantListOptions(ctx context.Context, v interface{}) (*model.TenantListOptions, error) {
+func (ec *executionContext) unmarshalOTenantListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantListOptions(ctx context.Context, v interface{}) (*model.TenantListOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13767,7 +13762,7 @@ func (ec *executionContext) unmarshalOTenantListOptions2ᚖdlzaᚑmanagerᚋpkg�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOTenantSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantSortKey(ctx context.Context, v interface{}) (*model.TenantSortKey, error) {
+func (ec *executionContext) unmarshalOTenantSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantSortKey(ctx context.Context, v interface{}) (*model.TenantSortKey, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -13776,7 +13771,7 @@ func (ec *executionContext) unmarshalOTenantSortKey2ᚖdlzaᚑmanagerᚋpkgᚋcl
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOTenantSortKey2ᚖdlzaᚑmanagerᚋpkgᚋclerkᚋgraphᚋmodelᚐTenantSortKey(ctx context.Context, sel ast.SelectionSet, v *model.TenantSortKey) graphql.Marshaler {
+func (ec *executionContext) marshalOTenantSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantSortKey(ctx context.Context, sel ast.SelectionSet, v *model.TenantSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

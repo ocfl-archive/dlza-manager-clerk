@@ -37,13 +37,28 @@ service ClerkHandlerService {
   rpc DeleteStorageLocationById(Id) returns (Status){};
 
   rpc GetCollectionsByTenantId(Id) returns (Collections){};
+  rpc GetCollectionById(Id) returns (Collection){};
   rpc DeleteCollectionById(Id) returns (Status){};
   rpc CreateCollection(Collection) returns (Status){};
   rpc UpdateCollection(Collection) returns (Status){};
 
-  rpc GetStorageLocationsByTenantIdPaginated(Pagination) returns (StorageLocations){};
-  rpc GetCollectionsByTenantIdPaginated(Pagination) returns (Collections){};
+  rpc GetObjectById(Id) returns (Object){};
+  rpc GetObjectInstanceById(Id) returns (ObjectInstance){};
+  rpc GetFileById(Id) returns (File){};
+  rpc GetObjectInstanceCheckById(Id) returns (ObjectInstanceCheck){};
+  rpc GetStorageLocationById(Id) returns (StorageLocation){};
+  rpc GetStoragePartitionById(Id) returns (StoragePartition){};
+
   rpc FindAllTenantsPaginated(Pagination) returns (Tenants){};
+  rpc GetCollectionsByTenantIdPaginated(Pagination) returns (Collections){};
+  rpc GetObjectsByCollectionIdPaginated(Pagination) returns (Objects){}
+  rpc GetObjectInstancesByObjectIdPaginated(Pagination) returns (ObjectInstances){}
+  rpc GetFilesByObjectIdPaginated(Pagination) returns (Files){}
+  rpc GetObjectInstanceChecksByObjectInstanceIdPaginated(Pagination) returns (ObjectInstanceChecks){}
+
+  rpc GetStorageLocationsByTenantIdPaginated(Pagination) returns (StorageLocations){};
+  rpc GetStoragePartitionsByLocationIdPaginated(Pagination) returns (StoragePartitions){}
+  rpc GetObjectInstancesByStoragePartitionIdPaginated(Pagination) returns (ObjectInstances){}
 }
 
 service DispatcherHandlerService {
@@ -62,6 +77,7 @@ message Pagination {
   int32 Take = 3;
   string SortDirection = 4;
   string SortKey = 5;
+  repeated string AllowedTenants = 6;
 }
 
 message ObjectPath {
@@ -217,4 +233,21 @@ message File {
   int64  Duration = 8;
   string Id = 9;
   string ObjectId = 10;
+}
+
+message Files {
+  repeated File Files = 1;
+}
+
+message ObjectInstanceCheck {
+  string CheckTime = 1;
+  bool Error = 2;
+  string Message = 3;
+  string Id = 4;
+  string ObjectInstanceId = 5;
+}
+
+message ObjectInstanceChecks {
+  repeated ObjectInstanceCheck ObjectInstanceChecks = 1;
+
 }

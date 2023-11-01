@@ -98,7 +98,7 @@ input ObjectInstanceListOptions {
   sortKey: ObjectInstanceSortKey
 }
 input ObjectInstanceCheckListOptions {
-  ObjectId: ID
+  ObjectInstanceId: ID
   skip: Int
   take: Int
   sortDirection: SortDirection
@@ -196,7 +196,7 @@ type Object implements Node {
   signature: String!
   sets: [String!]!
   identifiers: [String!]!
-  title: Int!
+  title: String!
   alternativeTitles: [String!]!
   description: String!
   keywords: [String!]!
@@ -205,7 +205,7 @@ type Object implements Node {
   user: String!
   address: String!
   created: String!
-  lastChanges: String!
+  lastChanged: String!
   size: Int!
   collectionId: ID!
   collection: Collection!
@@ -228,7 +228,7 @@ type ObjectInstance implements Node {
 type File implements Node {
   id: ID!
   checksum: String!
-  name: String!
+  name: [String!]!
   mimetype: String!
   size: Int!
   pronom: String!
@@ -266,7 +266,7 @@ type Query {
   files(options: FileListOptions): FileList!
   file(id: ID!): File
 
-  storageLocations(options: StorageLocationListOptions!): StorageLocationList!
+  storageLocations(options: StorageLocationListOptions): StorageLocationList!
   storageLocation(id: ID!): StorageLocation
 
   storagePartitions(options: StoragePartitionListOptions): StoragePartitionList!

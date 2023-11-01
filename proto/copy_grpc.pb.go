@@ -631,12 +631,25 @@ type ClerkHandlerServiceClient interface {
 	SaveStorageLocation(ctx context.Context, in *StorageLocation, opts ...grpc.CallOption) (*Status, error)
 	DeleteStorageLocationById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error)
 	GetCollectionsByTenantId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Collections, error)
+	GetCollectionById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Collection, error)
 	DeleteCollectionById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error)
 	CreateCollection(ctx context.Context, in *Collection, opts ...grpc.CallOption) (*Status, error)
 	UpdateCollection(ctx context.Context, in *Collection, opts ...grpc.CallOption) (*Status, error)
-	GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error)
-	GetCollectionsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Collections, error)
+	GetObjectById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Object, error)
+	GetObjectInstanceById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectInstance, error)
+	GetFileById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*File, error)
+	GetObjectInstanceCheckById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectInstanceCheck, error)
+	GetStorageLocationById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StorageLocation, error)
+	GetStoragePartitionById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StoragePartition, error)
 	FindAllTenantsPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Tenants, error)
+	GetCollectionsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Collections, error)
+	GetObjectsByCollectionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Objects, error)
+	GetObjectInstancesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
+	GetFilesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error)
+	GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstanceChecks, error)
+	GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error)
+	GetStoragePartitionsByLocationIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StoragePartitions, error)
+	GetObjectInstancesByStoragePartitionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
 }
 
 type clerkHandlerServiceClient struct {
@@ -728,6 +741,15 @@ func (c *clerkHandlerServiceClient) GetCollectionsByTenantId(ctx context.Context
 	return out, nil
 }
 
+func (c *clerkHandlerServiceClient) GetCollectionById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Collection, error) {
+	out := new(Collection)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetCollectionById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *clerkHandlerServiceClient) DeleteCollectionById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
 	err := c.cc.Invoke(ctx, "/ClerkHandlerService/DeleteCollectionById", in, out, opts...)
@@ -755,9 +777,63 @@ func (c *clerkHandlerServiceClient) UpdateCollection(ctx context.Context, in *Co
 	return out, nil
 }
 
-func (c *clerkHandlerServiceClient) GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error) {
-	out := new(StorageLocations)
-	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetStorageLocationsByTenantIdPaginated", in, out, opts...)
+func (c *clerkHandlerServiceClient) GetObjectById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Object, error) {
+	out := new(Object)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetObjectInstanceById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectInstance, error) {
+	out := new(ObjectInstance)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstanceById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetFileById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*File, error) {
+	out := new(File)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetFileById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetObjectInstanceCheckById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectInstanceCheck, error) {
+	out := new(ObjectInstanceCheck)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstanceCheckById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetStorageLocationById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StorageLocation, error) {
+	out := new(StorageLocation)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetStorageLocationById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetStoragePartitionById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StoragePartition, error) {
+	out := new(StoragePartition)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetStoragePartitionById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) FindAllTenantsPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Tenants, error) {
+	out := new(Tenants)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/FindAllTenantsPaginated", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -773,9 +849,63 @@ func (c *clerkHandlerServiceClient) GetCollectionsByTenantIdPaginated(ctx contex
 	return out, nil
 }
 
-func (c *clerkHandlerServiceClient) FindAllTenantsPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Tenants, error) {
-	out := new(Tenants)
-	err := c.cc.Invoke(ctx, "/ClerkHandlerService/FindAllTenantsPaginated", in, out, opts...)
+func (c *clerkHandlerServiceClient) GetObjectsByCollectionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Objects, error) {
+	out := new(Objects)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectsByCollectionIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetObjectInstancesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error) {
+	out := new(ObjectInstances)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstancesByObjectIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetFilesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error) {
+	out := new(Files)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetFilesByObjectIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstanceChecks, error) {
+	out := new(ObjectInstanceChecks)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstanceChecksByObjectInstanceIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error) {
+	out := new(StorageLocations)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetStorageLocationsByTenantIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetStoragePartitionsByLocationIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StoragePartitions, error) {
+	out := new(StoragePartitions)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetStoragePartitionsByLocationIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetObjectInstancesByStoragePartitionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error) {
+	out := new(ObjectInstances)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstancesByStoragePartitionIdPaginated", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -795,12 +925,25 @@ type ClerkHandlerServiceServer interface {
 	SaveStorageLocation(context.Context, *StorageLocation) (*Status, error)
 	DeleteStorageLocationById(context.Context, *Id) (*Status, error)
 	GetCollectionsByTenantId(context.Context, *Id) (*Collections, error)
+	GetCollectionById(context.Context, *Id) (*Collection, error)
 	DeleteCollectionById(context.Context, *Id) (*Status, error)
 	CreateCollection(context.Context, *Collection) (*Status, error)
 	UpdateCollection(context.Context, *Collection) (*Status, error)
-	GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error)
-	GetCollectionsByTenantIdPaginated(context.Context, *Pagination) (*Collections, error)
+	GetObjectById(context.Context, *Id) (*Object, error)
+	GetObjectInstanceById(context.Context, *Id) (*ObjectInstance, error)
+	GetFileById(context.Context, *Id) (*File, error)
+	GetObjectInstanceCheckById(context.Context, *Id) (*ObjectInstanceCheck, error)
+	GetStorageLocationById(context.Context, *Id) (*StorageLocation, error)
+	GetStoragePartitionById(context.Context, *Id) (*StoragePartition, error)
 	FindAllTenantsPaginated(context.Context, *Pagination) (*Tenants, error)
+	GetCollectionsByTenantIdPaginated(context.Context, *Pagination) (*Collections, error)
+	GetObjectsByCollectionIdPaginated(context.Context, *Pagination) (*Objects, error)
+	GetObjectInstancesByObjectIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
+	GetFilesByObjectIdPaginated(context.Context, *Pagination) (*Files, error)
+	GetObjectInstanceChecksByObjectInstanceIdPaginated(context.Context, *Pagination) (*ObjectInstanceChecks, error)
+	GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error)
+	GetStoragePartitionsByLocationIdPaginated(context.Context, *Pagination) (*StoragePartitions, error)
+	GetObjectInstancesByStoragePartitionIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
 	mustEmbedUnimplementedClerkHandlerServiceServer()
 }
 
@@ -835,6 +978,9 @@ func (UnimplementedClerkHandlerServiceServer) DeleteStorageLocationById(context.
 func (UnimplementedClerkHandlerServiceServer) GetCollectionsByTenantId(context.Context, *Id) (*Collections, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollectionsByTenantId not implemented")
 }
+func (UnimplementedClerkHandlerServiceServer) GetCollectionById(context.Context, *Id) (*Collection, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCollectionById not implemented")
+}
 func (UnimplementedClerkHandlerServiceServer) DeleteCollectionById(context.Context, *Id) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollectionById not implemented")
 }
@@ -844,14 +990,50 @@ func (UnimplementedClerkHandlerServiceServer) CreateCollection(context.Context, 
 func (UnimplementedClerkHandlerServiceServer) UpdateCollection(context.Context, *Collection) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCollection not implemented")
 }
-func (UnimplementedClerkHandlerServiceServer) GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationsByTenantIdPaginated not implemented")
+func (UnimplementedClerkHandlerServiceServer) GetObjectById(context.Context, *Id) (*Object, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectById not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetObjectInstanceById(context.Context, *Id) (*ObjectInstance, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstanceById not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetFileById(context.Context, *Id) (*File, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFileById not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetObjectInstanceCheckById(context.Context, *Id) (*ObjectInstanceCheck, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstanceCheckById not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetStorageLocationById(context.Context, *Id) (*StorageLocation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationById not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetStoragePartitionById(context.Context, *Id) (*StoragePartition, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStoragePartitionById not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) FindAllTenantsPaginated(context.Context, *Pagination) (*Tenants, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindAllTenantsPaginated not implemented")
 }
 func (UnimplementedClerkHandlerServiceServer) GetCollectionsByTenantIdPaginated(context.Context, *Pagination) (*Collections, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollectionsByTenantIdPaginated not implemented")
 }
-func (UnimplementedClerkHandlerServiceServer) FindAllTenantsPaginated(context.Context, *Pagination) (*Tenants, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindAllTenantsPaginated not implemented")
+func (UnimplementedClerkHandlerServiceServer) GetObjectsByCollectionIdPaginated(context.Context, *Pagination) (*Objects, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectsByCollectionIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetObjectInstancesByObjectIdPaginated(context.Context, *Pagination) (*ObjectInstances, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstancesByObjectIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetFilesByObjectIdPaginated(context.Context, *Pagination) (*Files, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFilesByObjectIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetObjectInstanceChecksByObjectInstanceIdPaginated(context.Context, *Pagination) (*ObjectInstanceChecks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstanceChecksByObjectInstanceIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationsByTenantIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetStoragePartitionsByLocationIdPaginated(context.Context, *Pagination) (*StoragePartitions, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStoragePartitionsByLocationIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetObjectInstancesByStoragePartitionIdPaginated(context.Context, *Pagination) (*ObjectInstances, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstancesByStoragePartitionIdPaginated not implemented")
 }
 func (UnimplementedClerkHandlerServiceServer) mustEmbedUnimplementedClerkHandlerServiceServer() {}
 
@@ -1028,6 +1210,24 @@ func _ClerkHandlerService_GetCollectionsByTenantId_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClerkHandlerService_GetCollectionById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetCollectionById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetCollectionById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetCollectionById(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ClerkHandlerService_DeleteCollectionById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Id)
 	if err := dec(in); err != nil {
@@ -1082,20 +1282,128 @@ func _ClerkHandlerService_UpdateCollection_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ClerkHandlerService_GetStorageLocationsByTenantIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ClerkHandlerService_GetObjectById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetObjectById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetObjectById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetObjectById(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetObjectInstanceById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstanceById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetObjectInstanceById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstanceById(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetFileById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetFileById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetFileById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetFileById(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetObjectInstanceCheckById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstanceCheckById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetObjectInstanceCheckById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstanceCheckById(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetStorageLocationById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetStorageLocationById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetStorageLocationById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetStorageLocationById(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetStoragePartitionById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetStoragePartitionById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetStoragePartitionById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetStoragePartitionById(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_FindAllTenantsPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Pagination)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClerkHandlerServiceServer).GetStorageLocationsByTenantIdPaginated(ctx, in)
+		return srv.(ClerkHandlerServiceServer).FindAllTenantsPaginated(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ClerkHandlerService/GetStorageLocationsByTenantIdPaginated",
+		FullMethod: "/ClerkHandlerService/FindAllTenantsPaginated",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClerkHandlerServiceServer).GetStorageLocationsByTenantIdPaginated(ctx, req.(*Pagination))
+		return srv.(ClerkHandlerServiceServer).FindAllTenantsPaginated(ctx, req.(*Pagination))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1118,20 +1426,128 @@ func _ClerkHandlerService_GetCollectionsByTenantIdPaginated_Handler(srv interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ClerkHandlerService_FindAllTenantsPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ClerkHandlerService_GetObjectsByCollectionIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Pagination)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClerkHandlerServiceServer).FindAllTenantsPaginated(ctx, in)
+		return srv.(ClerkHandlerServiceServer).GetObjectsByCollectionIdPaginated(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ClerkHandlerService/FindAllTenantsPaginated",
+		FullMethod: "/ClerkHandlerService/GetObjectsByCollectionIdPaginated",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClerkHandlerServiceServer).FindAllTenantsPaginated(ctx, req.(*Pagination))
+		return srv.(ClerkHandlerServiceServer).GetObjectsByCollectionIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetObjectInstancesByObjectIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstancesByObjectIdPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetObjectInstancesByObjectIdPaginated",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstancesByObjectIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetFilesByObjectIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetFilesByObjectIdPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetFilesByObjectIdPaginated",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetFilesByObjectIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetObjectInstanceChecksByObjectInstanceIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetObjectInstanceChecksByObjectInstanceIdPaginated",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetStorageLocationsByTenantIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetStorageLocationsByTenantIdPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetStorageLocationsByTenantIdPaginated",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetStorageLocationsByTenantIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetStoragePartitionsByLocationIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetStoragePartitionsByLocationIdPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetStoragePartitionsByLocationIdPaginated",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetStoragePartitionsByLocationIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetObjectInstancesByStoragePartitionIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstancesByStoragePartitionIdPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetObjectInstancesByStoragePartitionIdPaginated",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetObjectInstancesByStoragePartitionIdPaginated(ctx, req.(*Pagination))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1180,6 +1596,10 @@ var ClerkHandlerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ClerkHandlerService_GetCollectionsByTenantId_Handler,
 		},
 		{
+			MethodName: "GetCollectionById",
+			Handler:    _ClerkHandlerService_GetCollectionById_Handler,
+		},
+		{
 			MethodName: "DeleteCollectionById",
 			Handler:    _ClerkHandlerService_DeleteCollectionById_Handler,
 		},
@@ -1192,16 +1612,64 @@ var ClerkHandlerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ClerkHandlerService_UpdateCollection_Handler,
 		},
 		{
-			MethodName: "GetStorageLocationsByTenantIdPaginated",
-			Handler:    _ClerkHandlerService_GetStorageLocationsByTenantIdPaginated_Handler,
+			MethodName: "GetObjectById",
+			Handler:    _ClerkHandlerService_GetObjectById_Handler,
+		},
+		{
+			MethodName: "GetObjectInstanceById",
+			Handler:    _ClerkHandlerService_GetObjectInstanceById_Handler,
+		},
+		{
+			MethodName: "GetFileById",
+			Handler:    _ClerkHandlerService_GetFileById_Handler,
+		},
+		{
+			MethodName: "GetObjectInstanceCheckById",
+			Handler:    _ClerkHandlerService_GetObjectInstanceCheckById_Handler,
+		},
+		{
+			MethodName: "GetStorageLocationById",
+			Handler:    _ClerkHandlerService_GetStorageLocationById_Handler,
+		},
+		{
+			MethodName: "GetStoragePartitionById",
+			Handler:    _ClerkHandlerService_GetStoragePartitionById_Handler,
+		},
+		{
+			MethodName: "FindAllTenantsPaginated",
+			Handler:    _ClerkHandlerService_FindAllTenantsPaginated_Handler,
 		},
 		{
 			MethodName: "GetCollectionsByTenantIdPaginated",
 			Handler:    _ClerkHandlerService_GetCollectionsByTenantIdPaginated_Handler,
 		},
 		{
-			MethodName: "FindAllTenantsPaginated",
-			Handler:    _ClerkHandlerService_FindAllTenantsPaginated_Handler,
+			MethodName: "GetObjectsByCollectionIdPaginated",
+			Handler:    _ClerkHandlerService_GetObjectsByCollectionIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetObjectInstancesByObjectIdPaginated",
+			Handler:    _ClerkHandlerService_GetObjectInstancesByObjectIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetFilesByObjectIdPaginated",
+			Handler:    _ClerkHandlerService_GetFilesByObjectIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetObjectInstanceChecksByObjectInstanceIdPaginated",
+			Handler:    _ClerkHandlerService_GetObjectInstanceChecksByObjectInstanceIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetStorageLocationsByTenantIdPaginated",
+			Handler:    _ClerkHandlerService_GetStorageLocationsByTenantIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetStoragePartitionsByLocationIdPaginated",
+			Handler:    _ClerkHandlerService_GetStoragePartitionsByLocationIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetObjectInstancesByStoragePartitionIdPaginated",
+			Handler:    _ClerkHandlerService_GetObjectInstancesByStoragePartitionIdPaginated_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
