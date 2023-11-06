@@ -25,10 +25,10 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 tenants")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 tenants")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -61,10 +61,10 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.Cle
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 storageLocations")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 storageLocations")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -99,10 +99,10 @@ func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHan
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 collections")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 collections")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -127,6 +127,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	tenantId := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -136,29 +137,35 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 collections")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 collections")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.TenantID != nil {
+			tenantId = *options.TenantID
+		}
 	}
-	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: *options.TenantID, AllowedTenants: allowedTenants})
+	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: tenantId, AllowedTenants: allowedTenants})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
-	tenantPb, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: *options.TenantID})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
-	}
-	tenant := tenantToGraphQlTenant(tenantPb)
+	tenantsMap := make(map[string]*model.Tenant)
 	collections := make([]*model.Collection, 0)
 	for _, collectionPb := range collectionsPb.Collections {
 		collection := collectionToGraphQlCollection(collectionPb)
-		collection.Tenant = tenant
+		if tenantsMap[collection.TenantID] == nil {
+			tenantPb, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: collection.TenantID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
+			}
+			tenantsMap[collection.TenantID] = tenantToGraphQlTenant(tenantPb)
+		}
+		collection.Tenant = tenantsMap[collection.TenantID]
 		collections = append(collections, collection)
 	}
 	return &model.CollectionList{Items: collections, TotalItems: len(collections)}, nil
@@ -179,10 +186,10 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 objects")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objects")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -207,6 +214,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	collectionId := ""
 
 	if options != nil {
 		if options.SortKey != nil {
@@ -217,29 +225,36 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 objects")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objects")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.CollectionID != nil {
+			collectionId = *options.CollectionID
+		}
 	}
-	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: *options.CollectionID, AllowedTenants: allowedTenants})
+	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: collectionId, AllowedTenants: allowedTenants})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
-	collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: *options.CollectionID})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
-	}
-	collection := collectionToGraphQlCollection(collectionPb)
+
+	collectionsMap := make(map[string]*model.Collection)
 	objects := make([]*model.Object, 0)
 	for _, objectPb := range objectsPb.Objects {
 		object := objectToGraphQlObject(objectPb)
-		object.Collection = collection
+		if collectionsMap[object.CollectionID] == nil {
+			collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: object.CollectionID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+			}
+			collectionsMap[object.CollectionID] = collectionToGraphQlCollection(collectionPb)
+		}
+		object.Collection = collectionsMap[object.CollectionID]
 		objects = append(objects, object)
 	}
 	return &model.ObjectList{Items: objects, TotalItems: len(objects)}, nil
@@ -260,10 +275,10 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 objectInstances")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objectInstances")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -298,10 +313,10 @@ func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 Files")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 Files")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -326,6 +341,7 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	objectId := ""
 
 	if options != nil {
 		if options.SortKey != nil {
@@ -336,29 +352,44 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 objectInstances")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objectInstances")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.ObjectID != nil {
+			objectId = *options.ObjectID
+		}
 	}
-	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: *options.ObjectID, AllowedTenants: allowedTenants})
+	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: objectId, AllowedTenants: allowedTenants})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstancesByObjectIdPaginated: %v", err)
 	}
-	objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: *options.ObjectID})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
-	}
-	object := objectToGraphQlObject(objectPb)
+	partitionsMap := make(map[string]*model.StoragePartition)
+	objectsMap := make(map[string]*model.Object)
 	objectInstances := make([]*model.ObjectInstance, 0)
 	for _, objectInstancePb := range objectInstancesPb.ObjectInstances {
 		objectInstance := objectInstanceToGraphQlObjectInstance(objectInstancePb)
-		objectInstance.Object = object
+		if objectsMap[objectInstance.ObjectID] == nil {
+			objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: objectInstance.ObjectID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
+			}
+			objectsMap[objectInstance.ObjectID] = objectToGraphQlObject(objectPb)
+		}
+		if partitionsMap[objectInstance.StoragePartitionID] == nil {
+			storagePartitionPb, err := clientClerkHandler.GetStoragePartitionById(ctx, &pb.Id{Id: objectInstance.StoragePartitionID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not GetStoragePartitionById: %v", err)
+			}
+			partitionsMap[objectInstance.StoragePartitionID] = storagePartitionToGraphQlStoragePartition(storagePartitionPb)
+		}
+		objectInstance.Object = objectsMap[objectInstance.ObjectID]
+		objectInstance.StoragePartition = partitionsMap[objectInstance.StoragePartitionID]
 		objectInstances = append(objectInstances, objectInstance)
 	}
 	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: len(objectInstances)}, nil
@@ -369,6 +400,7 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	objectId := ""
 
 	if options != nil {
 		if options.SortKey != nil {
@@ -379,29 +411,35 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 files")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 files")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.ObjectID != nil {
+			objectId = *options.ObjectID
+		}
 	}
-	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: *options.ObjectID, AllowedTenants: allowedTenants})
+	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: objectId, AllowedTenants: allowedTenants})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetFilesByObjectIdPaginated: %v", err)
 	}
-	objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: *options.ObjectID})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
-	}
-	object := objectToGraphQlObject(objectPb)
+	objectsMap := make(map[string]*model.Object)
 	files := make([]*model.File, 0)
 	for _, filePb := range filesPb.Files {
 		file := fileToGraphQlFile(filePb)
-		file.Object = object
+		if objectsMap[file.ObjectID] == nil {
+			objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: file.ObjectID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
+			}
+			objectsMap[file.ObjectID] = objectToGraphQlObject(objectPb)
+		}
+		file.Object = objectsMap[file.ObjectID]
 		files = append(files, file)
 	}
 	return &model.FileList{Items: files, TotalItems: len(files)}, nil
@@ -422,10 +460,10 @@ func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHa
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 objectInstanceChecks")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objectInstanceChecks")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -450,6 +488,7 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	objectInstanceId := ""
 
 	if options != nil {
 		if options.SortKey != nil {
@@ -460,29 +499,35 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 objectInstanceChecks")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objectInstanceChecks")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.ObjectInstanceID != nil {
+			objectInstanceId = *options.ObjectInstanceID
+		}
 	}
-	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: *options.ObjectInstanceID, AllowedTenants: allowedTenants})
+	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: objectInstanceId, AllowedTenants: allowedTenants})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstanceChecksByObjectInstanceIdPaginated: %v", err)
 	}
-	objectInstancePb, err := clientClerkHandler.GetObjectInstanceById(ctx, &pb.Id{Id: *options.ObjectInstanceID})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetObjectInstanceById: %v", err)
-	}
-	objectInstance := objectInstanceToGraphQlObjectInstance(objectInstancePb)
+	objectInstancesMap := make(map[string]*model.ObjectInstance)
 	objectInstanceChecks := make([]*model.ObjectInstanceCheck, 0)
 	for _, objectInstanceCheckPb := range objectInstanceChecksPb.ObjectInstanceChecks {
 		objectInstanceCheck := objectInstanceCheckToGraphQlObjectInstanceCheck(objectInstanceCheckPb)
-		objectInstanceCheck.ObjectInstance = objectInstance
+		if objectInstancesMap[objectInstanceCheck.ObjectInstanceID] == nil {
+			objectInstancePb, err := clientClerkHandler.GetObjectInstanceById(ctx, &pb.Id{Id: objectInstanceCheck.ObjectInstanceID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not GetObjectInstanceById: %v", err)
+			}
+			objectInstancesMap[objectInstanceCheck.ObjectInstanceID] = objectInstanceToGraphQlObjectInstance(objectInstancePb)
+		}
+		objectInstanceCheck.ObjectInstance = objectInstancesMap[objectInstanceCheck.ObjectInstanceID]
 		objectInstanceChecks = append(objectInstanceChecks, objectInstanceCheck)
 	}
 	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: len(objectInstanceChecks)}, nil
@@ -493,6 +538,7 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	tenantId := ""
 
 	if options != nil {
 		if options.SortKey != nil {
@@ -503,29 +549,35 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 storageLocations")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 storageLocations")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.TenantID != nil {
+			tenantId = *options.TenantID
+		}
 	}
-	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: *options.TenantID, AllowedTenants: allowedTenants})
+	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: tenantId, AllowedTenants: allowedTenants})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantIdPaginated: %v", err)
 	}
-	tenantPb, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: *options.TenantID})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
-	}
-	tenant := tenantToGraphQlTenant(tenantPb)
+	tenantsMap := make(map[string]*model.Tenant)
 	storageLocations := make([]*model.StorageLocation, 0)
 	for _, storageLocationPb := range storageLocationsPb.StorageLocations {
 		storageLocation := storageLocationToGraphQlStorageLocation(storageLocationPb)
-		storageLocation.Tenant = tenant
+		if tenantsMap[storageLocation.TenantID] == nil {
+			tenantPb, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: storageLocation.TenantID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
+			}
+			tenantsMap[storageLocation.TenantID] = tenantToGraphQlTenant(tenantPb)
+		}
+		storageLocation.Tenant = tenantsMap[storageLocation.TenantID]
 		storageLocations = append(storageLocations, storageLocation)
 	}
 	return &model.StorageLocationList{Items: storageLocations, TotalItems: len(storageLocations)}, nil
@@ -536,6 +588,7 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	storageLocationId := ""
 
 	if options != nil {
 		if options.SortKey != nil {
@@ -546,29 +599,35 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 storagePartitions")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 storagePartitions")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.StorageLocationID != nil {
+			storageLocationId = *options.StorageLocationID
+		}
 	}
-	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: *options.StorageLocationID, AllowedTenants: allowedTenants})
+	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: storageLocationId, AllowedTenants: allowedTenants})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionsByLocationIdPaginated: %v", err)
 	}
-	storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: *options.StorageLocationID})
-	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
-	}
-	storageLocation := storageLocationToGraphQlStorageLocation(storageLocationPb)
+	storageLocationsMap := make(map[string]*model.StorageLocation)
 	storagePartitions := make([]*model.StoragePartition, 0)
 	for _, storagePartitionPb := range storagePartitionsPb.StoragePartitions {
 		storagePartition := storagePartitionToGraphQlStoragePartition(storagePartitionPb)
-		storagePartition.StorageLocation = storageLocation
+		if storageLocationsMap[storagePartition.StorageLocationID] == nil {
+			storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: storagePartition.StorageLocationID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
+			}
+			storageLocationsMap[storagePartition.StorageLocationID] = storageLocationToGraphQlStorageLocation(storageLocationPb)
+		}
+		storagePartition.StorageLocation = storageLocationsMap[storagePartition.StorageLocationID]
 		storagePartitions = append(storagePartitions, storagePartition)
 	}
 	return &model.StoragePartitionList{Items: storagePartitions, TotalItems: len(storagePartitions)}, nil
@@ -588,10 +647,10 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 storagePartitions")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 storagePartitions")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
@@ -626,10 +685,10 @@ func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandl
 				sortDirection = "DESC"
 			}
 		}
-		if *options.Take > 1000 {
-			return nil, errors.New("You could not retrieve more than 1000 objectInstances")
-		}
 		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objectInstances")
+			}
 			take = *options.Take
 		}
 		if options.Skip != nil {
