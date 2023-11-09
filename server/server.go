@@ -49,6 +49,7 @@ type Server struct {
 }
 
 var UiFS embed.FS
+var SchemaFS embed.FS
 
 func (srv *Server) Startup() (context.CancelFunc, error) {
 	// Get the SystemCertPool, continue with an empty pool on error
@@ -71,6 +72,9 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 
 	// router := gin.Default()
 	router := srv.router
+	router.GET("/schema", func(ctx *gin.Context) {
+		ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
+	})
 	router.GET("/graphql", func(ctx *gin.Context) {
 		ctx.FileFromFS("ui/build/playground.html", http.FS(UiFS))
 	})

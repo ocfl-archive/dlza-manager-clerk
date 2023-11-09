@@ -41,6 +41,9 @@ var configParam = flag.String("config", "", "config file in toml format")
 //go:embed all:ui/build
 var uiFS embed.FS
 
+//go:embed graph/schema.graphqls
+var schemaFS embed.FS
+
 func main() {
 
 	// //////ClerkIngest gRPC connection
@@ -218,6 +221,7 @@ func main() {
 		}
 	}
 	graphqlServer.UiFS = uiFS
+	graphqlServer.SchemaFS = schemaFS
 	srv, err := graphqlServer.NewServer(conf.GraphQLConfig.Addr, conf.GraphQLConfig.ExtAddr, cert, addCA, staticFS, logger, models.Keycloak{
 		Addr:         conf.GraphQLConfig.Keycloak.Addr,
 		Realm:        conf.GraphQLConfig.Keycloak.Realm,
