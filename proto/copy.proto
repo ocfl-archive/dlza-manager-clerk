@@ -104,6 +104,7 @@ message Collection {
 
 message Collections {
   repeated Collection collections = 1;
+  int32 TotalItems = 2;
 }
 
 message CollectionAlias {
@@ -128,10 +129,12 @@ message Tenant {
   string Alias = 3;
   string Person = 4;
   string Email = 5;
+  string ApiKeyId = 6;
 }
 
 message Tenants {
   repeated Tenant tenants = 1;
+  int32 TotalItems = 2;
 }
 
 message Status {
@@ -160,6 +163,7 @@ message Object {
 
 message Objects {
   repeated Object Objects = 1;
+  int32 TotalItems = 2;
 }
 
 message ObjectInstance {
@@ -174,6 +178,7 @@ message ObjectInstance {
 
 message ObjectInstances {
   repeated ObjectInstance ObjectInstances = 1;
+  int32 TotalItems = 2;
 }
 
 message ObjectWithInstancesAndFiles {
@@ -185,6 +190,7 @@ message ObjectWithInstancesAndFiles {
 
 message StorageLocations {
   repeated StorageLocation storageLocations = 1;
+  int32 TotalItems = 2;
 }
 
 message StorageLocation {
@@ -215,6 +221,7 @@ message StoragePartition {
 
 message StoragePartitions {
   repeated StoragePartition StoragePartitions = 1;
+  int32 TotalItems = 2;
 }
 
 message SizeAndId {
@@ -237,6 +244,7 @@ message File {
 
 message Files {
   repeated File Files = 1;
+  int32 TotalItems = 2;
 }
 
 message ObjectInstanceCheck {
@@ -249,5 +257,6 @@ message ObjectInstanceCheck {
 
 message ObjectInstanceChecks {
   repeated ObjectInstanceCheck ObjectInstanceChecks = 1;
+  int32 TotalItems = 2;
 
 }

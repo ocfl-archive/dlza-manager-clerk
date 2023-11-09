@@ -44,7 +44,7 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 		tenant := tenantToGraphQlTenant(tenantPb)
 		tenants = append(tenants, tenant)
 	}
-	return &model.TenantList{Items: tenants, TotalItems: len(tenants)}, nil
+	return &model.TenantList{Items: tenants, TotalItems: int(tenantsPb.TotalItems)}, nil
 }
 
 func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Tenant, options *model.StorageLocationListOptions) (*model.StorageLocationList, error) {
@@ -81,7 +81,7 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.Cle
 		storageLocation.Tenant = obj
 		storageLocations = append(storageLocations, storageLocation)
 	}
-	return &model.StorageLocationList{Items: storageLocations, TotalItems: len(storageLocations)}, nil
+	return &model.StorageLocationList{Items: storageLocations, TotalItems: int(storageLocationsPb.TotalItems)}, nil
 }
 
 func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Tenant, options *model.CollectionListOptions) (*model.CollectionList, error) {
@@ -119,7 +119,7 @@ func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHan
 		collection.Tenant = obj
 		collections = append(collections, collection)
 	}
-	return &model.CollectionList{Items: collections, TotalItems: len(collections)}, nil
+	return &model.CollectionList{Items: collections, TotalItems: int(collectionsPb.TotalItems)}, nil
 }
 
 func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.CollectionListOptions, allowedTenants []string) (*model.CollectionList, error) {
@@ -168,7 +168,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 		collection.Tenant = tenantsMap[collection.TenantID]
 		collections = append(collections, collection)
 	}
-	return &model.CollectionList{Items: collections, TotalItems: len(collections)}, nil
+	return &model.CollectionList{Items: collections, TotalItems: int(collectionsPb.TotalItems)}, nil
 }
 
 func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection, options *model.ObjectListOptions) (*model.ObjectList, error) {
@@ -206,7 +206,7 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 		object.Collection = obj
 		objects = append(objects, object)
 	}
-	return &model.ObjectList{Items: objects, TotalItems: len(objects)}, nil
+	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
 }
 
 func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.ObjectListOptions, allowedTenants []string) (*model.ObjectList, error) {
@@ -257,7 +257,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 		object.Collection = collectionsMap[object.CollectionID]
 		objects = append(objects, object)
 	}
-	return &model.ObjectList{Items: objects, TotalItems: len(objects)}, nil
+	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
 }
 
 func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
@@ -295,7 +295,7 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 		objectInstance.Object = obj
 		objectInstances = append(objectInstances, objectInstance)
 	}
-	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: len(objectInstances)}, nil
+	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: int(objectInstancesPb.TotalItems)}, nil
 }
 
 func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Object, options *model.FileListOptions) (*model.FileList, error) {
@@ -333,7 +333,7 @@ func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 		file.Object = obj
 		files = append(files, file)
 	}
-	return &model.FileList{Items: files, TotalItems: len(files)}, nil
+	return &model.FileList{Items: files, TotalItems: int(filesPb.TotalItems)}, nil
 }
 
 func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.ObjectInstanceListOptions, allowedTenants []string) (*model.ObjectInstanceList, error) {
@@ -392,7 +392,7 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 		objectInstance.StoragePartition = partitionsMap[objectInstance.StoragePartitionID]
 		objectInstances = append(objectInstances, objectInstance)
 	}
-	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: len(objectInstances)}, nil
+	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: int(objectInstancesPb.TotalItems)}, nil
 }
 
 func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.FileListOptions, allowedTenants []string) (*model.FileList, error) {
@@ -442,7 +442,7 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 		file.Object = objectsMap[file.ObjectID]
 		files = append(files, file)
 	}
-	return &model.FileList{Items: files, TotalItems: len(files)}, nil
+	return &model.FileList{Items: files, TotalItems: int(filesPb.TotalItems)}, nil
 }
 
 func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.ObjectInstance, options *model.ObjectInstanceCheckListOptions) (*model.ObjectInstanceCheckList, error) {
@@ -480,7 +480,7 @@ func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHa
 		objectInstanceCheck.ObjectInstance = obj
 		objectInstanceChecks = append(objectInstanceChecks, objectInstanceCheck)
 	}
-	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: len(objectInstanceChecks)}, nil
+	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: int(objectInstanceChecksPb.TotalItems)}, nil
 }
 
 func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.ObjectInstanceCheckListOptions, allowedTenants []string) (*model.ObjectInstanceCheckList, error) {
@@ -530,7 +530,7 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 		objectInstanceCheck.ObjectInstance = objectInstancesMap[objectInstanceCheck.ObjectInstanceID]
 		objectInstanceChecks = append(objectInstanceChecks, objectInstanceCheck)
 	}
-	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: len(objectInstanceChecks)}, nil
+	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: int(objectInstanceChecksPb.TotalItems)}, nil
 }
 
 func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.StorageLocationListOptions, allowedTenants []string) (*model.StorageLocationList, error) {
@@ -580,7 +580,7 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 		storageLocation.Tenant = tenantsMap[storageLocation.TenantID]
 		storageLocations = append(storageLocations, storageLocation)
 	}
-	return &model.StorageLocationList{Items: storageLocations, TotalItems: len(storageLocations)}, nil
+	return &model.StorageLocationList{Items: storageLocations, TotalItems: int(storageLocationsPb.TotalItems)}, nil
 }
 
 func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.StoragePartitionListOptions, allowedTenants []string) (*model.StoragePartitionList, error) {
@@ -630,7 +630,7 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 		storagePartition.StorageLocation = storageLocationsMap[storagePartition.StorageLocationID]
 		storagePartitions = append(storagePartitions, storagePartition)
 	}
-	return &model.StoragePartitionList{Items: storagePartitions, TotalItems: len(storagePartitions)}, nil
+	return &model.StoragePartitionList{Items: storagePartitions, TotalItems: int(storagePartitionsPb.TotalItems)}, nil
 }
 
 func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.StorageLocation, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error) {
@@ -667,7 +667,7 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 		storagePartition.StorageLocation = obj
 		storagePartitions = append(storagePartitions, storagePartition)
 	}
-	return &model.StoragePartitionList{Items: storagePartitions, TotalItems: len(storagePartitions)}, nil
+	return &model.StoragePartitionList{Items: storagePartitions, TotalItems: int(storagePartitionsPb.TotalItems)}, nil
 }
 
 func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.StoragePartition, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
@@ -705,7 +705,7 @@ func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandl
 		objectInstance.StoragePartition = obj
 		objectInstances = append(objectInstances, objectInstance)
 	}
-	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: len(objectInstances)}, nil
+	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: int(objectInstancesPb.TotalItems)}, nil
 }
 
 func GetTenantById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string, allowedTenants []string) (*model.Tenant, error) {
