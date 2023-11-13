@@ -1,7 +1,8 @@
+[GraphQLConfig]
 addr = "localhost:4443"
 extaddr = "https://localhost:4443"
 
-[logging]
+[GraphQLConfig.logging]
 namespace="graphql-ui-template"
 stashHost=""
 stashPortNb=0
@@ -9,10 +10,10 @@ traceLevel="DEBUG"
 stashTraceLevel="ERROR"
 filename=""
 
-[keycloak]
+[GraphQLConfig.keycloak]
 realm="test"
 addr="https://auth.ub.unibas.ch/"
-callback=https://localhost:4443"
+callback="https://localhost:4443"
 clientId="graphql-demo"
 
 [Handler]

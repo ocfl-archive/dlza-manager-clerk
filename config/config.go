@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/jinzhu/configor"
@@ -22,11 +23,13 @@ type Config struct {
 }
 
 // GetConfig creates a new config from a given environment
-func GetConfig(configFile string, configType string) (config Config, err error) {
+func GetConfig(configFile string, fileType string) (config Config, err error) {
 	if configFile == "" {
+		fmt.Println("here 0")
 		defaultConfig := "config.yml"
-		if configType == "toml" {
+		if fileType == "toml" {
 			defaultConfig = "config.toml"
+			fmt.Println("here")
 		}
 		err = configor.Load(&config, defaultConfig)
 		if err != nil {

@@ -31,11 +31,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var (
-	portIngest  = ":8082"
-	portHandler = ":8083"
-)
-
 var configParam = flag.String("config", "", "config file in toml format, no need for filetype for this param")
 var filetype = flag.String("filetype", "", "config file format, default is .yml")
 
@@ -47,6 +42,7 @@ var schemaFS embed.FS
 
 func main() {
 
+	flag.Parse()
 	conf, err := config.GetConfig(*configParam, *filetype)
 	if err != nil {
 		log.Fatal(err)
@@ -74,40 +70,6 @@ func main() {
 	storagePartitionController := controller.NewStoragePartitionController(clerkIngestServiceClient)
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
 	routes := router.NewRouter(orderController, tenantController, storageLocationController, collectionController, storagePartitionController)
-
-	// server := &http.Server{
-	// 	Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
-	// 	Handler: routes,
-	// }
-	// go func() {
-	// 	err = server.ListenAndServe()
-
-	// 	if err != nil {
-	// 		log.Fatalf("error: %s", err.Error())
-	// 	}
-	// }()
-
-	// //////GraphQl
-	// flag.Parse()
-
-	// var cfgData []byte
-	// // read embedded toml if no external one is given
-	// if *configParam == "" {
-	// 	cfgData, err = fs.ReadFile(config.ConfigFS, "server.toml")
-	// 	if err != nil {
-	// 		emperror.Panic(errors.Wrapf(err, "cannot read %v/%s", config.ConfigFS, "server.toml"))
-	// 	}
-	// } else {
-	// 	cfgData, err = os.ReadFile(*configParam)
-	// 	if err != nil {
-	// 		emperror.Panic(errors.Wrapf(err, "cannot read %s", *configParam))
-	// 	}
-	// }
-	// // load config file
-	// cfg, err := configstruct.LoadGraphQLConfig(cfgData)
-	// if err != nil {
-	// 	emperror.Panic(errors.Wrap(err, "cannot decode config file"))
-	// }
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
