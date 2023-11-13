@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/jinzhu/configor"
@@ -9,10 +8,10 @@ import (
 )
 
 type Service struct {
-	ServiceName    string         `yaml:"service_name" toml:"ServiceName"`
-	Host           string         `yaml:"host" toml:"Host"`
-	Port           int            `yaml:"port" toml:"Port"`
-	DatabaseConfig DatabaseConfig `yaml:"database_config" toml:"DatabaseConfig"`
+	ServiceName string         `yaml:"service_name" toml:"ServiceName"`
+	Host        string         `yaml:"host" toml:"Host"`
+	Port        int            `yaml:"port" toml:"Port"`
+	Database    DatabaseConfig `yaml:"database" toml:"Database"`
 }
 
 type Config struct {
@@ -25,11 +24,9 @@ type Config struct {
 // GetConfig creates a new config from a given environment
 func GetConfig(configFile string, fileType string) (config Config, err error) {
 	if configFile == "" {
-		fmt.Println("here 0")
 		defaultConfig := "config.yml"
 		if fileType == "toml" {
 			defaultConfig = "config.toml"
-			fmt.Println("here")
 		}
 		err = configor.Load(&config, defaultConfig)
 		if err != nil {
