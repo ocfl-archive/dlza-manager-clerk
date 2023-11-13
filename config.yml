@@ -1,0 +1,28 @@
+graphql_config :  
+  addr : "localhost:4443" #modify if needed 
+  extaddr : "http://localhost:4443" #modify if needed 
+  #certificate = ""
+  #certificatekey = ""
+  #rootca = ["/tmp/ca.cert.pem"]
+  #webstatic = "/tmp"
+  keycloak:
+    realm : "test"
+    addr : "https://auth.ub.unibas.ch/"
+    callback= : https://localhost:4443" #modify if needed 
+    clientId : "graphql-demo"
+  logging :
+    namespace : "graphql-ui-template"
+    stashHost : ""
+    stashPortNb : 0
+    traceLevel : "Debuglevel"
+    stashTraceLevel : "ErrorLevel"
+    filename : ""
+handler: 
+  host : localhost
+  port : 9082  #modify if needed 
+ingester:
+  host : localhost
+  port : 9083  #modify if needed 
+clerk: 
+  host : localhost
+  port : 9086  #modify if needed 

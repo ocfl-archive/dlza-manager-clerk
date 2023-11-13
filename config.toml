@@ -1,0 +1,29 @@
+addr = "localhost:4443"
+extaddr = "https://localhost:4443"
+
+[logging]
+namespace="graphql-ui-template"
+stashHost=""
+stashPortNb=0
+traceLevel="DEBUG"
+stashTraceLevel="ERROR"
+filename=""
+
+[keycloak]
+realm="test"
+addr="https://auth.ub.unibas.ch/"
+callback=https://localhost:4443"
+clientId="graphql-demo"
+
+[Handler]
+Host="localhost"
+Port=9082
+[Ingester]
+Host="localhost"
+Port=9083
+[Clerk]
+Host="localhost"
+Port=9086
+
+
+#modify if needed the hosts/ports and addresses

@@ -36,7 +36,8 @@ var (
 	portHandler = ":8083"
 )
 
-var configParam = flag.String("config", "", "config file in toml format")
+var configParam = flag.String("config", "", "config file in toml format, no need for filetype for this param")
+var filetype = flag.String("filetype", "", "config file format, default is .yml")
 
 //go:embed all:ui/build
 var uiFS embed.FS
@@ -46,31 +47,7 @@ var schemaFS embed.FS
 
 func main() {
 
-	// //////ClerkIngest gRPC connection
-	// connectionClerkIngest, err := grpc.Dial("localhost"+portIngest, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// if err != nil {
-	// 	log.Fatalf("did not connect: %v", err)
-	// }
-
-	// //////ClerkHandler gRPC connection
-	// connectionClerkHandler, err := grpc.Dial("localhost"+portHandler, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// if err != nil {
-	// 	log.Fatalf("did not connect: %v", err)
-	// }
-
-	//////ClerkIngest gRPC connection
-	// connectionClerkIngest, err := grpc.Dial("dlza-manager-ingester-svc:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// if err != nil {
-	// 	log.Fatalf("did not connect: %v", err)
-	// }
-
-	// //////ClerkHandler gRPC connection
-	// connectionClerkHandler, err := grpc.Dial("dlza-manager-handler-svc:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// if err != nil {
-	// 	log.Fatalf("did not connect: %v", err)
-	// }
-
-	conf, err := config.GetConfig()
+	conf, err := config.GetConfig(*configParam, *filetype)
 	if err != nil {
 		log.Fatal(err)
 	}
