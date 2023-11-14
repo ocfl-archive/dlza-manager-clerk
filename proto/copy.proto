@@ -78,6 +78,7 @@ message Pagination {
   string SortDirection = 4;
   string SortKey = 5;
   repeated string AllowedTenants = 6;
+  string searchField = 7;
 }
 
 message ObjectPath {

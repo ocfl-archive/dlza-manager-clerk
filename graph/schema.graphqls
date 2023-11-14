@@ -55,6 +55,8 @@ input TenantListOptions {
 
   # Specifies the sort key
   sortKey: TenantSortKey
+  # ID, ALIAS, NAME, EMAIL, PERSON
+  search: String
 }
 input CollectionListOptions {
   tenantId: ID
@@ -62,6 +64,8 @@ input CollectionListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: CollectionSortKey
+  #  ID, ALIAS, DESCRIPTION, OWNER, OWNERMAIL, NAME
+  search: String
 }
 input StorageLocationListOptions {
   tenantId: ID
@@ -69,6 +73,8 @@ input StorageLocationListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: StorageLocationSortKey
+  #  ID, ALIAS, SECURITYCOMPLIENCY
+  search: String
 }
 input StoragePartitionListOptions {
   storageLocationId: ID
@@ -76,6 +82,8 @@ input StoragePartitionListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: StoragePartitionSortKey
+  #  ID, ALIAS, NAME
+  search: String
 }
 input ObjectListOptions {
   collectionId: ID
@@ -83,6 +91,8 @@ input ObjectListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: ObjectSortKey
+  #  ID, SIGNATURE, TITLE, DESCRIPTION, INGESTWORKFLOW, USER, ADDRESS, CHECKSUM
+  search: String
 }
 input ObjectInstanceListOptions {
   ObjectId: ID
@@ -90,6 +100,8 @@ input ObjectInstanceListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: ObjectInstanceSortKey
+  #  ID, PATH, STATUS
+  search: String
 }
 input ObjectInstanceCheckListOptions {
   ObjectInstanceId: ID
@@ -97,6 +109,8 @@ input ObjectInstanceCheckListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: ObjectInstanceCheckSortKey
+  #  ID, MESSAGE
+  search: String
 }
 input FileListOptions {
   ObjectId: ID
@@ -104,6 +118,8 @@ input FileListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: FileSortKey
+  #  ID, CHECKSUM, MIMETYPE, PRONOM
+  search: String
 }
 
 enum TenantSortKey {
@@ -114,12 +130,15 @@ enum TenantSortKey {
   EMAIL
 }
 enum CollectionSortKey {
+  ID,
   NAME
 }
 enum StorageLocationSortKey {
+  ID,
   ALIAS
 }
 enum StoragePartitionSortKey {
+  ID,
   ALIAS
 }
 enum ObjectSortKey {
@@ -132,6 +151,7 @@ enum ObjectInstanceCheckSortKey {
   ID
 }
 enum FileSortKey {
+  ID
   NAME
 }
 

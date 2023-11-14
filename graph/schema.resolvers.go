@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-
 	"emperror.dev/errors"
 
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"

@@ -9893,7 +9893,7 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"tenantId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"tenantId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9945,6 +9945,15 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 
@@ -9958,7 +9967,7 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ObjectId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"ObjectId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10010,6 +10019,15 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 
@@ -10023,7 +10041,7 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ObjectInstanceId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"ObjectInstanceId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10075,6 +10093,15 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 
@@ -10088,7 +10115,7 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ObjectId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"ObjectId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10140,6 +10167,15 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 
@@ -10153,7 +10189,7 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"collectionId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"collectionId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10205,6 +10241,15 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 
@@ -10218,7 +10263,7 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"tenantId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"tenantId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10270,6 +10315,15 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 
@@ -10283,7 +10337,7 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"storageLocationId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"storageLocationId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10335,6 +10389,15 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 
@@ -10348,7 +10411,7 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10391,6 +10454,15 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 				return it, err
 			}
 			it.SortKey = data
+		case "search":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Search = data
 		}
 	}
 

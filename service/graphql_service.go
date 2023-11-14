@@ -16,6 +16,7 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -34,8 +35,11 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	tenantsPb, err := clientClerkHandler.FindAllTenantsPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, AllowedTenants: allowedTenants})
+	tenantsPb, err := clientClerkHandler.FindAllTenantsPaginated(ctx, getPaginationObject("", skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not FindAllTenants: %v", err)
 	}
@@ -52,6 +56,7 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.Cle
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -70,8 +75,11 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.Cle
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantID: %v", err)
 	}
@@ -89,7 +97,7 @@ func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHan
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -108,8 +116,11 @@ func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHan
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -128,6 +139,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 	take := 10
 	skip := 0
 	tenantId := ""
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -149,8 +161,11 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 		if options.TenantID != nil {
 			tenantId = *options.TenantID
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: tenantId, AllowedTenants: allowedTenants})
+	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, getPaginationObject(tenantId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -176,7 +191,7 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -195,8 +210,11 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -215,7 +233,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 	take := 10
 	skip := 0
 	collectionId := ""
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -237,8 +255,11 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 		if options.CollectionID != nil {
 			collectionId = *options.CollectionID
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: collectionId, AllowedTenants: allowedTenants})
+	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, getPaginationObject(collectionId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -265,7 +286,7 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -284,8 +305,11 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstancesByObjectIdPaginated: %v", err)
 	}
@@ -303,7 +327,7 @@ func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -322,8 +346,11 @@ func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetFilesByObjectIdPaginated: %v", err)
 	}
@@ -342,7 +369,7 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 	take := 10
 	skip := 0
 	objectId := ""
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -364,8 +391,11 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 		if options.ObjectID != nil {
 			objectId = *options.ObjectID
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: objectId, AllowedTenants: allowedTenants})
+	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, getPaginationObject(objectId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstancesByObjectIdPaginated: %v", err)
 	}
@@ -401,7 +431,7 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 	take := 10
 	skip := 0
 	objectId := ""
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -423,8 +453,11 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 		if options.ObjectID != nil {
 			objectId = *options.ObjectID
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: objectId, AllowedTenants: allowedTenants})
+	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, getPaginationObject(objectId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetFilesByObjectIdPaginated: %v", err)
 	}
@@ -450,7 +483,7 @@ func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHa
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -469,8 +502,11 @@ func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHa
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstanceChecksByObjectInstanceIdPaginated: %v", err)
 	}
@@ -489,7 +525,7 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 	take := 10
 	skip := 0
 	objectInstanceId := ""
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -511,8 +547,11 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 		if options.ObjectInstanceID != nil {
 			objectInstanceId = *options.ObjectInstanceID
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: objectInstanceId, AllowedTenants: allowedTenants})
+	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, getPaginationObject(objectInstanceId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstanceChecksByObjectInstanceIdPaginated: %v", err)
 	}
@@ -539,7 +578,7 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 	take := 10
 	skip := 0
 	tenantId := ""
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -561,8 +600,11 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 		if options.TenantID != nil {
 			tenantId = *options.TenantID
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: tenantId, AllowedTenants: allowedTenants})
+	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, getPaginationObject(tenantId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantIdPaginated: %v", err)
 	}
@@ -589,7 +631,7 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 	take := 10
 	skip := 0
 	storageLocationId := ""
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -611,8 +653,11 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 		if options.StorageLocationID != nil {
 			storageLocationId = *options.StorageLocationID
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: storageLocationId, AllowedTenants: allowedTenants})
+	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, getPaginationObject(storageLocationId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionsByLocationIdPaginated: %v", err)
 	}
@@ -638,6 +683,7 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -656,8 +702,11 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionsByLocationIdPaginated: %v", err)
 	}
@@ -675,7 +724,7 @@ func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandl
 	sortDirection := "ASC"
 	take := 10
 	skip := 0
-
+	searchField := ""
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -694,8 +743,11 @@ func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandl
 		if options.Skip != nil {
 			skip = *options.Skip
 		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
 	}
-	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByStoragePartitionIdPaginated(ctx, &pb.Pagination{Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, Id: obj.ID})
+	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByStoragePartitionIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstancesByStoragePartitionIdPaginated: %v", err)
 	}
@@ -937,4 +989,8 @@ func storagePartitionToGraphQlStoragePartition(storagePartitionPb *pb.StoragePar
 	storagePartition.StorageLocationID = storagePartitionPb.StorageLocationId
 
 	return &storagePartition
+}
+
+func getPaginationObject(id string, skip int, take int, sortDirection string, sortKey string, allowedTenants []string, searchField string) *pb.Pagination {
+	return &pb.Pagination{Id: id, Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, AllowedTenants: allowedTenants, SearchField: searchField}
 }

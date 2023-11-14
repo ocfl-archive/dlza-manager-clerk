@@ -59,6 +59,7 @@ type CollectionListOptions struct {
 	Take          *int               `json:"take,omitempty"`
 	SortDirection *SortDirection     `json:"sortDirection,omitempty"`
 	SortKey       *CollectionSortKey `json:"sortKey,omitempty"`
+	Search        *string            `json:"search,omitempty"`
 }
 
 type File struct {
@@ -102,6 +103,7 @@ type FileListOptions struct {
 	Take          *int           `json:"take,omitempty"`
 	SortDirection *SortDirection `json:"sortDirection,omitempty"`
 	SortKey       *FileSortKey   `json:"sortKey,omitempty"`
+	Search        *string        `json:"search,omitempty"`
 }
 
 type Object struct {
@@ -182,6 +184,7 @@ type ObjectInstanceCheckListOptions struct {
 	Take             *int                        `json:"take,omitempty"`
 	SortDirection    *SortDirection              `json:"sortDirection,omitempty"`
 	SortKey          *ObjectInstanceCheckSortKey `json:"sortKey,omitempty"`
+	Search           *string                     `json:"search,omitempty"`
 }
 
 type ObjectInstanceList struct {
@@ -208,6 +211,7 @@ type ObjectInstanceListOptions struct {
 	Take          *int                   `json:"take,omitempty"`
 	SortDirection *SortDirection         `json:"sortDirection,omitempty"`
 	SortKey       *ObjectInstanceSortKey `json:"sortKey,omitempty"`
+	Search        *string                `json:"search,omitempty"`
 }
 
 type ObjectList struct {
@@ -234,6 +238,7 @@ type ObjectListOptions struct {
 	Take          *int           `json:"take,omitempty"`
 	SortDirection *SortDirection `json:"sortDirection,omitempty"`
 	SortKey       *ObjectSortKey `json:"sortKey,omitempty"`
+	Search        *string        `json:"search,omitempty"`
 }
 
 type StorageLocation struct {
@@ -280,6 +285,7 @@ type StorageLocationListOptions struct {
 	Take          *int                    `json:"take,omitempty"`
 	SortDirection *SortDirection          `json:"sortDirection,omitempty"`
 	SortKey       *StorageLocationSortKey `json:"sortKey,omitempty"`
+	Search        *string                 `json:"search,omitempty"`
 }
 
 type StoragePartition struct {
@@ -322,6 +328,7 @@ type StoragePartitionListOptions struct {
 	Take              *int                     `json:"take,omitempty"`
 	SortDirection     *SortDirection           `json:"sortDirection,omitempty"`
 	SortKey           *StoragePartitionSortKey `json:"sortKey,omitempty"`
+	Search            *string                  `json:"search,omitempty"`
 }
 
 type Tenant struct {
@@ -360,21 +367,24 @@ type TenantListOptions struct {
 	Take          *int           `json:"take,omitempty"`
 	SortDirection *SortDirection `json:"sortDirection,omitempty"`
 	SortKey       *TenantSortKey `json:"sortKey,omitempty"`
+	Search        *string        `json:"search,omitempty"`
 }
 
 type CollectionSortKey string
 
 const (
+	CollectionSortKeyID   CollectionSortKey = "ID"
 	CollectionSortKeyName CollectionSortKey = "NAME"
 )
 
 var AllCollectionSortKey = []CollectionSortKey{
+	CollectionSortKeyID,
 	CollectionSortKeyName,
 }
 
 func (e CollectionSortKey) IsValid() bool {
 	switch e {
-	case CollectionSortKeyName:
+	case CollectionSortKeyID, CollectionSortKeyName:
 		return true
 	}
 	return false
@@ -404,16 +414,18 @@ func (e CollectionSortKey) MarshalGQL(w io.Writer) {
 type FileSortKey string
 
 const (
+	FileSortKeyID   FileSortKey = "ID"
 	FileSortKeyName FileSortKey = "NAME"
 )
 
 var AllFileSortKey = []FileSortKey{
+	FileSortKeyID,
 	FileSortKeyName,
 }
 
 func (e FileSortKey) IsValid() bool {
 	switch e {
-	case FileSortKeyName:
+	case FileSortKeyID, FileSortKeyName:
 		return true
 	}
 	return false
@@ -601,16 +613,18 @@ func (e SortDirection) MarshalGQL(w io.Writer) {
 type StorageLocationSortKey string
 
 const (
+	StorageLocationSortKeyID    StorageLocationSortKey = "ID"
 	StorageLocationSortKeyAlias StorageLocationSortKey = "ALIAS"
 )
 
 var AllStorageLocationSortKey = []StorageLocationSortKey{
+	StorageLocationSortKeyID,
 	StorageLocationSortKeyAlias,
 }
 
 func (e StorageLocationSortKey) IsValid() bool {
 	switch e {
-	case StorageLocationSortKeyAlias:
+	case StorageLocationSortKeyID, StorageLocationSortKeyAlias:
 		return true
 	}
 	return false
@@ -640,16 +654,18 @@ func (e StorageLocationSortKey) MarshalGQL(w io.Writer) {
 type StoragePartitionSortKey string
 
 const (
+	StoragePartitionSortKeyID    StoragePartitionSortKey = "ID"
 	StoragePartitionSortKeyAlias StoragePartitionSortKey = "ALIAS"
 )
 
 var AllStoragePartitionSortKey = []StoragePartitionSortKey{
+	StoragePartitionSortKeyID,
 	StoragePartitionSortKeyAlias,
 }
 
 func (e StoragePartitionSortKey) IsValid() bool {
 	switch e {
-	case StoragePartitionSortKeyAlias:
+	case StoragePartitionSortKeyID, StoragePartitionSortKeyAlias:
 		return true
 	}
 	return false
