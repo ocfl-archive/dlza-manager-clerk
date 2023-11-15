@@ -7,15 +7,17 @@ import (
 	"embed"
 	"io/fs"
 	"net/http"
-
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	"strings"
 
 	"emperror.dev/errors"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/tbaehler/gin-keycloak/pkg/ginkeycloak"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/constants"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"golang.org/x/net/http2"
 )
@@ -120,6 +122,24 @@ func (srv *Server) graphqlHandler(clientClerkHandler pb.ClerkHandlerServiceClien
 	// Resolver is in the resolver.go file
 	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{ClientClerkHandler: clientClerkHandler}}))
 	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
+
+		rawAccessToken := c.Request.Header.Get("Authorization")
+		parts := strings.Split(rawAccessToken, " ")
+		if len(parts) != 2 {
+			c.Writer.WriteHeader(400)
+			return
+		}
+		var userClaim models.KeyCloakToken
+
+		_, err := jwt.ParseWithClaims(parts[1], &userClaim, nil)
+		if err != nil {
+			c.Writer.WriteHeader(400)
+		}
+
+		ctx := context.WithValue(c, constants.Needed, "Needed to attach context")
+		c.Set("keycloak_group", userClaim.Groups)
+		c.Set("tenant_list", userClaim.TenantList)
+
+		h.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
 }
