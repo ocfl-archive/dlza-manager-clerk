@@ -39,6 +39,7 @@ type KeyCloakToken struct {
 	EmailVerified     bool                   `json:"email_verified,omitempty"`
 	Sid               string                 `json:"sid,omitempty"`
 	Aud               string                 `json:"aud,omitempty"`
+	TenantList        []string               `json:"tenant_list,omitempty"`
 }
 
 type ServiceRole struct {
