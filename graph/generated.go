@@ -53,16 +53,20 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Collection struct {
-		Alias       func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Objects     func(childComplexity int, options *model.ObjectListOptions) int
-		Owner       func(childComplexity int) int
-		OwnerMail   func(childComplexity int) int
-		Quality     func(childComplexity int) int
-		Tenant      func(childComplexity int) int
-		TenantID    func(childComplexity int) int
+		Alias            func(childComplexity int) int
+		Description      func(childComplexity int) int
+		Files            func(childComplexity int, options *model.FileListOptions) int
+		ID               func(childComplexity int) int
+		Name             func(childComplexity int) int
+		Objects          func(childComplexity int, options *model.ObjectListOptions) int
+		Owner            func(childComplexity int) int
+		OwnerMail        func(childComplexity int) int
+		Quality          func(childComplexity int) int
+		Tenant           func(childComplexity int) int
+		TenantID         func(childComplexity int) int
+		TotalFileCount   func(childComplexity int) int
+		TotalFileSize    func(childComplexity int) int
+		TotalObjectCount func(childComplexity int) int
 	}
 
 	CollectionList struct {
@@ -75,7 +79,7 @@ type ComplexityRoot struct {
 		Duration func(childComplexity int) int
 		Height   func(childComplexity int) int
 		ID       func(childComplexity int) int
-		Mimetype func(childComplexity int) int
+		MimeType func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Object   func(childComplexity int) int
 		ObjectID func(childComplexity int) int
@@ -85,6 +89,16 @@ type ComplexityRoot struct {
 	}
 
 	FileList struct {
+		Items      func(childComplexity int) int
+		TotalItems func(childComplexity int) int
+	}
+
+	MimeType struct {
+		FileCount func(childComplexity int) int
+		ID        func(childComplexity int) int
+	}
+
+	MimeTypeList struct {
 		Items      func(childComplexity int) int
 		TotalItems func(childComplexity int) int
 	}
@@ -154,6 +168,7 @@ type ComplexityRoot struct {
 		Collections          func(childComplexity int, options *model.CollectionListOptions) int
 		File                 func(childComplexity int, id string) int
 		Files                func(childComplexity int, options *model.FileListOptions) int
+		MimeTypes            func(childComplexity int, options *model.MimeTypeListOptions) int
 		Object               func(childComplexity int, id string) int
 		ObjectInstance       func(childComplexity int, id string) int
 		ObjectInstanceCheck  func(childComplexity int, id string) int
@@ -226,6 +241,10 @@ type ComplexityRoot struct {
 
 type CollectionResolver interface {
 	Objects(ctx context.Context, obj *model.Collection, options *model.ObjectListOptions) (*model.ObjectList, error)
+	Files(ctx context.Context, obj *model.Collection, options *model.FileListOptions) (*model.FileList, error)
+	TotalFileSize(ctx context.Context, obj *model.Collection) (int, error)
+	TotalFileCount(ctx context.Context, obj *model.Collection) (int, error)
+	TotalObjectCount(ctx context.Context, obj *model.Collection) (int, error)
 }
 type ObjectResolver interface {
 	ObjectInstances(ctx context.Context, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error)
@@ -251,6 +270,7 @@ type QueryResolver interface {
 	StorageLocation(ctx context.Context, id string) (*model.StorageLocation, error)
 	StoragePartitions(ctx context.Context, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error)
 	StoragePartition(ctx context.Context, id string) (*model.StoragePartition, error)
+	MimeTypes(ctx context.Context, options *model.MimeTypeListOptions) (*model.MimeTypeList, error)
 }
 type StorageLocationResolver interface {
 	StoragePartitions(ctx context.Context, obj *model.StorageLocation, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error)
@@ -295,6 +315,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Collection.Description(childComplexity), true
+
+	case "Collection.files":
+		if e.complexity.Collection.Files == nil {
+			break
+		}
+
+		args, err := ec.field_Collection_files_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Collection.Files(childComplexity, args["options"].(*model.FileListOptions)), true
 
 	case "Collection.id":
 		if e.complexity.Collection.ID == nil {
@@ -357,6 +389,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Collection.TenantID(childComplexity), true
 
+	case "Collection.totalFileCount":
+		if e.complexity.Collection.TotalFileCount == nil {
+			break
+		}
+
+		return e.complexity.Collection.TotalFileCount(childComplexity), true
+
+	case "Collection.totalFileSize":
+		if e.complexity.Collection.TotalFileSize == nil {
+			break
+		}
+
+		return e.complexity.Collection.TotalFileSize(childComplexity), true
+
+	case "Collection.totalObjectCount":
+		if e.complexity.Collection.TotalObjectCount == nil {
+			break
+		}
+
+		return e.complexity.Collection.TotalObjectCount(childComplexity), true
+
 	case "CollectionList.items":
 		if e.complexity.CollectionList.Items == nil {
 			break
@@ -399,12 +452,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.File.ID(childComplexity), true
 
-	case "File.mimetype":
-		if e.complexity.File.Mimetype == nil {
+	case "File.mimeType":
+		if e.complexity.File.MimeType == nil {
 			break
 		}
 
-		return e.complexity.File.Mimetype(childComplexity), true
+		return e.complexity.File.MimeType(childComplexity), true
 
 	case "File.name":
 		if e.complexity.File.Name == nil {
@@ -461,6 +514,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.FileList.TotalItems(childComplexity), true
+
+	case "MimeType.fileCount":
+		if e.complexity.MimeType.FileCount == nil {
+			break
+		}
+
+		return e.complexity.MimeType.FileCount(childComplexity), true
+
+	case "MimeType.id":
+		if e.complexity.MimeType.ID == nil {
+			break
+		}
+
+		return e.complexity.MimeType.ID(childComplexity), true
+
+	case "MimeTypeList.items":
+		if e.complexity.MimeTypeList.Items == nil {
+			break
+		}
+
+		return e.complexity.MimeTypeList.Items(childComplexity), true
+
+	case "MimeTypeList.totalItems":
+		if e.complexity.MimeTypeList.TotalItems == nil {
+			break
+		}
+
+		return e.complexity.MimeTypeList.TotalItems(childComplexity), true
 
 	case "Object.address":
 		if e.complexity.Object.Address == nil {
@@ -818,6 +899,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Files(childComplexity, args["options"].(*model.FileListOptions)), true
+
+	case "Query.mimeTypes":
+		if e.complexity.Query.MimeTypes == nil {
+			break
+		}
+
+		args, err := ec.field_Query_mimeTypes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MimeTypes(childComplexity, args["options"].(*model.MimeTypeListOptions)), true
 
 	case "Query.object":
 		if e.complexity.Query.Object == nil {
@@ -1252,6 +1345,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCollectionListOptions,
 		ec.unmarshalInputFileListOptions,
+		ec.unmarshalInputMimeTypeListOptions,
 		ec.unmarshalInputObjectInstanceCheckListOptions,
 		ec.unmarshalInputObjectInstanceListOptions,
 		ec.unmarshalInputObjectListOptions,
@@ -1358,6 +1452,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Collection_files_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.FileListOptions
+	if tmp, ok := rawArgs["options"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
+		arg0, err = ec.unmarshalOFileListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileListOptions(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Collection_objects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1486,6 +1595,21 @@ func (ec *executionContext) field_Query_files_args(ctx context.Context, rawArgs 
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
 		arg0, err = ec.unmarshalOFileListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileListOptions(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_mimeTypes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.MimeTypeListOptions
+	if tmp, ok := rawArgs["options"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
+		arg0, err = ec.unmarshalOMimeTypeListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2245,6 +2369,199 @@ func (ec *executionContext) fieldContext_Collection_objects(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Collection_files(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_files(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collection().Files(rctx, obj, fc.Args["options"].(*model.FileListOptions))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.FileList)
+	fc.Result = res
+	return ec.marshalNFileList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_files(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "items":
+				return ec.fieldContext_FileList_items(ctx, field)
+			case "totalItems":
+				return ec.fieldContext_FileList_totalItems(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type FileList", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Collection_files_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collection_totalFileSize(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_totalFileSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collection().TotalFileSize(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_totalFileSize(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collection_totalFileCount(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_totalFileCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collection().TotalFileCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_totalFileCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collection_totalObjectCount(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_totalObjectCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collection().TotalObjectCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_totalObjectCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CollectionList_items(ctx context.Context, field graphql.CollectedField, obj *model.CollectionList) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CollectionList_items(ctx, field)
 	if err != nil {
@@ -2304,6 +2621,14 @@ func (ec *executionContext) fieldContext_CollectionList_items(ctx context.Contex
 				return ec.fieldContext_Collection_tenant(ctx, field)
 			case "objects":
 				return ec.fieldContext_Collection_objects(ctx, field)
+			case "files":
+				return ec.fieldContext_Collection_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Collection_totalFileCount(ctx, field)
+			case "totalObjectCount":
+				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -2487,8 +2812,8 @@ func (ec *executionContext) fieldContext_File_name(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _File_mimetype(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_mimetype(ctx, field)
+func (ec *executionContext) _File_mimeType(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_mimeType(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2501,7 +2826,7 @@ func (ec *executionContext) _File_mimetype(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Mimetype, nil
+		return obj.MimeType, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2518,7 +2843,7 @@ func (ec *executionContext) _File_mimetype(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_File_mimetype(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_File_mimeType(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "File",
 		Field:      field,
@@ -2926,8 +3251,8 @@ func (ec *executionContext) fieldContext_FileList_items(ctx context.Context, fie
 				return ec.fieldContext_File_checksum(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
-			case "mimetype":
-				return ec.fieldContext_File_mimetype(ctx, field)
+			case "mimeType":
+				return ec.fieldContext_File_mimeType(ctx, field)
 			case "size":
 				return ec.fieldContext_File_size(ctx, field)
 			case "pronom":
@@ -2983,6 +3308,188 @@ func (ec *executionContext) _FileList_totalItems(ctx context.Context, field grap
 func (ec *executionContext) fieldContext_FileList_totalItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "FileList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MimeType_id(ctx context.Context, field graphql.CollectedField, obj *model.MimeType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MimeType_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MimeType_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MimeType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MimeType_fileCount(ctx context.Context, field graphql.CollectedField, obj *model.MimeType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MimeType_fileCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MimeType_fileCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MimeType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MimeTypeList_items(ctx context.Context, field graphql.CollectedField, obj *model.MimeTypeList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MimeTypeList_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.MimeType)
+	fc.Result = res
+	return ec.marshalNMimeType2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MimeTypeList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MimeTypeList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MimeType_id(ctx, field)
+			case "fileCount":
+				return ec.fieldContext_MimeType_fileCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MimeType", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MimeTypeList_totalItems(ctx context.Context, field graphql.CollectedField, obj *model.MimeTypeList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MimeTypeList_totalItems(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MimeTypeList_totalItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MimeTypeList",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -3756,6 +4263,14 @@ func (ec *executionContext) fieldContext_Object_collection(ctx context.Context, 
 				return ec.fieldContext_Collection_tenant(ctx, field)
 			case "objects":
 				return ec.fieldContext_Collection_objects(ctx, field)
+			case "files":
+				return ec.fieldContext_Collection_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Collection_totalFileCount(ctx, field)
+			case "totalObjectCount":
+				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -5324,6 +5839,14 @@ func (ec *executionContext) fieldContext_Query_collection(ctx context.Context, f
 				return ec.fieldContext_Collection_tenant(ctx, field)
 			case "objects":
 				return ec.fieldContext_Collection_objects(ctx, field)
+			case "files":
+				return ec.fieldContext_Collection_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Collection_totalFileCount(ctx, field)
+			case "totalObjectCount":
+				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -5862,8 +6385,8 @@ func (ec *executionContext) fieldContext_Query_file(ctx context.Context, field g
 				return ec.fieldContext_File_checksum(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
-			case "mimetype":
-				return ec.fieldContext_File_mimetype(ctx, field)
+			case "mimeType":
+				return ec.fieldContext_File_mimeType(ctx, field)
 			case "size":
 				return ec.fieldContext_File_size(ctx, field)
 			case "pronom":
@@ -6168,6 +6691,67 @@ func (ec *executionContext) fieldContext_Query_storagePartition(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_storagePartition_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_mimeTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_mimeTypes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MimeTypes(rctx, fc.Args["options"].(*model.MimeTypeListOptions))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.MimeTypeList)
+	fc.Result = res
+	return ec.marshalNMimeTypeList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_mimeTypes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "items":
+				return ec.fieldContext_MimeTypeList_items(ctx, field)
+			case "totalItems":
+				return ec.fieldContext_MimeTypeList_totalItems(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MimeTypeList", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_mimeTypes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -9967,22 +10551,31 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ObjectId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"objectId", "collectionId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "ObjectId":
+		case "objectId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ObjectId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objectId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ObjectID = data
+		case "collectionId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CollectionID = data
 		case "skip":
 			var err error
 
@@ -10034,6 +10627,71 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Context, obj interface{}) (model.MimeTypeListOptions, error) {
+	var it model.MimeTypeListOptions
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"collectionId", "skip", "take", "sortDirection", "sortKey"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "collectionId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CollectionID = data
+		case "skip":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Skip = data
+		case "take":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Take = data
+		case "sortDirection":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SortDirection = data
+		case "sortKey":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
+			data, err := ec.unmarshalOMimeTypeSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeSortKey(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SortKey = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx context.Context, obj interface{}) (model.ObjectInstanceCheckListOptions, error) {
 	var it model.ObjectInstanceCheckListOptions
 	asMap := map[string]interface{}{}
@@ -10041,17 +10699,17 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ObjectInstanceId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"objectInstanceId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "ObjectInstanceId":
+		case "objectInstanceId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ObjectInstanceId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objectInstanceId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
@@ -10533,6 +11191,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._ObjectInstanceCheck(ctx, sel, obj)
+	case model.MimeType:
+		return ec._MimeType(ctx, sel, &obj)
+	case *model.MimeType:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._MimeType(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -10598,6 +11263,13 @@ func (ec *executionContext) _PaginatedList(ctx context.Context, sel ast.Selectio
 			return graphql.Null
 		}
 		return ec._FileList(ctx, sel, obj)
+	case model.MimeTypeList:
+		return ec._MimeTypeList(ctx, sel, &obj)
+	case *model.MimeTypeList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._MimeTypeList(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -10673,6 +11345,150 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 					}
 				}()
 				res = ec._Collection_objects(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "files":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collection_files(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "totalFileSize":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collection_totalFileSize(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "totalFileCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collection_totalFileCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "totalObjectCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collection_totalObjectCount(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10792,8 +11608,8 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "mimetype":
-			out.Values[i] = ec._File_mimetype(ctx, field, obj)
+		case "mimeType":
+			out.Values[i] = ec._File_mimeType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -10873,6 +11689,94 @@ func (ec *executionContext) _FileList(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "totalItems":
 			out.Values[i] = ec._FileList_totalItems(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mimeTypeImplementors = []string{"MimeType", "Node"}
+
+func (ec *executionContext) _MimeType(ctx context.Context, sel ast.SelectionSet, obj *model.MimeType) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mimeTypeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MimeType")
+		case "id":
+			out.Values[i] = ec._MimeType_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileCount":
+			out.Values[i] = ec._MimeType_fileCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mimeTypeListImplementors = []string{"MimeTypeList", "PaginatedList"}
+
+func (ec *executionContext) _MimeTypeList(ctx context.Context, sel ast.SelectionSet, obj *model.MimeTypeList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mimeTypeListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MimeTypeList")
+		case "items":
+			out.Values[i] = ec._MimeTypeList_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalItems":
+			out.Values[i] = ec._MimeTypeList_totalItems(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11744,6 +12648,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_storagePartition(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "mimeTypes":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_mimeTypes(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -12804,6 +13730,74 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) marshalNMimeType2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MimeType) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMimeType2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMimeType2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeType(ctx context.Context, sel ast.SelectionSet, v *model.MimeType) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MimeType(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMimeTypeList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeList(ctx context.Context, sel ast.SelectionSet, v model.MimeTypeList) graphql.Marshaler {
+	return ec._MimeTypeList(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMimeTypeList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeList(ctx context.Context, sel ast.SelectionSet, v *model.MimeTypeList) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MimeTypeList(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNObject2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Object) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -13630,6 +14624,30 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOMimeTypeListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeListOptions(ctx context.Context, v interface{}) (*model.MimeTypeListOptions, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMimeTypeListOptions(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOMimeTypeSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeSortKey(ctx context.Context, v interface{}) (*model.MimeTypeSortKey, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.MimeTypeSortKey)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMimeTypeSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeSortKey(ctx context.Context, sel ast.SelectionSet, v *model.MimeTypeSortKey) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOObject2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObject(ctx context.Context, sel ast.SelectionSet, v *model.Object) graphql.Marshaler {

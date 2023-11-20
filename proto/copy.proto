@@ -52,9 +52,13 @@ service ClerkHandlerService {
   rpc FindAllTenantsPaginated(Pagination) returns (Tenants){};
   rpc GetCollectionsByTenantIdPaginated(Pagination) returns (Collections){};
   rpc GetObjectsByCollectionIdPaginated(Pagination) returns (Objects){}
+  rpc GetFilesByCollectionIdPaginated(Pagination) returns (Files){}
+  rpc GetMimeTypesForCollectionId(Pagination) returns (MimeTypes){}
   rpc GetObjectInstancesByObjectIdPaginated(Pagination) returns (ObjectInstances){}
   rpc GetFilesByObjectIdPaginated(Pagination) returns (Files){}
   rpc GetObjectInstanceChecksByObjectInstanceIdPaginated(Pagination) returns (ObjectInstanceChecks){}
+  rpc GetFilesSizeAndCountForCollection(Id) returns (FilesSizeAndCount){}
+  rpc GetObjectsCountForCollection(Id) returns (ObjectsCount){}
 
   rpc GetStorageLocationsByTenantIdPaginated(Pagination) returns (StorageLocations){};
   rpc GetStoragePartitionsByLocationIdPaginated(Pagination) returns (StoragePartitions){}
@@ -234,7 +238,7 @@ message File {
   string Checksum = 1;
   repeated string  Name = 2;
   int64    Size = 3;
-  string  Mimetype = 4;
+  string  MimeType = 4;
   string  Pronom = 5;
   int64 Width = 6;
   int64 Height = 7;
@@ -259,5 +263,23 @@ message ObjectInstanceCheck {
 message ObjectInstanceChecks {
   repeated ObjectInstanceCheck ObjectInstanceChecks = 1;
   int32 TotalItems = 2;
+}
 
+message MimeType {
+  string Id = 1;
+  int32  FileCount = 2;
+}
+
+message MimeTypes {
+  repeated MimeType MimeTypes = 1;
+  int32 TotalItems = 2;
+}
+
+message FilesSizeAndCount {
+  int64 Size = 1;
+  int32 Count = 2;
+}
+
+message ObjectsCount {
+  int32 Count = 2;
 }

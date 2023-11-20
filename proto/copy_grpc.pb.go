@@ -644,9 +644,13 @@ type ClerkHandlerServiceClient interface {
 	FindAllTenantsPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Tenants, error)
 	GetCollectionsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Collections, error)
 	GetObjectsByCollectionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Objects, error)
+	GetFilesByCollectionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error)
+	GetMimeTypesForCollectionId(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*MimeTypes, error)
 	GetObjectInstancesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
 	GetFilesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error)
 	GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstanceChecks, error)
+	GetFilesSizeAndCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FilesSizeAndCount, error)
+	GetObjectsCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectsCount, error)
 	GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error)
 	GetStoragePartitionsByLocationIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StoragePartitions, error)
 	GetObjectInstancesByStoragePartitionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
@@ -858,6 +862,24 @@ func (c *clerkHandlerServiceClient) GetObjectsByCollectionIdPaginated(ctx contex
 	return out, nil
 }
 
+func (c *clerkHandlerServiceClient) GetFilesByCollectionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error) {
+	out := new(Files)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetFilesByCollectionIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetMimeTypesForCollectionId(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*MimeTypes, error) {
+	out := new(MimeTypes)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetMimeTypesForCollectionId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *clerkHandlerServiceClient) GetObjectInstancesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error) {
 	out := new(ObjectInstances)
 	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstancesByObjectIdPaginated", in, out, opts...)
@@ -879,6 +901,24 @@ func (c *clerkHandlerServiceClient) GetFilesByObjectIdPaginated(ctx context.Cont
 func (c *clerkHandlerServiceClient) GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstanceChecks, error) {
 	out := new(ObjectInstanceChecks)
 	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstanceChecksByObjectInstanceIdPaginated", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetFilesSizeAndCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FilesSizeAndCount, error) {
+	out := new(FilesSizeAndCount)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetFilesSizeAndCountForCollection", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) GetObjectsCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectsCount, error) {
+	out := new(ObjectsCount)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectsCountForCollection", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -938,9 +978,13 @@ type ClerkHandlerServiceServer interface {
 	FindAllTenantsPaginated(context.Context, *Pagination) (*Tenants, error)
 	GetCollectionsByTenantIdPaginated(context.Context, *Pagination) (*Collections, error)
 	GetObjectsByCollectionIdPaginated(context.Context, *Pagination) (*Objects, error)
+	GetFilesByCollectionIdPaginated(context.Context, *Pagination) (*Files, error)
+	GetMimeTypesForCollectionId(context.Context, *Pagination) (*MimeTypes, error)
 	GetObjectInstancesByObjectIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
 	GetFilesByObjectIdPaginated(context.Context, *Pagination) (*Files, error)
 	GetObjectInstanceChecksByObjectInstanceIdPaginated(context.Context, *Pagination) (*ObjectInstanceChecks, error)
+	GetFilesSizeAndCountForCollection(context.Context, *Id) (*FilesSizeAndCount, error)
+	GetObjectsCountForCollection(context.Context, *Id) (*ObjectsCount, error)
 	GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error)
 	GetStoragePartitionsByLocationIdPaginated(context.Context, *Pagination) (*StoragePartitions, error)
 	GetObjectInstancesByStoragePartitionIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
@@ -1017,6 +1061,12 @@ func (UnimplementedClerkHandlerServiceServer) GetCollectionsByTenantIdPaginated(
 func (UnimplementedClerkHandlerServiceServer) GetObjectsByCollectionIdPaginated(context.Context, *Pagination) (*Objects, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectsByCollectionIdPaginated not implemented")
 }
+func (UnimplementedClerkHandlerServiceServer) GetFilesByCollectionIdPaginated(context.Context, *Pagination) (*Files, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFilesByCollectionIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetMimeTypesForCollectionId(context.Context, *Pagination) (*MimeTypes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMimeTypesForCollectionId not implemented")
+}
 func (UnimplementedClerkHandlerServiceServer) GetObjectInstancesByObjectIdPaginated(context.Context, *Pagination) (*ObjectInstances, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstancesByObjectIdPaginated not implemented")
 }
@@ -1025,6 +1075,12 @@ func (UnimplementedClerkHandlerServiceServer) GetFilesByObjectIdPaginated(contex
 }
 func (UnimplementedClerkHandlerServiceServer) GetObjectInstanceChecksByObjectInstanceIdPaginated(context.Context, *Pagination) (*ObjectInstanceChecks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstanceChecksByObjectInstanceIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetFilesSizeAndCountForCollection(context.Context, *Id) (*FilesSizeAndCount, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFilesSizeAndCountForCollection not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetObjectsCountForCollection(context.Context, *Id) (*ObjectsCount, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetObjectsCountForCollection not implemented")
 }
 func (UnimplementedClerkHandlerServiceServer) GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationsByTenantIdPaginated not implemented")
@@ -1444,6 +1500,42 @@ func _ClerkHandlerService_GetObjectsByCollectionIdPaginated_Handler(srv interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClerkHandlerService_GetFilesByCollectionIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetFilesByCollectionIdPaginated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetFilesByCollectionIdPaginated",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetFilesByCollectionIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetMimeTypesForCollectionId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetMimeTypesForCollectionId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetMimeTypesForCollectionId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetMimeTypesForCollectionId(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ClerkHandlerService_GetObjectInstancesByObjectIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Pagination)
 	if err := dec(in); err != nil {
@@ -1494,6 +1586,42 @@ func _ClerkHandlerService_GetObjectInstanceChecksByObjectInstanceIdPaginated_Han
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ClerkHandlerServiceServer).GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetFilesSizeAndCountForCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetFilesSizeAndCountForCollection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetFilesSizeAndCountForCollection",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetFilesSizeAndCountForCollection(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_GetObjectsCountForCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetObjectsCountForCollection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetObjectsCountForCollection",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetObjectsCountForCollection(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1648,6 +1776,14 @@ var ClerkHandlerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ClerkHandlerService_GetObjectsByCollectionIdPaginated_Handler,
 		},
 		{
+			MethodName: "GetFilesByCollectionIdPaginated",
+			Handler:    _ClerkHandlerService_GetFilesByCollectionIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetMimeTypesForCollectionId",
+			Handler:    _ClerkHandlerService_GetMimeTypesForCollectionId_Handler,
+		},
+		{
 			MethodName: "GetObjectInstancesByObjectIdPaginated",
 			Handler:    _ClerkHandlerService_GetObjectInstancesByObjectIdPaginated_Handler,
 		},
@@ -1658,6 +1794,14 @@ var ClerkHandlerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetObjectInstanceChecksByObjectInstanceIdPaginated",
 			Handler:    _ClerkHandlerService_GetObjectInstanceChecksByObjectInstanceIdPaginated_Handler,
+		},
+		{
+			MethodName: "GetFilesSizeAndCountForCollection",
+			Handler:    _ClerkHandlerService_GetFilesSizeAndCountForCollection_Handler,
+		},
+		{
+			MethodName: "GetObjectsCountForCollection",
+			Handler:    _ClerkHandlerService_GetObjectsCountForCollection_Handler,
 		},
 		{
 			MethodName: "GetStorageLocationsByTenantIdPaginated",

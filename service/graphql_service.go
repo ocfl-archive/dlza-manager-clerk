@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"regexp"
+	"strings"
 
 	"slices"
 
@@ -34,7 +36,6 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 	take := 10
 	skip := 0
 	searchField := ""
-
 	if options != nil {
 		if options.SortKey != nil {
 			sortKey = options.SortKey.String()
@@ -250,7 +251,7 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 	}
 	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetObjectsByCollectionIdPaginated: %v", err)
 	}
 	objects := make([]*model.Object, 0)
 	for _, objectPb := range objectsPb.Objects {
@@ -259,6 +260,55 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 		objects = append(objects, object)
 	}
 	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
+}
+
+func GetFilesForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection, options *model.FileListOptions) (*model.FileList, error) {
+	sortKey := "ID"
+	sortDirection := "ASC"
+	take := 10
+	skip := 0
+	searchField := ""
+	if options != nil {
+		if options.SortKey != nil {
+			sortKey = options.SortKey.String()
+		}
+		if options.SortDirection != nil {
+			if *options.SortDirection == model.SortDirectionDescending {
+				sortDirection = "DESC"
+			}
+		}
+		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 objects")
+			}
+			take = *options.Take
+		}
+		if options.Skip != nil {
+			skip = *options.Skip
+		}
+		if options.Search != nil {
+			searchField = *options.Search
+		}
+	}
+	filesPb, err := clientClerkHandler.GetFilesByCollectionIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetFilesByCollectionIdPaginated: %v", err)
+	}
+	objectsMap := make(map[string]*model.Object)
+	files := make([]*model.File, 0)
+	for _, filePb := range filesPb.Files {
+		file := fileToGraphQlFile(filePb)
+		if objectsMap[file.ObjectID] == nil {
+			objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: file.ObjectID})
+			if err != nil {
+				return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
+			}
+			objectsMap[file.ObjectID] = objectToGraphQlObject(objectPb)
+		}
+		file.Object = objectsMap[file.ObjectID]
+		files = append(files, file)
+	}
+	return &model.FileList{Items: files, TotalItems: int(filesPb.TotalItems)}, nil
 }
 
 func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.ObjectListOptions, allowedTenants []string) (*model.ObjectList, error) {
@@ -1024,6 +1074,73 @@ func GetStoragePartitionById(ctx context.Context, clientClerkHandler pb.ClerkHan
 	return storagePartition, err
 }
 
+//Statistic
+
+func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.MimeTypeListOptions, allowedTenants []string) (*model.MimeTypeList, error) {
+	sortKey := "ID"
+	sortDirection := "ASC"
+	take := 10
+	skip := 0
+	collectionId := ""
+
+	if options != nil {
+		if options.SortKey != nil {
+			sortKey = options.SortKey.String()
+		}
+		if options.SortDirection != nil {
+			if *options.SortDirection == model.SortDirectionDescending {
+				sortDirection = "DESC"
+			}
+		}
+		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 mimeTypes")
+			}
+			take = *options.Take
+		}
+		if options.Skip != nil {
+			skip = *options.Skip
+		}
+		if options.CollectionID != nil {
+			collectionId = *options.CollectionID
+		}
+	}
+	mimeTypesPb, err := clientClerkHandler.GetMimeTypesForCollectionId(ctx, getPaginationObject(collectionId, skip, take, sortDirection, sortKey, allowedTenants, ""))
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetMimeTypesForCollectionId: %v", err)
+	}
+
+	mimeTypes := make([]*model.MimeType, 0)
+	for _, mimeTypePb := range mimeTypesPb.MimeTypes {
+		mimeType := model.MimeType{ID: mimeTypePb.Id, FileCount: int(mimeTypePb.FileCount)}
+		mimeTypes = append(mimeTypes, &mimeType)
+	}
+	return &model.MimeTypeList{Items: mimeTypes, TotalItems: int(mimeTypesPb.TotalItems)}, nil
+}
+
+func GetTotalFileSize(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection) (int, error) {
+	filesSizeAndCount, err := clientClerkHandler.GetFilesSizeAndCountForCollection(ctx, &pb.Id{Id: obj.ID})
+	if err != nil {
+		return 0, errors.Wrapf(err, "Could not GetFilesSizeAndCountForCollection: %v", err)
+	}
+	return int(filesSizeAndCount.Size), nil
+}
+
+func GetTotalFileCount(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection) (int, error) {
+	filesSizeAndCount, err := clientClerkHandler.GetFilesSizeAndCountForCollection(ctx, &pb.Id{Id: obj.ID})
+	if err != nil {
+		return 0, errors.Wrapf(err, "Could not GetFilesSizeAndCountForCollection: %v", err)
+	}
+	return int(filesSizeAndCount.Count), nil
+}
+
+func GetTotalObjectCount(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection) (int, error) {
+	objectsCount, err := clientClerkHandler.GetObjectsCountForCollection(ctx, &pb.Id{Id: obj.ID})
+	if err != nil {
+		return 0, errors.Wrapf(err, "Could not GetObjectsCountForCollection: %v", err)
+	}
+	return int(objectsCount.Count), nil
+}
 func tenantToGraphQlTenant(tenantPb *pb.Tenant) *model.Tenant {
 	var tenant model.Tenant
 	tenant.ID = tenantPb.Id
@@ -1086,7 +1203,7 @@ func fileToGraphQlFile(filePb *pb.File) *model.File {
 	file.Checksum = filePb.Checksum
 	file.Name = filePb.Name
 	file.Size = int(filePb.Size)
-	file.Mimetype = filePb.Mimetype
+	file.MimeType = filePb.MimeType
 	file.Pronom = filePb.Pronom
 	file.Width = int(filePb.Width)
 	file.Height = int(filePb.Height)
@@ -1138,5 +1255,13 @@ func storagePartitionToGraphQlStoragePartition(storagePartitionPb *pb.StoragePar
 }
 
 func getPaginationObject(id string, skip int, take int, sortDirection string, sortKey string, allowedTenants []string, searchField string) *pb.Pagination {
-	return &pb.Pagination{Id: id, Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: sortKey, AllowedTenants: allowedTenants, SearchField: searchField}
+	return &pb.Pagination{Id: id, Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: toSnakeCase(sortKey), AllowedTenants: allowedTenants, SearchField: toSnakeCase(searchField)}
+}
+
+func toSnakeCase(str string) string {
+	matchFirstCap := regexp.MustCompile("(.)([A-Z][a-z]+)")
+	matchAllCap := regexp.MustCompile("([a-z0-9])([A-Z])")
+	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+	return strings.ToLower(snake)
 }
