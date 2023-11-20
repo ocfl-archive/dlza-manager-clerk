@@ -20,16 +20,20 @@ type PaginatedList interface {
 }
 
 type Collection struct {
-	ID          string      `json:"id"`
-	Alias       string      `json:"alias"`
-	Description string      `json:"description"`
-	Owner       string      `json:"owner"`
-	OwnerMail   string      `json:"ownerMail"`
-	Name        string      `json:"name"`
-	Quality     int         `json:"quality"`
-	TenantID    string      `json:"tenantId"`
-	Tenant      *Tenant     `json:"tenant"`
-	Objects     *ObjectList `json:"objects"`
+	ID               string      `json:"id"`
+	Alias            string      `json:"alias"`
+	Description      string      `json:"description"`
+	Owner            string      `json:"owner"`
+	OwnerMail        string      `json:"ownerMail"`
+	Name             string      `json:"name"`
+	Quality          int         `json:"quality"`
+	TenantID         string      `json:"tenantId"`
+	Tenant           *Tenant     `json:"tenant"`
+	Objects          *ObjectList `json:"objects"`
+	Files            *FileList   `json:"files"`
+	TotalFileSize    int         `json:"totalFileSize"`
+	TotalFileCount   int         `json:"totalFileCount"`
+	TotalObjectCount int         `json:"totalObjectCount"`
 }
 
 func (Collection) IsNode()            {}
@@ -66,7 +70,7 @@ type File struct {
 	ID       string   `json:"id"`
 	Checksum string   `json:"checksum"`
 	Name     []string `json:"name"`
-	Mimetype string   `json:"mimetype"`
+	MimeType string   `json:"mimeType"`
 	Size     int      `json:"size"`
 	Pronom   string   `json:"pronom"`
 	Width    int      `json:"width"`
@@ -98,12 +102,47 @@ func (this FileList) GetItems() []Node {
 func (this FileList) GetTotalItems() int { return this.TotalItems }
 
 type FileListOptions struct {
-	ObjectID      *string        `json:"ObjectId,omitempty"`
+	ObjectID      *string        `json:"objectId,omitempty"`
+	CollectionID  *string        `json:"collectionId,omitempty"`
 	Skip          *int           `json:"skip,omitempty"`
 	Take          *int           `json:"take,omitempty"`
 	SortDirection *SortDirection `json:"sortDirection,omitempty"`
 	SortKey       *FileSortKey   `json:"sortKey,omitempty"`
 	Search        *string        `json:"search,omitempty"`
+}
+
+type MimeType struct {
+	ID        string `json:"id"`
+	FileCount int    `json:"fileCount"`
+}
+
+func (MimeType) IsNode()            {}
+func (this MimeType) GetID() string { return this.ID }
+
+type MimeTypeList struct {
+	Items      []*MimeType `json:"items"`
+	TotalItems int         `json:"totalItems"`
+}
+
+func (MimeTypeList) IsPaginatedList() {}
+func (this MimeTypeList) GetItems() []Node {
+	if this.Items == nil {
+		return nil
+	}
+	interfaceSlice := make([]Node, 0, len(this.Items))
+	for _, concrete := range this.Items {
+		interfaceSlice = append(interfaceSlice, concrete)
+	}
+	return interfaceSlice
+}
+func (this MimeTypeList) GetTotalItems() int { return this.TotalItems }
+
+type MimeTypeListOptions struct {
+	CollectionID  *string          `json:"collectionId,omitempty"`
+	Skip          *int             `json:"skip,omitempty"`
+	Take          *int             `json:"take,omitempty"`
+	SortDirection *SortDirection   `json:"sortDirection,omitempty"`
+	SortKey       *MimeTypeSortKey `json:"sortKey,omitempty"`
 }
 
 type Object struct {
@@ -179,7 +218,7 @@ func (this ObjectInstanceCheckList) GetItems() []Node {
 func (this ObjectInstanceCheckList) GetTotalItems() int { return this.TotalItems }
 
 type ObjectInstanceCheckListOptions struct {
-	ObjectInstanceID *string                     `json:"ObjectInstanceId,omitempty"`
+	ObjectInstanceID *string                     `json:"objectInstanceId,omitempty"`
 	Skip             *int                        `json:"skip,omitempty"`
 	Take             *int                        `json:"take,omitempty"`
 	SortDirection    *SortDirection              `json:"sortDirection,omitempty"`
@@ -373,18 +412,32 @@ type TenantListOptions struct {
 type CollectionSortKey string
 
 const (
-	CollectionSortKeyID   CollectionSortKey = "ID"
-	CollectionSortKeyName CollectionSortKey = "NAME"
+	CollectionSortKeyID               CollectionSortKey = "id"
+	CollectionSortKeyName             CollectionSortKey = "name"
+	CollectionSortKeyAlias            CollectionSortKey = "alias"
+	CollectionSortKeyDescription      CollectionSortKey = "description"
+	CollectionSortKeyOwner            CollectionSortKey = "owner"
+	CollectionSortKeyOwnerMail        CollectionSortKey = "ownerMail"
+	CollectionSortKeyTotalFileSize    CollectionSortKey = "totalFileSize"
+	CollectionSortKeyTotalFileCount   CollectionSortKey = "totalFileCount"
+	CollectionSortKeyTotalObjectCount CollectionSortKey = "totalObjectCount"
 )
 
 var AllCollectionSortKey = []CollectionSortKey{
 	CollectionSortKeyID,
 	CollectionSortKeyName,
+	CollectionSortKeyAlias,
+	CollectionSortKeyDescription,
+	CollectionSortKeyOwner,
+	CollectionSortKeyOwnerMail,
+	CollectionSortKeyTotalFileSize,
+	CollectionSortKeyTotalFileCount,
+	CollectionSortKeyTotalObjectCount,
 }
 
 func (e CollectionSortKey) IsValid() bool {
 	switch e {
-	case CollectionSortKeyID, CollectionSortKeyName:
+	case CollectionSortKeyID, CollectionSortKeyName, CollectionSortKeyAlias, CollectionSortKeyDescription, CollectionSortKeyOwner, CollectionSortKeyOwnerMail, CollectionSortKeyTotalFileSize, CollectionSortKeyTotalFileCount, CollectionSortKeyTotalObjectCount:
 		return true
 	}
 	return false
@@ -414,18 +467,24 @@ func (e CollectionSortKey) MarshalGQL(w io.Writer) {
 type FileSortKey string
 
 const (
-	FileSortKeyID   FileSortKey = "ID"
-	FileSortKeyName FileSortKey = "NAME"
+	FileSortKeyID       FileSortKey = "id"
+	FileSortKeyChecksum FileSortKey = "checksum"
+	FileSortKeyMimeType FileSortKey = "mimeType"
+	FileSortKeyPronom   FileSortKey = "pronom"
+	FileSortKeyName     FileSortKey = "name"
 )
 
 var AllFileSortKey = []FileSortKey{
 	FileSortKeyID,
+	FileSortKeyChecksum,
+	FileSortKeyMimeType,
+	FileSortKeyPronom,
 	FileSortKeyName,
 }
 
 func (e FileSortKey) IsValid() bool {
 	switch e {
-	case FileSortKeyID, FileSortKeyName:
+	case FileSortKeyID, FileSortKeyChecksum, FileSortKeyMimeType, FileSortKeyPronom, FileSortKeyName:
 		return true
 	}
 	return false
@@ -452,19 +511,64 @@ func (e FileSortKey) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type MimeTypeSortKey string
+
+const (
+	MimeTypeSortKeyID        MimeTypeSortKey = "id"
+	MimeTypeSortKeyFileCount MimeTypeSortKey = "fileCount"
+)
+
+var AllMimeTypeSortKey = []MimeTypeSortKey{
+	MimeTypeSortKeyID,
+	MimeTypeSortKeyFileCount,
+}
+
+func (e MimeTypeSortKey) IsValid() bool {
+	switch e {
+	case MimeTypeSortKeyID, MimeTypeSortKeyFileCount:
+		return true
+	}
+	return false
+}
+
+func (e MimeTypeSortKey) String() string {
+	return string(e)
+}
+
+func (e *MimeTypeSortKey) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = MimeTypeSortKey(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid MimeTypeSortKey", str)
+	}
+	return nil
+}
+
+func (e MimeTypeSortKey) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type ObjectInstanceCheckSortKey string
 
 const (
-	ObjectInstanceCheckSortKeyID ObjectInstanceCheckSortKey = "ID"
+	ObjectInstanceCheckSortKeyID        ObjectInstanceCheckSortKey = "id"
+	ObjectInstanceCheckSortKeyMessage   ObjectInstanceCheckSortKey = "message"
+	ObjectInstanceCheckSortKeyChecktime ObjectInstanceCheckSortKey = "checktime"
 )
 
 var AllObjectInstanceCheckSortKey = []ObjectInstanceCheckSortKey{
 	ObjectInstanceCheckSortKeyID,
+	ObjectInstanceCheckSortKeyMessage,
+	ObjectInstanceCheckSortKeyChecktime,
 }
 
 func (e ObjectInstanceCheckSortKey) IsValid() bool {
 	switch e {
-	case ObjectInstanceCheckSortKeyID:
+	case ObjectInstanceCheckSortKeyID, ObjectInstanceCheckSortKeyMessage, ObjectInstanceCheckSortKeyChecktime:
 		return true
 	}
 	return false
@@ -494,16 +598,20 @@ func (e ObjectInstanceCheckSortKey) MarshalGQL(w io.Writer) {
 type ObjectInstanceSortKey string
 
 const (
-	ObjectInstanceSortKeyID ObjectInstanceSortKey = "ID"
+	ObjectInstanceSortKeyID     ObjectInstanceSortKey = "id"
+	ObjectInstanceSortKeyPath   ObjectInstanceSortKey = "path"
+	ObjectInstanceSortKeyStatus ObjectInstanceSortKey = "status"
 )
 
 var AllObjectInstanceSortKey = []ObjectInstanceSortKey{
 	ObjectInstanceSortKeyID,
+	ObjectInstanceSortKeyPath,
+	ObjectInstanceSortKeyStatus,
 }
 
 func (e ObjectInstanceSortKey) IsValid() bool {
 	switch e {
-	case ObjectInstanceSortKeyID:
+	case ObjectInstanceSortKeyID, ObjectInstanceSortKeyPath, ObjectInstanceSortKeyStatus:
 		return true
 	}
 	return false
@@ -533,16 +641,36 @@ func (e ObjectInstanceSortKey) MarshalGQL(w io.Writer) {
 type ObjectSortKey string
 
 const (
-	ObjectSortKeyID ObjectSortKey = "ID"
+	ObjectSortKeyID                ObjectSortKey = "id"
+	ObjectSortKeySignature         ObjectSortKey = "signature"
+	ObjectSortKeyTitle             ObjectSortKey = "title"
+	ObjectSortKeyDescription       ObjectSortKey = "description"
+	ObjectSortKeyIngestWorkflow    ObjectSortKey = "ingestWorkflow"
+	ObjectSortKeyUser              ObjectSortKey = "user"
+	ObjectSortKeyAddress           ObjectSortKey = "address"
+	ObjectSortKeyChecksum          ObjectSortKey = "checksum"
+	ObjectSortKeyKeywords          ObjectSortKey = "keywords"
+	ObjectSortKeyIdentifiers       ObjectSortKey = "identifiers"
+	ObjectSortKeyAlternativeTitles ObjectSortKey = "alternativeTitles"
 )
 
 var AllObjectSortKey = []ObjectSortKey{
 	ObjectSortKeyID,
+	ObjectSortKeySignature,
+	ObjectSortKeyTitle,
+	ObjectSortKeyDescription,
+	ObjectSortKeyIngestWorkflow,
+	ObjectSortKeyUser,
+	ObjectSortKeyAddress,
+	ObjectSortKeyChecksum,
+	ObjectSortKeyKeywords,
+	ObjectSortKeyIdentifiers,
+	ObjectSortKeyAlternativeTitles,
 }
 
 func (e ObjectSortKey) IsValid() bool {
 	switch e {
-	case ObjectSortKeyID:
+	case ObjectSortKeyID, ObjectSortKeySignature, ObjectSortKeyTitle, ObjectSortKeyDescription, ObjectSortKeyIngestWorkflow, ObjectSortKeyUser, ObjectSortKeyAddress, ObjectSortKeyChecksum, ObjectSortKeyKeywords, ObjectSortKeyIdentifiers, ObjectSortKeyAlternativeTitles:
 		return true
 	}
 	return false
@@ -613,18 +741,20 @@ func (e SortDirection) MarshalGQL(w io.Writer) {
 type StorageLocationSortKey string
 
 const (
-	StorageLocationSortKeyID    StorageLocationSortKey = "ID"
-	StorageLocationSortKeyAlias StorageLocationSortKey = "ALIAS"
+	StorageLocationSortKeyID                 StorageLocationSortKey = "id"
+	StorageLocationSortKeyAlias              StorageLocationSortKey = "alias"
+	StorageLocationSortKeySecurityCompliency StorageLocationSortKey = "securityCompliency"
 )
 
 var AllStorageLocationSortKey = []StorageLocationSortKey{
 	StorageLocationSortKeyID,
 	StorageLocationSortKeyAlias,
+	StorageLocationSortKeySecurityCompliency,
 }
 
 func (e StorageLocationSortKey) IsValid() bool {
 	switch e {
-	case StorageLocationSortKeyID, StorageLocationSortKeyAlias:
+	case StorageLocationSortKeyID, StorageLocationSortKeyAlias, StorageLocationSortKeySecurityCompliency:
 		return true
 	}
 	return false
@@ -654,18 +784,20 @@ func (e StorageLocationSortKey) MarshalGQL(w io.Writer) {
 type StoragePartitionSortKey string
 
 const (
-	StoragePartitionSortKeyID    StoragePartitionSortKey = "ID"
-	StoragePartitionSortKeyAlias StoragePartitionSortKey = "ALIAS"
+	StoragePartitionSortKeyID    StoragePartitionSortKey = "id"
+	StoragePartitionSortKeyAlias StoragePartitionSortKey = "alias"
+	StoragePartitionSortKeyName  StoragePartitionSortKey = "name"
 )
 
 var AllStoragePartitionSortKey = []StoragePartitionSortKey{
 	StoragePartitionSortKeyID,
 	StoragePartitionSortKeyAlias,
+	StoragePartitionSortKeyName,
 }
 
 func (e StoragePartitionSortKey) IsValid() bool {
 	switch e {
-	case StoragePartitionSortKeyID, StoragePartitionSortKeyAlias:
+	case StoragePartitionSortKeyID, StoragePartitionSortKeyAlias, StoragePartitionSortKeyName:
 		return true
 	}
 	return false
@@ -695,11 +827,11 @@ func (e StoragePartitionSortKey) MarshalGQL(w io.Writer) {
 type TenantSortKey string
 
 const (
-	TenantSortKeyID     TenantSortKey = "ID"
-	TenantSortKeyName   TenantSortKey = "NAME"
-	TenantSortKeyAlias  TenantSortKey = "ALIAS"
-	TenantSortKeyPerson TenantSortKey = "PERSON"
-	TenantSortKeyEmail  TenantSortKey = "EMAIL"
+	TenantSortKeyID     TenantSortKey = "id"
+	TenantSortKeyName   TenantSortKey = "name"
+	TenantSortKeyAlias  TenantSortKey = "alias"
+	TenantSortKeyPerson TenantSortKey = "person"
+	TenantSortKeyEmail  TenantSortKey = "email"
 )
 
 var AllTenantSortKey = []TenantSortKey{

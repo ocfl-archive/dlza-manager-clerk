@@ -21,6 +21,42 @@ func (r *collectionResolver) Objects(ctx context.Context, obj *model.Collection,
 	return collections, nil
 }
 
+// Files is the resolver for the files field.
+func (r *collectionResolver) Files(ctx context.Context, obj *model.Collection, options *model.FileListOptions) (*model.FileList, error) {
+	files, err := service.GetFilesForCollection(ctx, r.ClientClerkHandler, obj, options)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetFilesForCollection: %v", err)
+	}
+	return files, nil
+}
+
+// TotalFileSize is the resolver for the totalFileSize field.
+func (r *collectionResolver) TotalFileSize(ctx context.Context, obj *model.Collection) (int, error) {
+	fileSize, err := service.GetTotalFileSize(ctx, r.ClientClerkHandler, obj)
+	if err != nil {
+		return 0, errors.Wrapf(err, "Could not GetTotalFileSize: %v", err)
+	}
+	return fileSize, nil
+}
+
+// TotalFileCount is the resolver for the totalFileCount field.
+func (r *collectionResolver) TotalFileCount(ctx context.Context, obj *model.Collection) (int, error) {
+	fileCount, err := service.GetTotalFileCount(ctx, r.ClientClerkHandler, obj)
+	if err != nil {
+		return 0, errors.Wrapf(err, "Could not GetTotalFileCount: %v", err)
+	}
+	return fileCount, nil
+}
+
+// TotalObjectCount is the resolver for the totalObjectCount field.
+func (r *collectionResolver) TotalObjectCount(ctx context.Context, obj *model.Collection) (int, error) {
+	objectCount, err := service.GetTotalObjectCount(ctx, r.ClientClerkHandler, obj)
+	if err != nil {
+		return 0, errors.Wrapf(err, "Could not GetTotalObjectCount: %v", err)
+	}
+	return objectCount, nil
+}
+
 // ObjectInstances is the resolver for the objectInstances field.
 func (r *objectResolver) ObjectInstances(ctx context.Context, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
 	objectInstances, err := service.GetObjectInstancesForObject(ctx, r.ClientClerkHandler, obj, options)
@@ -190,6 +226,15 @@ func (r *queryResolver) StoragePartition(ctx context.Context, id string) (*model
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionById: %v", err)
 	}
 	return storagePartition, nil
+}
+
+// MimeTypes is the resolver for the mimeTypes field.
+func (r *queryResolver) MimeTypes(ctx context.Context, options *model.MimeTypeListOptions) (*model.MimeTypeList, error) {
+	mimeTypes, err := service.GetMimeTypesForCollectionId(ctx, r.ClientClerkHandler, options, r.AllowedTenants)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetMimeTypesForCollectionId: %v", err)
+	}
+	return mimeTypes, nil
 }
 
 // StoragePartitions is the resolver for the storagePartitions field.

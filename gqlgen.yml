@@ -95,6 +95,14 @@ models:
     fields:
       objects:
         resolver: true
+      files:
+        resolver: true
+      totalFileSize:
+        resolver: true
+      totalFileCount:
+        resolver: true
+      totalObjectCount:
+        resolver: true
   Object:
     fields:
       objectInstances:
@@ -113,5 +121,3 @@ models:
     fields:
       objectInstances:
         resolver: true
-
-

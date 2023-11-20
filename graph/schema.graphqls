@@ -1,3 +1,5 @@
+# go run github.com/99designs/gqlgen generate
+
 interface Node {
   id: ID!
 }
@@ -55,7 +57,7 @@ input TenantListOptions {
 
   # Specifies the sort key
   sortKey: TenantSortKey
-  # ID, ALIAS, NAME, EMAIL, PERSON
+  # id, alias, name, email, person
   search: String
 }
 input CollectionListOptions {
@@ -64,7 +66,7 @@ input CollectionListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: CollectionSortKey
-  #  ID, ALIAS, DESCRIPTION, OWNER, OWNERMAIL, NAME
+  #  id, alias, description, owner, ownerMail, name
   search: String
 }
 input StorageLocationListOptions {
@@ -73,7 +75,7 @@ input StorageLocationListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: StorageLocationSortKey
-  #  ID, ALIAS, SECURITYCOMPLIENCY
+  #  id, alias, securityCompliency
   search: String
 }
 input StoragePartitionListOptions {
@@ -82,7 +84,7 @@ input StoragePartitionListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: StoragePartitionSortKey
-  #  ID, ALIAS, NAME
+  #  id, alias, name
   search: String
 }
 input ObjectListOptions {
@@ -91,7 +93,7 @@ input ObjectListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: ObjectSortKey
-  #  ID, SIGNATURE, TITLE, DESCRIPTION, INGESTWORKFLOW, USER, ADDRESS, CHECKSUM
+  #  id, signature, title, description, ingestWorkflow, user, address, checksum
   search: String
 }
 input ObjectInstanceListOptions {
@@ -100,59 +102,89 @@ input ObjectInstanceListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: ObjectInstanceSortKey
-  #  ID, PATH, STATUS
+  #  id, path, status
   search: String
 }
 input ObjectInstanceCheckListOptions {
-  ObjectInstanceId: ID
+  objectInstanceId: ID
   skip: Int
   take: Int
   sortDirection: SortDirection
   sortKey: ObjectInstanceCheckSortKey
-  #  ID, MESSAGE
+  #  id, message
   search: String
 }
 input FileListOptions {
-  ObjectId: ID
+  objectId: ID
+  collectionId: ID
   skip: Int
   take: Int
   sortDirection: SortDirection
   sortKey: FileSortKey
-  #  ID, CHECKSUM, MIMETYPE, PRONOM
+  #  id, checksum, mimeType, pronom, name
   search: String
 }
 
 enum TenantSortKey {
-  ID,
-  NAME,
-  ALIAS,
-  PERSON,
-  EMAIL
+  id,
+  name,
+  alias,
+  person,
+  email
 }
 enum CollectionSortKey {
-  ID,
-  NAME
+  id,
+  name,
+  alias,
+  description,
+  owner,
+  ownerMail
+  # todo: sort by aggregated column
+  totalFileSize
+  # todo: sort by aggregated column
+  totalFileCount
+  # todo: sort by aggregated column
+  totalObjectCount
 }
 enum StorageLocationSortKey {
-  ID,
-  ALIAS
+  id,
+  alias,
+  securityCompliency
 }
 enum StoragePartitionSortKey {
-  ID,
-  ALIAS
+  id,
+  alias,
+  name
 }
 enum ObjectSortKey {
-  ID
+  id,
+  signature,
+  title,
+  description,
+  ingestWorkflow,
+  user,
+  address,
+  checksum,
+  keywords,
+  identifiers,
+  alternativeTitles
 }
 enum ObjectInstanceSortKey {
-  ID
+  id,
+  path,
+  status
 }
 enum ObjectInstanceCheckSortKey {
-  ID
+  id,
+  message,
+  checktime
 }
 enum FileSortKey {
-  ID
-  NAME
+  id,
+  checksum,
+  mimeType,
+  pronom,
+  name
 }
 
 type Tenant implements Node {
@@ -176,6 +208,10 @@ type Collection implements Node {
   tenantId: ID!
   tenant: Tenant!
   objects(options: ObjectListOptions): ObjectList!
+  files(options: FileListOptions): FileList!
+  totalFileSize: Int!
+  totalFileCount: Int!
+  totalObjectCount: Int!
 }
 type StorageLocation implements Node {
   id: ID!
@@ -243,7 +279,7 @@ type File implements Node {
   id: ID!
   checksum: String!
   name: [String!]!
-  mimetype: String!
+  mimeType: String!
   size: Int!
   pronom: String!
   width: Int!
@@ -261,6 +297,29 @@ type ObjectInstanceCheck implements Node {
   objectInstanceId: ID!
   objectInstance: ObjectInstance!
 }
+
+type MimeType implements Node {
+  id: ID!
+  fileCount: Int!
+}
+
+type MimeTypeList implements PaginatedList {
+  items: [MimeType!]!
+  totalItems: Int!
+}
+enum MimeTypeSortKey {
+  id
+  fileCount
+}
+
+input MimeTypeListOptions {
+  collectionId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: MimeTypeSortKey
+}
+
 type Query {
   tenants(options: TenantListOptions): TenantList!
   tenant(id: ID!): Tenant
@@ -285,4 +344,6 @@ type Query {
 
   storagePartitions(options: StoragePartitionListOptions): StoragePartitionList!
   storagePartition(id: ID!): StoragePartition
+
+  mimeTypes(options: MimeTypeListOptions): MimeTypeList!
 }
