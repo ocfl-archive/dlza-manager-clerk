@@ -1,6 +1,6 @@
 graphql_config :  
-  addr : "localhost:4443" #modify if needed 
-  extaddr : "http://localhost:4443" #modify if needed 
+  addr : "localhost:9087" #modify if needed 
+  extaddr : "http://localhost:9087" #modify if needed 
   #certificate = ""
   #certificatekey = ""
   #rootca = ["/tmp/ca.cert.pem"]
@@ -8,8 +8,9 @@ graphql_config :
   keycloak:
     realm : "test"
     addr : "https://auth.ub.unibas.ch/"
-    callback= : https://localhost:4443" #modify if needed 
+    callback : https://localhost:9087" #modify if needed 
     clientId : "graphql-demo"
+
   logging :
     namespace : "graphql-ui-template"
     stashHost : ""

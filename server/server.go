@@ -5,12 +5,14 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"embed"
+	"fmt"
 	"io/fs"
 	"net/http"
 	"strings"
 
 	"emperror.dev/errors"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/coreos/go-oidc"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/tbaehler/gin-keycloak/pkg/ginkeycloak"
@@ -127,15 +129,33 @@ func (srv *Server) graphqlHandler(clientClerkHandler pb.ClerkHandlerServiceClien
 		parts := strings.Split(rawAccessToken, " ")
 		if len(parts) != 2 {
 			c.Writer.WriteHeader(400)
+			fmt.Println("error 400", len(parts))
 			return
 		}
-		var userClaim models.KeyCloakToken
 
-		_, err := jwt.ParseWithClaims(parts[1], &userClaim, nil)
+		var userClaim models.KeyCloakToken
+		provider, err := oidc.NewProvider(c, srv.keycloak.Addr+"realms/"+srv.keycloak.Realm)
 		if err != nil {
-			c.Writer.WriteHeader(400)
+			panic(err)
 		}
 
+		oidcConfig := &oidc.Config{
+			ClientID: srv.keycloak.ClientId,
+		}
+
+		verifier := provider.Verifier(oidcConfig)
+
+		_, err = verifier.Verify(c, parts[1])
+		if err != nil {
+			c.Error(errors.Errorf("Failed to verify ID Token: "+err.Error(), http.StatusInternalServerError))
+			return
+		}
+
+		_, err = jwt.ParseWithClaims(parts[1], &userClaim, nil)
+		if err != nil && err.Error() != "no Keyfunc was provided." {
+			fmt.Println("error 400", err)
+			c.Writer.WriteHeader(400)
+		}
 		ctx := context.WithValue(c, constants.Needed, "Needed to attach context")
 		c.Set("keycloak_group", userClaim.Groups)
 		c.Set("tenant_list", userClaim.TenantList)
