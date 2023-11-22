@@ -1118,29 +1118,6 @@ func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.Cler
 	return &model.MimeTypeList{Items: mimeTypes, TotalItems: int(mimeTypesPb.TotalItems)}, nil
 }
 
-func GetTotalFileSize(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection) (int, error) {
-	filesSizeAndCount, err := clientClerkHandler.GetFilesSizeAndCountForCollection(ctx, &pb.Id{Id: obj.ID})
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not GetFilesSizeAndCountForCollection: %v", err)
-	}
-	return int(filesSizeAndCount.Size), nil
-}
-
-func GetTotalFileCount(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection) (int, error) {
-	filesSizeAndCount, err := clientClerkHandler.GetFilesSizeAndCountForCollection(ctx, &pb.Id{Id: obj.ID})
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not GetFilesSizeAndCountForCollection: %v", err)
-	}
-	return int(filesSizeAndCount.Count), nil
-}
-
-func GetTotalObjectCount(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection) (int, error) {
-	objectsCount, err := clientClerkHandler.GetObjectsCountForCollection(ctx, &pb.Id{Id: obj.ID})
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not GetObjectsCountForCollection: %v", err)
-	}
-	return int(objectsCount.Count), nil
-}
 func tenantToGraphQlTenant(tenantPb *pb.Tenant) *model.Tenant {
 	var tenant model.Tenant
 	tenant.ID = tenantPb.Id
@@ -1161,6 +1138,9 @@ func collectionToGraphQlCollection(collectionPb *pb.Collection) *model.Collectio
 	collection.OwnerMail = collectionPb.OwnerMail
 	collection.Quality = int(collectionPb.Quality)
 	collection.TenantID = collectionPb.TenantId
+	collection.TotalFileSize = int(collectionPb.TotalFileSize)
+	collection.TotalFileCount = int(collectionPb.TotalFileCount)
+	collection.TotalObjectCount = int(collectionPb.TotalObjectCount)
 	return &collection
 }
 
@@ -1255,7 +1235,7 @@ func storagePartitionToGraphQlStoragePartition(storagePartitionPb *pb.StoragePar
 }
 
 func getPaginationObject(id string, skip int, take int, sortDirection string, sortKey string, allowedTenants []string, searchField string) *pb.Pagination {
-	return &pb.Pagination{Id: id, Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: toSnakeCase(sortKey), AllowedTenants: allowedTenants, SearchField: toSnakeCase(searchField)}
+	return &pb.Pagination{Id: id, Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: toSnakeCase(sortKey), AllowedTenants: allowedTenants, SearchField: searchField}
 }
 
 func toSnakeCase(str string) string {
