@@ -3,11 +3,11 @@ package models
 import "github.com/golang-jwt/jwt/v4"
 
 type Keycloak struct {
-	Addr         string
-	Realm        string
-	Callback     string
-	ClientId     string
-	ClientSecret string
+	Addr         string `yaml:"addr" toml:"addr"`
+	Realm        string `yaml:"realm" toml:"realm"`
+	Callback     string `yaml:"callback" toml:"callback"`
+	ClientId     string `yaml:"clientId" toml:"clientId"`
+	ClientSecret string `yaml:"clientSecret" toml:"clientSecret"`
 }
 
 type KeyCloakToken struct {
@@ -38,8 +38,8 @@ type KeyCloakToken struct {
 	AtHash            string                 `json:"at_hash,omitempty"`
 	EmailVerified     bool                   `json:"email_verified,omitempty"`
 	Sid               string                 `json:"sid,omitempty"`
-	Aud               string                 `json:"aud,omitempty"`
-	TenantList        []string               `json:"tenant_list,omitempty"`
+	// Aud               string                 `json:"aud,omitempty"`
+	TenantList []string `json:"tenant_list,omitempty"`
 }
 
 type ServiceRole struct {
