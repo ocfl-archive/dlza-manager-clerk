@@ -649,8 +649,6 @@ type ClerkHandlerServiceClient interface {
 	GetObjectInstancesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
 	GetFilesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error)
 	GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstanceChecks, error)
-	GetFilesSizeAndCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FilesSizeAndCount, error)
-	GetObjectsCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectsCount, error)
 	GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error)
 	GetStoragePartitionsByLocationIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StoragePartitions, error)
 	GetObjectInstancesByStoragePartitionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
@@ -907,24 +905,6 @@ func (c *clerkHandlerServiceClient) GetObjectInstanceChecksByObjectInstanceIdPag
 	return out, nil
 }
 
-func (c *clerkHandlerServiceClient) GetFilesSizeAndCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FilesSizeAndCount, error) {
-	out := new(FilesSizeAndCount)
-	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetFilesSizeAndCountForCollection", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *clerkHandlerServiceClient) GetObjectsCountForCollection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectsCount, error) {
-	out := new(ObjectsCount)
-	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectsCountForCollection", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *clerkHandlerServiceClient) GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error) {
 	out := new(StorageLocations)
 	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetStorageLocationsByTenantIdPaginated", in, out, opts...)
@@ -983,8 +963,6 @@ type ClerkHandlerServiceServer interface {
 	GetObjectInstancesByObjectIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
 	GetFilesByObjectIdPaginated(context.Context, *Pagination) (*Files, error)
 	GetObjectInstanceChecksByObjectInstanceIdPaginated(context.Context, *Pagination) (*ObjectInstanceChecks, error)
-	GetFilesSizeAndCountForCollection(context.Context, *Id) (*FilesSizeAndCount, error)
-	GetObjectsCountForCollection(context.Context, *Id) (*ObjectsCount, error)
 	GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error)
 	GetStoragePartitionsByLocationIdPaginated(context.Context, *Pagination) (*StoragePartitions, error)
 	GetObjectInstancesByStoragePartitionIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
@@ -1075,12 +1053,6 @@ func (UnimplementedClerkHandlerServiceServer) GetFilesByObjectIdPaginated(contex
 }
 func (UnimplementedClerkHandlerServiceServer) GetObjectInstanceChecksByObjectInstanceIdPaginated(context.Context, *Pagination) (*ObjectInstanceChecks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstanceChecksByObjectInstanceIdPaginated not implemented")
-}
-func (UnimplementedClerkHandlerServiceServer) GetFilesSizeAndCountForCollection(context.Context, *Id) (*FilesSizeAndCount, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFilesSizeAndCountForCollection not implemented")
-}
-func (UnimplementedClerkHandlerServiceServer) GetObjectsCountForCollection(context.Context, *Id) (*ObjectsCount, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetObjectsCountForCollection not implemented")
 }
 func (UnimplementedClerkHandlerServiceServer) GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationsByTenantIdPaginated not implemented")
@@ -1590,42 +1562,6 @@ func _ClerkHandlerService_GetObjectInstanceChecksByObjectInstanceIdPaginated_Han
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ClerkHandlerService_GetFilesSizeAndCountForCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Id)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ClerkHandlerServiceServer).GetFilesSizeAndCountForCollection(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ClerkHandlerService/GetFilesSizeAndCountForCollection",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClerkHandlerServiceServer).GetFilesSizeAndCountForCollection(ctx, req.(*Id))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ClerkHandlerService_GetObjectsCountForCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Id)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ClerkHandlerServiceServer).GetObjectsCountForCollection(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ClerkHandlerService/GetObjectsCountForCollection",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClerkHandlerServiceServer).GetObjectsCountForCollection(ctx, req.(*Id))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ClerkHandlerService_GetStorageLocationsByTenantIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Pagination)
 	if err := dec(in); err != nil {
@@ -1794,14 +1730,6 @@ var ClerkHandlerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetObjectInstanceChecksByObjectInstanceIdPaginated",
 			Handler:    _ClerkHandlerService_GetObjectInstanceChecksByObjectInstanceIdPaginated_Handler,
-		},
-		{
-			MethodName: "GetFilesSizeAndCountForCollection",
-			Handler:    _ClerkHandlerService_GetFilesSizeAndCountForCollection_Handler,
-		},
-		{
-			MethodName: "GetObjectsCountForCollection",
-			Handler:    _ClerkHandlerService_GetObjectsCountForCollection_Handler,
 		},
 		{
 			MethodName: "GetStorageLocationsByTenantIdPaginated",

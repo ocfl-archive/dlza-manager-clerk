@@ -30,33 +30,6 @@ func (r *collectionResolver) Files(ctx context.Context, obj *model.Collection, o
 	return files, nil
 }
 
-// TotalFileSize is the resolver for the totalFileSize field.
-func (r *collectionResolver) TotalFileSize(ctx context.Context, obj *model.Collection) (int, error) {
-	fileSize, err := service.GetTotalFileSize(ctx, r.ClientClerkHandler, obj)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not GetTotalFileSize: %v", err)
-	}
-	return fileSize, nil
-}
-
-// TotalFileCount is the resolver for the totalFileCount field.
-func (r *collectionResolver) TotalFileCount(ctx context.Context, obj *model.Collection) (int, error) {
-	fileCount, err := service.GetTotalFileCount(ctx, r.ClientClerkHandler, obj)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not GetTotalFileCount: %v", err)
-	}
-	return fileCount, nil
-}
-
-// TotalObjectCount is the resolver for the totalObjectCount field.
-func (r *collectionResolver) TotalObjectCount(ctx context.Context, obj *model.Collection) (int, error) {
-	objectCount, err := service.GetTotalObjectCount(ctx, r.ClientClerkHandler, obj)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not GetTotalObjectCount: %v", err)
-	}
-	return objectCount, nil
-}
-
 // ObjectInstances is the resolver for the objectInstances field.
 func (r *objectResolver) ObjectInstances(ctx context.Context, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
 	objectInstances, err := service.GetObjectInstancesForObject(ctx, r.ClientClerkHandler, obj, options)
