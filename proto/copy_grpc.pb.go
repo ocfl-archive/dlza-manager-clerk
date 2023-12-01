@@ -646,6 +646,7 @@ type ClerkHandlerServiceClient interface {
 	GetObjectsByCollectionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Objects, error)
 	GetFilesByCollectionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error)
 	GetMimeTypesForCollectionId(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*MimeTypes, error)
+	GetPronomsForCollectionId(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Pronoms, error)
 	GetObjectInstancesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
 	GetFilesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Files, error)
 	GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstanceChecks, error)
@@ -878,6 +879,15 @@ func (c *clerkHandlerServiceClient) GetMimeTypesForCollectionId(ctx context.Cont
 	return out, nil
 }
 
+func (c *clerkHandlerServiceClient) GetPronomsForCollectionId(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*Pronoms, error) {
+	out := new(Pronoms)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetPronomsForCollectionId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *clerkHandlerServiceClient) GetObjectInstancesByObjectIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error) {
 	out := new(ObjectInstances)
 	err := c.cc.Invoke(ctx, "/ClerkHandlerService/GetObjectInstancesByObjectIdPaginated", in, out, opts...)
@@ -960,6 +970,7 @@ type ClerkHandlerServiceServer interface {
 	GetObjectsByCollectionIdPaginated(context.Context, *Pagination) (*Objects, error)
 	GetFilesByCollectionIdPaginated(context.Context, *Pagination) (*Files, error)
 	GetMimeTypesForCollectionId(context.Context, *Pagination) (*MimeTypes, error)
+	GetPronomsForCollectionId(context.Context, *Pagination) (*Pronoms, error)
 	GetObjectInstancesByObjectIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
 	GetFilesByObjectIdPaginated(context.Context, *Pagination) (*Files, error)
 	GetObjectInstanceChecksByObjectInstanceIdPaginated(context.Context, *Pagination) (*ObjectInstanceChecks, error)
@@ -1044,6 +1055,9 @@ func (UnimplementedClerkHandlerServiceServer) GetFilesByCollectionIdPaginated(co
 }
 func (UnimplementedClerkHandlerServiceServer) GetMimeTypesForCollectionId(context.Context, *Pagination) (*MimeTypes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMimeTypesForCollectionId not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) GetPronomsForCollectionId(context.Context, *Pagination) (*Pronoms, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPronomsForCollectionId not implemented")
 }
 func (UnimplementedClerkHandlerServiceServer) GetObjectInstancesByObjectIdPaginated(context.Context, *Pagination) (*ObjectInstances, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstancesByObjectIdPaginated not implemented")
@@ -1508,6 +1522,24 @@ func _ClerkHandlerService_GetMimeTypesForCollectionId_Handler(srv interface{}, c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClerkHandlerService_GetPronomsForCollectionId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Pagination)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).GetPronomsForCollectionId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/GetPronomsForCollectionId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).GetPronomsForCollectionId(ctx, req.(*Pagination))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ClerkHandlerService_GetObjectInstancesByObjectIdPaginated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Pagination)
 	if err := dec(in); err != nil {
@@ -1718,6 +1750,10 @@ var ClerkHandlerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMimeTypesForCollectionId",
 			Handler:    _ClerkHandlerService_GetMimeTypesForCollectionId_Handler,
+		},
+		{
+			MethodName: "GetPronomsForCollectionId",
+			Handler:    _ClerkHandlerService_GetPronomsForCollectionId_Handler,
 		},
 		{
 			MethodName: "GetObjectInstancesByObjectIdPaginated",

@@ -71,6 +71,7 @@ input CollectionListOptions {
 }
 input StorageLocationListOptions {
   tenantId: ID
+  collectionId: ID
   skip: Int
   take: Int
   sortDirection: SortDirection
@@ -138,18 +139,17 @@ enum CollectionSortKey {
   alias,
   description,
   owner,
-  ownerMail
-  # todo: sort by aggregated column
-  totalFileSize
-  # todo: sort by aggregated column
-  totalFileCount
-  # todo: sort by aggregated column
+  ownerMail,
+  totalFileSize,
+  totalFileCount,
   totalObjectCount
 }
 enum StorageLocationSortKey {
   id,
   alias,
-  securityCompliency
+  securityCompliency,
+  totalFilesSize,
+  totalExistingVolume
 }
 enum StoragePartitionSortKey {
   id,
@@ -167,7 +167,9 @@ enum ObjectSortKey {
   checksum,
   keywords,
   identifiers,
-  alternativeTitles
+  alternativeTitles,
+  totalFileSize,
+  totalFileCount
 }
 enum ObjectInstanceSortKey {
   id,
@@ -227,6 +229,8 @@ type StorageLocation implements Node {
   tenantId: ID!
   tenant: Tenant!
   numberOfThreads: Int!
+  totalFilesSize: Int!
+  totalExistingVolume: Int!
   storagePartitions(options: StoragePartitionListOptions): StoragePartitionList!
 }
 type StoragePartition implements Node {
@@ -262,6 +266,8 @@ type Object implements Node {
   checksum: String!
   objectInstances(options: ObjectInstanceListOptions): ObjectInstanceList!
   files(options: FileListOptions): FileList!
+  totalFileSize: Int!
+  totalFileCount: Int!
 }
 type ObjectInstance implements Node {
   id: ID!
@@ -320,6 +326,31 @@ input MimeTypeListOptions {
   sortKey: MimeTypeSortKey
 }
 
+type PronomId implements Node {
+  id: ID!
+  fileCount: Int!
+}
+
+type PronomIdList implements PaginatedList {
+  items: [PronomId!]!
+  # total of aggregation, not files
+  totalItems: Int!
+}
+
+enum PronomIdSortKey {
+  id
+  fileCount
+}
+
+input PronomIdListOptions {
+  # filter by collection
+  collectionId: ID
+  skip: Int
+  take: Int
+  sortDirection: SortDirection
+  sortKey: PronomIdSortKey
+}
+
 type Query {
   tenants(options: TenantListOptions): TenantList!
   tenant(id: ID!): Tenant
@@ -346,4 +377,5 @@ type Query {
   storagePartition(id: ID!): StoragePartition
 
   mimeTypes(options: MimeTypeListOptions): MimeTypeList!
+  pronomIds(options: PronomIdListOptions): PronomIdList!
 }

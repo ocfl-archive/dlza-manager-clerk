@@ -13,6 +13,11 @@ import (
 	"emperror.dev/errors"
 )
 
+const (
+	sortDirectionDescending string = "DESC NULLS LAST"
+	sortDirectionAscending  string = "ASC"
+)
+
 func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.TenantListOptions, allowedTenants []string) (*model.TenantList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
@@ -30,35 +35,35 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
 				return nil, errors.New("You could not retrieve more than 1000 tenants")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	tenantsPb, err := clientClerkHandler.FindAllTenantsPaginated(ctx, getPaginationObject("", skip, take, sortDirection, sortKey, allowedTenants, searchField))
+	tenantsPb, err := clientClerkHandler.FindAllTenantsPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not FindAllTenants: %v", err)
 	}
@@ -71,34 +76,38 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 }
 
 func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Tenant, options *model.StorageLocationListOptions) (*model.StorageLocationList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 storageLocations")
+				return nil, errors.New("You could not retrieve more than 1000 storage locations")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
+		}
+		if options.CollectionID != nil {
+			optionsPb.SecondId = *options.CollectionID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantID: %v", err)
 	}
@@ -112,34 +121,35 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.Cle
 }
 
 func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Tenant, options *model.CollectionListOptions) (*model.CollectionList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
 				return nil, errors.New("You could not retrieve more than 1000 collections")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -169,38 +179,39 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	tenantId := ""
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
 				return nil, errors.New("You could not retrieve more than 1000 collections")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.TenantID != nil {
-			tenantId = *options.TenantID
+			optionsPb.Id = *options.TenantID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, getPaginationObject(tenantId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
+
+	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -222,34 +233,35 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 }
 
 func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection, options *model.ObjectListOptions) (*model.ObjectList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
 				return nil, errors.New("You could not retrieve more than 1000 objects")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectsByCollectionIdPaginated: %v", err)
 	}
@@ -263,34 +275,35 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 }
 
 func GetFilesForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection, options *model.FileListOptions) (*model.FileList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 objects")
+				return nil, errors.New("You could not retrieve more than 1000 files")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	filesPb, err := clientClerkHandler.GetFilesByCollectionIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	filesPb, err := clientClerkHandler.GetFilesByCollectionIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetFilesByCollectionIdPaginated: %v", err)
 	}
@@ -328,38 +341,38 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	collectionId := ""
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 objects")
+				return nil, errors.New("You could not retrieve more than 1000 collections")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.CollectionID != nil {
-			collectionId = *options.CollectionID
+			optionsPb.Id = *options.CollectionID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, getPaginationObject(collectionId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
+	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -382,34 +395,35 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 }
 
 func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 objectInstances")
+				return nil, errors.New("You could not retrieve more than 1000 object instances")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstancesByObjectIdPaginated: %v", err)
 	}
@@ -423,34 +437,35 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 }
 
 func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Object, options *model.FileListOptions) (*model.FileList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 Files")
+				return nil, errors.New("You could not retrieve more than 1000 files")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetFilesByObjectIdPaginated: %v", err)
 	}
@@ -480,38 +495,38 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	objectId := ""
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 objectInstances")
+				return nil, errors.New("You could not retrieve more than 1000 object instances")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.ObjectID != nil {
-			objectId = *options.ObjectID
+			optionsPb.Id = *options.ObjectID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, getPaginationObject(objectId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
+	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstancesByObjectIdPaginated: %v", err)
 	}
@@ -558,38 +573,38 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	objectId := ""
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
 				return nil, errors.New("You could not retrieve more than 1000 files")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.ObjectID != nil {
-			objectId = *options.ObjectID
+			optionsPb.Id = *options.ObjectID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, getPaginationObject(objectId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
+	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetFilesByObjectIdPaginated: %v", err)
 	}
@@ -611,34 +626,35 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 }
 
 func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.ObjectInstance, options *model.ObjectInstanceCheckListOptions) (*model.ObjectInstanceCheckList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 objectInstanceChecks")
+				return nil, errors.New("You could not retrieve more than 1000 object instances")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstanceChecksByObjectInstanceIdPaginated: %v", err)
 	}
@@ -668,38 +684,38 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	objectInstanceId := ""
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 objectInstanceChecks")
+				return nil, errors.New("You could not retrieve more than 1000 object instance checks")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.ObjectInstanceID != nil {
-			objectInstanceId = *options.ObjectInstanceID
+			optionsPb.Id = *options.ObjectInstanceID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, getPaginationObject(objectInstanceId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
+	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstanceChecksByObjectInstanceIdPaginated: %v", err)
 	}
@@ -737,38 +753,41 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	tenantId := ""
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 storageLocations")
+				return nil, errors.New("You could not retrieve more than 1000 storage locations")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.TenantID != nil {
-			tenantId = *options.TenantID
+			optionsPb.Id = *options.TenantID
+		}
+		if options.CollectionID != nil {
+			optionsPb.SecondId = *options.CollectionID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, getPaginationObject(tenantId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
+	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantIdPaginated: %v", err)
 	}
@@ -806,38 +825,38 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
 	}
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	storageLocationId := ""
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 storagePartitions")
+				return nil, errors.New("You could not retrieve more than 1000 storage partitions")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.StorageLocationID != nil {
-			storageLocationId = *options.StorageLocationID
+			optionsPb.Id = *options.StorageLocationID
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, getPaginationObject(storageLocationId, skip, take, sortDirection, sortKey, allowedTenants, searchField))
+	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionsByLocationIdPaginated: %v", err)
 	}
@@ -859,34 +878,35 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 }
 
 func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.StorageLocation, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 storagePartitions")
+				return nil, errors.New("You could not retrieve more than 1000 storage partitions")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionsByLocationIdPaginated: %v", err)
 	}
@@ -900,34 +920,35 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 }
 
 func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.StoragePartition, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	searchField := ""
+	optionsPb := pb.Pagination{
+		Take:          10,
+		SortDirection: sortDirectionAscending,
+		Id:            obj.ID,
+		SortKey:       "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 objectInstances")
+				return nil, errors.New("You could not retrieve more than 1000 object instances")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			searchField = *options.Search
+			optionsPb.SearchField = *options.Search
 		}
 	}
-	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByStoragePartitionIdPaginated(ctx, getPaginationObject(obj.ID, skip, take, sortDirection, sortKey, nil, searchField))
+	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByStoragePartitionIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstancesByStoragePartitionIdPaginated: %v", err)
 	}
@@ -1077,35 +1098,51 @@ func GetStoragePartitionById(ctx context.Context, clientClerkHandler pb.ClerkHan
 //Statistic
 
 func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.MimeTypeListOptions, allowedTenants []string) (*model.MimeTypeList, error) {
-	sortKey := "ID"
-	sortDirection := "ASC"
-	take := 10
-	skip := 0
-	collectionId := ""
-
+	var keyCloakGroup []string
+	var tenantList []string
+	if ctx.Value("keycloak_group") != nil {
+		keyCloakGroup = ctx.Value("keycloak_group").([]string)
+	}
+	if ctx.Value("tenant_list") != nil {
+		tenantList = ctx.Value("tenant_list").([]string)
+	}
+	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
+		return nil, errors.New("You are not allowed to retrive datas")
+	} else if len(tenantList) > 0 {
+		allowedTenants = tenantList
+	}
+	if slices.Contains(keyCloakGroup, "dlza-admin") {
+		allowedTenants = []string{}
+	}
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
 	if options != nil {
 		if options.SortKey != nil {
-			sortKey = options.SortKey.String()
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
 		}
 		if options.SortDirection != nil {
 			if *options.SortDirection == model.SortDirectionDescending {
-				sortDirection = "DESC"
+				optionsPb.SortDirection = sortDirectionDescending
 			}
 		}
 		if options.Take != nil {
 			if *options.Take > 1000 {
-				return nil, errors.New("You could not retrieve more than 1000 mimeTypes")
+				return nil, errors.New("You could not retrieve more than 1000 mime types")
 			}
-			take = *options.Take
+			optionsPb.Take = int32(*options.Take)
 		}
 		if options.Skip != nil {
-			skip = *options.Skip
+			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.CollectionID != nil {
-			collectionId = *options.CollectionID
+			optionsPb.Id = *options.CollectionID
 		}
 	}
-	mimeTypesPb, err := clientClerkHandler.GetMimeTypesForCollectionId(ctx, getPaginationObject(collectionId, skip, take, sortDirection, sortKey, allowedTenants, ""))
+	mimeTypesPb, err := clientClerkHandler.GetMimeTypesForCollectionId(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetMimeTypesForCollectionId: %v", err)
 	}
@@ -1116,6 +1153,64 @@ func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.Cler
 		mimeTypes = append(mimeTypes, &mimeType)
 	}
 	return &model.MimeTypeList{Items: mimeTypes, TotalItems: int(mimeTypesPb.TotalItems)}, nil
+}
+
+func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.PronomIDListOptions, allowedTenants []string) (*model.PronomIDList, error) {
+	var keyCloakGroup []string
+	var tenantList []string
+	if ctx.Value("keycloak_group") != nil {
+		keyCloakGroup = ctx.Value("keycloak_group").([]string)
+	}
+	if ctx.Value("tenant_list") != nil {
+		tenantList = ctx.Value("tenant_list").([]string)
+	}
+	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
+		return nil, errors.New("You are not allowed to retrive datas")
+	} else if len(tenantList) > 0 {
+		allowedTenants = tenantList
+	}
+	if slices.Contains(keyCloakGroup, "dlza-admin") {
+		allowedTenants = []string{}
+	}
+	optionsPb := pb.Pagination{
+		Take:           10,
+		SortDirection:  sortDirectionAscending,
+		AllowedTenants: allowedTenants,
+		SortKey:        "ID",
+	}
+	if options != nil {
+		if options.SortKey != nil {
+			optionsPb.SortKey = toSnakeCase(options.SortKey.String())
+		}
+		if options.SortDirection != nil {
+			if *options.SortDirection == model.SortDirectionDescending {
+				optionsPb.SortDirection = sortDirectionDescending
+			}
+		}
+		if options.Take != nil {
+			if *options.Take > 1000 {
+				return nil, errors.New("You could not retrieve more than 1000 pronoms")
+			}
+			optionsPb.Take = int32(*options.Take)
+		}
+		if options.Skip != nil {
+			optionsPb.Skip = int32(*options.Skip)
+		}
+		if options.CollectionID != nil {
+			optionsPb.Id = *options.CollectionID
+		}
+	}
+	pronomsPb, err := clientClerkHandler.GetPronomsForCollectionId(ctx, &optionsPb)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetMimeTypesForCollectionId: %v", err)
+	}
+
+	pronoms := make([]*model.PronomID, 0)
+	for _, pronomPb := range pronomsPb.Pronoms {
+		pronom := model.PronomID{ID: pronomPb.Id, FileCount: int(pronomPb.FileCount)}
+		pronoms = append(pronoms, &pronom)
+	}
+	return &model.PronomIDList{Items: pronoms, TotalItems: int(pronomsPb.TotalItems)}, nil
 }
 
 func tenantToGraphQlTenant(tenantPb *pb.Tenant) *model.Tenant {
@@ -1163,6 +1258,8 @@ func objectToGraphQlObject(objectPb *pb.Object) *model.Object {
 	object.ID = objectPb.Id
 	object.CollectionID = objectPb.CollectionId
 	object.Checksum = objectPb.Checksum
+	object.TotalFileSize = int(objectPb.TotalFileSize)
+	object.TotalFileCount = int(objectPb.TotalFileCount)
 	return &object
 }
 
@@ -1217,6 +1314,8 @@ func storageLocationToGraphQlStorageLocation(storageLocationPb *pb.StorageLocati
 	storageLocation.OcflType = storageLocationPb.OcflType
 	storageLocation.NumberOfThreads = int(storageLocationPb.NumberOfThreads)
 	storageLocation.TenantID = storageLocationPb.TenantId
+	storageLocation.TotalExistingVolume = int(storageLocationPb.TotalExistingVolume)
+	storageLocation.TotalFilesSize = int(storageLocationPb.TotalFilesSize)
 	return &storageLocation
 }
 
@@ -1232,10 +1331,6 @@ func storagePartitionToGraphQlStoragePartition(storagePartitionPb *pb.StoragePar
 	storagePartition.StorageLocationID = storagePartitionPb.StorageLocationId
 
 	return &storagePartition
-}
-
-func getPaginationObject(id string, skip int, take int, sortDirection string, sortKey string, allowedTenants []string, searchField string) *pb.Pagination {
-	return &pb.Pagination{Id: id, Skip: int32(skip), Take: int32(take), SortDirection: sortDirection, SortKey: toSnakeCase(sortKey), AllowedTenants: allowedTenants, SearchField: searchField}
 }
 
 func toSnakeCase(str string) string {

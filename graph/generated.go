@@ -123,6 +123,8 @@ type ComplexityRoot struct {
 		Signature         func(childComplexity int) int
 		Size              func(childComplexity int) int
 		Title             func(childComplexity int) int
+		TotalFileCount    func(childComplexity int) int
+		TotalFileSize     func(childComplexity int) int
 		User              func(childComplexity int) int
 	}
 
@@ -163,6 +165,16 @@ type ComplexityRoot struct {
 		TotalItems func(childComplexity int) int
 	}
 
+	PronomId struct {
+		FileCount func(childComplexity int) int
+		ID        func(childComplexity int) int
+	}
+
+	PronomIdList struct {
+		Items      func(childComplexity int) int
+		TotalItems func(childComplexity int) int
+	}
+
 	Query struct {
 		Collection           func(childComplexity int, id string) int
 		Collections          func(childComplexity int, options *model.CollectionListOptions) int
@@ -175,6 +187,7 @@ type ComplexityRoot struct {
 		ObjectInstanceChecks func(childComplexity int, options *model.ObjectInstanceCheckListOptions) int
 		ObjectInstances      func(childComplexity int, options *model.ObjectInstanceListOptions) int
 		Objects              func(childComplexity int, options *model.ObjectListOptions) int
+		PronomIds            func(childComplexity int, options *model.PronomIDListOptions) int
 		StorageLocation      func(childComplexity int, id string) int
 		StorageLocations     func(childComplexity int, options *model.StorageLocationListOptions) int
 		StoragePartition     func(childComplexity int, id string) int
@@ -184,20 +197,22 @@ type ComplexityRoot struct {
 	}
 
 	StorageLocation struct {
-		Alias              func(childComplexity int) int
-		Connection         func(childComplexity int) int
-		FillFirst          func(childComplexity int) int
-		ID                 func(childComplexity int) int
-		NumberOfThreads    func(childComplexity int) int
-		OcflType           func(childComplexity int) int
-		Price              func(childComplexity int) int
-		Quality            func(childComplexity int) int
-		SecurityCompliency func(childComplexity int) int
-		StoragePartitions  func(childComplexity int, options *model.StoragePartitionListOptions) int
-		Tenant             func(childComplexity int) int
-		TenantID           func(childComplexity int) int
-		Type               func(childComplexity int) int
-		Vault              func(childComplexity int) int
+		Alias               func(childComplexity int) int
+		Connection          func(childComplexity int) int
+		FillFirst           func(childComplexity int) int
+		ID                  func(childComplexity int) int
+		NumberOfThreads     func(childComplexity int) int
+		OcflType            func(childComplexity int) int
+		Price               func(childComplexity int) int
+		Quality             func(childComplexity int) int
+		SecurityCompliency  func(childComplexity int) int
+		StoragePartitions   func(childComplexity int, options *model.StoragePartitionListOptions) int
+		Tenant              func(childComplexity int) int
+		TenantID            func(childComplexity int) int
+		TotalExistingVolume func(childComplexity int) int
+		TotalFilesSize      func(childComplexity int) int
+		Type                func(childComplexity int) int
+		Vault               func(childComplexity int) int
 	}
 
 	StorageLocationList struct {
@@ -268,6 +283,7 @@ type QueryResolver interface {
 	StoragePartitions(ctx context.Context, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error)
 	StoragePartition(ctx context.Context, id string) (*model.StoragePartition, error)
 	MimeTypes(ctx context.Context, options *model.MimeTypeListOptions) (*model.MimeTypeList, error)
+	PronomIds(ctx context.Context, options *model.PronomIDListOptions) (*model.PronomIDList, error)
 }
 type StorageLocationResolver interface {
 	StoragePartitions(ctx context.Context, obj *model.StorageLocation, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error)
@@ -683,6 +699,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Object.Title(childComplexity), true
 
+	case "Object.totalFileCount":
+		if e.complexity.Object.TotalFileCount == nil {
+			break
+		}
+
+		return e.complexity.Object.TotalFileCount(childComplexity), true
+
+	case "Object.totalFileSize":
+		if e.complexity.Object.TotalFileSize == nil {
+			break
+		}
+
+		return e.complexity.Object.TotalFileSize(childComplexity), true
+
 	case "Object.user":
 		if e.complexity.Object.User == nil {
 			break
@@ -849,6 +879,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ObjectList.TotalItems(childComplexity), true
 
+	case "PronomId.fileCount":
+		if e.complexity.PronomId.FileCount == nil {
+			break
+		}
+
+		return e.complexity.PronomId.FileCount(childComplexity), true
+
+	case "PronomId.id":
+		if e.complexity.PronomId.ID == nil {
+			break
+		}
+
+		return e.complexity.PronomId.ID(childComplexity), true
+
+	case "PronomIdList.items":
+		if e.complexity.PronomIdList.Items == nil {
+			break
+		}
+
+		return e.complexity.PronomIdList.Items(childComplexity), true
+
+	case "PronomIdList.totalItems":
+		if e.complexity.PronomIdList.TotalItems == nil {
+			break
+		}
+
+		return e.complexity.PronomIdList.TotalItems(childComplexity), true
+
 	case "Query.collection":
 		if e.complexity.Query.Collection == nil {
 			break
@@ -980,6 +1038,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Objects(childComplexity, args["options"].(*model.ObjectListOptions)), true
+
+	case "Query.pronomIds":
+		if e.complexity.Query.PronomIds == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pronomIds_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PronomIds(childComplexity, args["options"].(*model.PronomIDListOptions)), true
 
 	case "Query.storageLocation":
 		if e.complexity.Query.StorageLocation == nil {
@@ -1141,6 +1211,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.StorageLocation.TenantID(childComplexity), true
+
+	case "StorageLocation.totalExistingVolume":
+		if e.complexity.StorageLocation.TotalExistingVolume == nil {
+			break
+		}
+
+		return e.complexity.StorageLocation.TotalExistingVolume(childComplexity), true
+
+	case "StorageLocation.totalFilesSize":
+		if e.complexity.StorageLocation.TotalFilesSize == nil {
+			break
+		}
+
+		return e.complexity.StorageLocation.TotalFilesSize(childComplexity), true
 
 	case "StorageLocation.type":
 		if e.complexity.StorageLocation.Type == nil {
@@ -1346,6 +1430,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputObjectInstanceCheckListOptions,
 		ec.unmarshalInputObjectInstanceListOptions,
 		ec.unmarshalInputObjectListOptions,
+		ec.unmarshalInputPronomIdListOptions,
 		ec.unmarshalInputStorageLocationListOptions,
 		ec.unmarshalInputStoragePartitionListOptions,
 		ec.unmarshalInputTenantListOptions,
@@ -1697,6 +1782,21 @@ func (ec *executionContext) field_Query_objects_args(ctx context.Context, rawArg
 	if tmp, ok := rawArgs["options"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
 		arg0, err = ec.unmarshalOObjectListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectListOptions(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_pronomIds_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.PronomIDListOptions
+	if tmp, ok := rawArgs["options"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
+		arg0, err = ec.unmarshalOPronomIdListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDListOptions(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3196,6 +3296,10 @@ func (ec *executionContext) fieldContext_File_object(ctx context.Context, field 
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
 				return ec.fieldContext_Object_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Object_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Object_totalFileCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -4441,6 +4545,94 @@ func (ec *executionContext) fieldContext_Object_files(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Object_totalFileSize(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_totalFileSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalFileSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_totalFileSize(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Object_totalFileCount(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_totalFileCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalFileCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_totalFileCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ObjectInstance_id(ctx context.Context, field graphql.CollectedField, obj *model.ObjectInstance) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ObjectInstance_id(ctx, field)
 	if err != nil {
@@ -4894,6 +5086,10 @@ func (ec *executionContext) fieldContext_ObjectInstance_object(ctx context.Conte
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
 				return ec.fieldContext_Object_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Object_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Object_totalFileCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -5539,6 +5735,10 @@ func (ec *executionContext) fieldContext_ObjectList_items(ctx context.Context, f
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
 				return ec.fieldContext_Object_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Object_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Object_totalFileCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -5580,6 +5780,188 @@ func (ec *executionContext) _ObjectList_totalItems(ctx context.Context, field gr
 func (ec *executionContext) fieldContext_ObjectList_totalItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ObjectList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PronomId_id(ctx context.Context, field graphql.CollectedField, obj *model.PronomID) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PronomId_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PronomId_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PronomId",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PronomId_fileCount(ctx context.Context, field graphql.CollectedField, obj *model.PronomID) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PronomId_fileCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PronomId_fileCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PronomId",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PronomIdList_items(ctx context.Context, field graphql.CollectedField, obj *model.PronomIDList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PronomIdList_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PronomID)
+	fc.Result = res
+	return ec.marshalNPronomId2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PronomIdList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PronomIdList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PronomId_id(ctx, field)
+			case "fileCount":
+				return ec.fieldContext_PronomId_fileCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PronomId", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PronomIdList_totalItems(ctx context.Context, field graphql.CollectedField, obj *model.PronomIDList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PronomIdList_totalItems(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PronomIdList_totalItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PronomIdList",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -5999,6 +6381,10 @@ func (ec *executionContext) fieldContext_Query_object(ctx context.Context, field
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
 				return ec.fieldContext_Object_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Object_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Object_totalFileCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -6539,6 +6925,10 @@ func (ec *executionContext) fieldContext_Query_storageLocation(ctx context.Conte
 				return ec.fieldContext_StorageLocation_tenant(ctx, field)
 			case "numberOfThreads":
 				return ec.fieldContext_StorageLocation_numberOfThreads(ctx, field)
+			case "totalFilesSize":
+				return ec.fieldContext_StorageLocation_totalFilesSize(ctx, field)
+			case "totalExistingVolume":
+				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
 			case "storagePartitions":
 				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
 			}
@@ -6749,6 +7139,67 @@ func (ec *executionContext) fieldContext_Query_mimeTypes(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_mimeTypes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_pronomIds(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_pronomIds(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PronomIds(rctx, fc.Args["options"].(*model.PronomIDListOptions))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PronomIDList)
+	fc.Result = res
+	return ec.marshalNPronomIdList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_pronomIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "items":
+				return ec.fieldContext_PronomIdList_items(ctx, field)
+			case "totalItems":
+				return ec.fieldContext_PronomIdList_totalItems(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PronomIdList", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_pronomIds_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7472,6 +7923,94 @@ func (ec *executionContext) fieldContext_StorageLocation_numberOfThreads(ctx con
 	return fc, nil
 }
 
+func (ec *executionContext) _StorageLocation_totalFilesSize(ctx context.Context, field graphql.CollectedField, obj *model.StorageLocation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_StorageLocation_totalFilesSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalFilesSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_StorageLocation_totalFilesSize(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "StorageLocation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _StorageLocation_totalExistingVolume(ctx context.Context, field graphql.CollectedField, obj *model.StorageLocation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalExistingVolume, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_StorageLocation_totalExistingVolume(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "StorageLocation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _StorageLocation_storagePartitions(ctx context.Context, field graphql.CollectedField, obj *model.StorageLocation) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
 	if err != nil {
@@ -7598,6 +8137,10 @@ func (ec *executionContext) fieldContext_StorageLocationList_items(ctx context.C
 				return ec.fieldContext_StorageLocation_tenant(ctx, field)
 			case "numberOfThreads":
 				return ec.fieldContext_StorageLocation_numberOfThreads(ctx, field)
+			case "totalFilesSize":
+				return ec.fieldContext_StorageLocation_totalFilesSize(ctx, field)
+			case "totalExistingVolume":
+				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
 			case "storagePartitions":
 				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
 			}
@@ -8068,6 +8611,10 @@ func (ec *executionContext) fieldContext_StoragePartition_storageLocation(ctx co
 				return ec.fieldContext_StorageLocation_tenant(ctx, field)
 			case "numberOfThreads":
 				return ec.fieldContext_StorageLocation_numberOfThreads(ctx, field)
+			case "totalFilesSize":
+				return ec.fieldContext_StorageLocation_totalFilesSize(ctx, field)
+			case "totalExistingVolume":
+				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
 			case "storagePartitions":
 				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
 			}
@@ -10911,6 +11458,71 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Context, obj interface{}) (model.PronomIDListOptions, error) {
+	var it model.PronomIDListOptions
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"collectionId", "skip", "take", "sortDirection", "sortKey"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "collectionId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CollectionID = data
+		case "skip":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Skip = data
+		case "take":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Take = data
+		case "sortDirection":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
+			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SortDirection = data
+		case "sortKey":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
+			data, err := ec.unmarshalOPronomIdSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDSortKey(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SortKey = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context.Context, obj interface{}) (model.StorageLocationListOptions, error) {
 	var it model.StorageLocationListOptions
 	asMap := map[string]interface{}{}
@@ -10918,7 +11530,7 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"tenantId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"tenantId", "collectionId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10934,6 +11546,15 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 				return it, err
 			}
 			it.TenantID = data
+		case "collectionId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CollectionID = data
 		case "skip":
 			var err error
 
@@ -11195,6 +11816,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._MimeType(ctx, sel, obj)
+	case model.PronomID:
+		return ec._PronomId(ctx, sel, &obj)
+	case *model.PronomID:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._PronomId(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -11267,6 +11895,13 @@ func (ec *executionContext) _PaginatedList(ctx context.Context, sel ast.Selectio
 			return graphql.Null
 		}
 		return ec._MimeTypeList(ctx, sel, obj)
+	case model.PronomIDList:
+		return ec._PronomIdList(ctx, sel, &obj)
+	case *model.PronomIDList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._PronomIdList(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -11880,6 +12515,16 @@ func (ec *executionContext) _Object(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "totalFileSize":
+			out.Values[i] = ec._Object_totalFileSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "totalFileCount":
+			out.Values[i] = ec._Object_totalFileCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12188,6 +12833,94 @@ func (ec *executionContext) _ObjectList(ctx context.Context, sel ast.SelectionSe
 			}
 		case "totalItems":
 			out.Values[i] = ec._ObjectList_totalItems(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var pronomIdImplementors = []string{"PronomId", "Node"}
+
+func (ec *executionContext) _PronomId(ctx context.Context, sel ast.SelectionSet, obj *model.PronomID) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pronomIdImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PronomId")
+		case "id":
+			out.Values[i] = ec._PronomId_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileCount":
+			out.Values[i] = ec._PronomId_fileCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var pronomIdListImplementors = []string{"PronomIdList", "PaginatedList"}
+
+func (ec *executionContext) _PronomIdList(ctx context.Context, sel ast.SelectionSet, obj *model.PronomIDList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pronomIdListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PronomIdList")
+		case "items":
+			out.Values[i] = ec._PronomIdList_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalItems":
+			out.Values[i] = ec._PronomIdList_totalItems(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -12583,6 +13316,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "pronomIds":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pronomIds(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -12687,6 +13442,16 @@ func (ec *executionContext) _StorageLocation(ctx context.Context, sel ast.Select
 			}
 		case "numberOfThreads":
 			out.Values[i] = ec._StorageLocation_numberOfThreads(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "totalFilesSize":
+			out.Values[i] = ec._StorageLocation_totalFilesSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "totalExistingVolume":
+			out.Values[i] = ec._StorageLocation_totalExistingVolume(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -13906,6 +14671,74 @@ func (ec *executionContext) marshalNObjectList2ᚖgitlabᚗswitchᚗchᚋubᚑun
 	return ec._ObjectList(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNPronomId2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PronomID) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPronomId2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomID(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPronomId2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomID(ctx context.Context, sel ast.SelectionSet, v *model.PronomID) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PronomId(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPronomIdList2gitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDList(ctx context.Context, sel ast.SelectionSet, v model.PronomIDList) graphql.Marshaler {
+	return ec._PronomIdList(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPronomIdList2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDList(ctx context.Context, sel ast.SelectionSet, v *model.PronomIDList) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PronomIdList(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNStorageLocation2ᚕᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.StorageLocation) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -14641,6 +15474,30 @@ func (ec *executionContext) unmarshalOObjectSortKey2ᚖgitlabᚗswitchᚗchᚋub
 }
 
 func (ec *executionContext) marshalOObjectSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectSortKey(ctx context.Context, sel ast.SelectionSet, v *model.ObjectSortKey) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOPronomIdListOptions2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDListOptions(ctx context.Context, v interface{}) (*model.PronomIDListOptions, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPronomIdListOptions(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPronomIdSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDSortKey(ctx context.Context, v interface{}) (*model.PronomIDSortKey, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.PronomIDSortKey)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPronomIdSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDSortKey(ctx context.Context, sel ast.SelectionSet, v *model.PronomIDSortKey) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
