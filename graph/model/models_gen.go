@@ -166,6 +166,8 @@ type Object struct {
 	Checksum          string              `json:"checksum"`
 	ObjectInstances   *ObjectInstanceList `json:"objectInstances"`
 	Files             *FileList           `json:"files"`
+	TotalFileSize     int                 `json:"totalFileSize"`
+	TotalFileCount    int                 `json:"totalFileCount"`
 }
 
 func (Object) IsNode()            {}
@@ -280,21 +282,57 @@ type ObjectListOptions struct {
 	Search        *string        `json:"search,omitempty"`
 }
 
+type PronomID struct {
+	ID        string `json:"id"`
+	FileCount int    `json:"fileCount"`
+}
+
+func (PronomID) IsNode()            {}
+func (this PronomID) GetID() string { return this.ID }
+
+type PronomIDList struct {
+	Items      []*PronomID `json:"items"`
+	TotalItems int         `json:"totalItems"`
+}
+
+func (PronomIDList) IsPaginatedList() {}
+func (this PronomIDList) GetItems() []Node {
+	if this.Items == nil {
+		return nil
+	}
+	interfaceSlice := make([]Node, 0, len(this.Items))
+	for _, concrete := range this.Items {
+		interfaceSlice = append(interfaceSlice, concrete)
+	}
+	return interfaceSlice
+}
+func (this PronomIDList) GetTotalItems() int { return this.TotalItems }
+
+type PronomIDListOptions struct {
+	CollectionID  *string          `json:"collectionId,omitempty"`
+	Skip          *int             `json:"skip,omitempty"`
+	Take          *int             `json:"take,omitempty"`
+	SortDirection *SortDirection   `json:"sortDirection,omitempty"`
+	SortKey       *PronomIDSortKey `json:"sortKey,omitempty"`
+}
+
 type StorageLocation struct {
-	ID                 string                `json:"id"`
-	Alias              string                `json:"alias"`
-	Type               string                `json:"type"`
-	Vault              string                `json:"vault"`
-	Connection         string                `json:"connection"`
-	Quality            int                   `json:"quality"`
-	Price              int                   `json:"price"`
-	SecurityCompliency string                `json:"securityCompliency"`
-	FillFirst          bool                  `json:"fillFirst"`
-	OcflType           string                `json:"ocflType"`
-	TenantID           string                `json:"tenantId"`
-	Tenant             *Tenant               `json:"tenant"`
-	NumberOfThreads    int                   `json:"numberOfThreads"`
-	StoragePartitions  *StoragePartitionList `json:"storagePartitions"`
+	ID                  string                `json:"id"`
+	Alias               string                `json:"alias"`
+	Type                string                `json:"type"`
+	Vault               string                `json:"vault"`
+	Connection          string                `json:"connection"`
+	Quality             int                   `json:"quality"`
+	Price               int                   `json:"price"`
+	SecurityCompliency  string                `json:"securityCompliency"`
+	FillFirst           bool                  `json:"fillFirst"`
+	OcflType            string                `json:"ocflType"`
+	TenantID            string                `json:"tenantId"`
+	Tenant              *Tenant               `json:"tenant"`
+	NumberOfThreads     int                   `json:"numberOfThreads"`
+	TotalFilesSize      int                   `json:"totalFilesSize"`
+	TotalExistingVolume int                   `json:"totalExistingVolume"`
+	StoragePartitions   *StoragePartitionList `json:"storagePartitions"`
 }
 
 func (StorageLocation) IsNode()            {}
@@ -320,6 +358,7 @@ func (this StorageLocationList) GetTotalItems() int { return this.TotalItems }
 
 type StorageLocationListOptions struct {
 	TenantID      *string                 `json:"tenantId,omitempty"`
+	CollectionID  *string                 `json:"collectionId,omitempty"`
 	Skip          *int                    `json:"skip,omitempty"`
 	Take          *int                    `json:"take,omitempty"`
 	SortDirection *SortDirection          `json:"sortDirection,omitempty"`
@@ -652,6 +691,8 @@ const (
 	ObjectSortKeyKeywords          ObjectSortKey = "keywords"
 	ObjectSortKeyIdentifiers       ObjectSortKey = "identifiers"
 	ObjectSortKeyAlternativeTitles ObjectSortKey = "alternativeTitles"
+	ObjectSortKeyTotalFileSize     ObjectSortKey = "totalFileSize"
+	ObjectSortKeyTotalFileCount    ObjectSortKey = "totalFileCount"
 )
 
 var AllObjectSortKey = []ObjectSortKey{
@@ -666,11 +707,13 @@ var AllObjectSortKey = []ObjectSortKey{
 	ObjectSortKeyKeywords,
 	ObjectSortKeyIdentifiers,
 	ObjectSortKeyAlternativeTitles,
+	ObjectSortKeyTotalFileSize,
+	ObjectSortKeyTotalFileCount,
 }
 
 func (e ObjectSortKey) IsValid() bool {
 	switch e {
-	case ObjectSortKeyID, ObjectSortKeySignature, ObjectSortKeyTitle, ObjectSortKeyDescription, ObjectSortKeyIngestWorkflow, ObjectSortKeyUser, ObjectSortKeyAddress, ObjectSortKeyChecksum, ObjectSortKeyKeywords, ObjectSortKeyIdentifiers, ObjectSortKeyAlternativeTitles:
+	case ObjectSortKeyID, ObjectSortKeySignature, ObjectSortKeyTitle, ObjectSortKeyDescription, ObjectSortKeyIngestWorkflow, ObjectSortKeyUser, ObjectSortKeyAddress, ObjectSortKeyChecksum, ObjectSortKeyKeywords, ObjectSortKeyIdentifiers, ObjectSortKeyAlternativeTitles, ObjectSortKeyTotalFileSize, ObjectSortKeyTotalFileCount:
 		return true
 	}
 	return false
@@ -694,6 +737,47 @@ func (e *ObjectSortKey) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ObjectSortKey) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PronomIDSortKey string
+
+const (
+	PronomIDSortKeyID        PronomIDSortKey = "id"
+	PronomIDSortKeyFileCount PronomIDSortKey = "fileCount"
+)
+
+var AllPronomIDSortKey = []PronomIDSortKey{
+	PronomIDSortKeyID,
+	PronomIDSortKeyFileCount,
+}
+
+func (e PronomIDSortKey) IsValid() bool {
+	switch e {
+	case PronomIDSortKeyID, PronomIDSortKeyFileCount:
+		return true
+	}
+	return false
+}
+
+func (e PronomIDSortKey) String() string {
+	return string(e)
+}
+
+func (e *PronomIDSortKey) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PronomIDSortKey(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PronomIdSortKey", str)
+	}
+	return nil
+}
+
+func (e PronomIDSortKey) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -741,20 +825,24 @@ func (e SortDirection) MarshalGQL(w io.Writer) {
 type StorageLocationSortKey string
 
 const (
-	StorageLocationSortKeyID                 StorageLocationSortKey = "id"
-	StorageLocationSortKeyAlias              StorageLocationSortKey = "alias"
-	StorageLocationSortKeySecurityCompliency StorageLocationSortKey = "securityCompliency"
+	StorageLocationSortKeyID                  StorageLocationSortKey = "id"
+	StorageLocationSortKeyAlias               StorageLocationSortKey = "alias"
+	StorageLocationSortKeySecurityCompliency  StorageLocationSortKey = "securityCompliency"
+	StorageLocationSortKeyTotalFilesSize      StorageLocationSortKey = "totalFilesSize"
+	StorageLocationSortKeyTotalExistingVolume StorageLocationSortKey = "totalExistingVolume"
 )
 
 var AllStorageLocationSortKey = []StorageLocationSortKey{
 	StorageLocationSortKeyID,
 	StorageLocationSortKeyAlias,
 	StorageLocationSortKeySecurityCompliency,
+	StorageLocationSortKeyTotalFilesSize,
+	StorageLocationSortKeyTotalExistingVolume,
 }
 
 func (e StorageLocationSortKey) IsValid() bool {
 	switch e {
-	case StorageLocationSortKeyID, StorageLocationSortKeyAlias, StorageLocationSortKeySecurityCompliency:
+	case StorageLocationSortKeyID, StorageLocationSortKeyAlias, StorageLocationSortKeySecurityCompliency, StorageLocationSortKeyTotalFilesSize, StorageLocationSortKeyTotalExistingVolume:
 		return true
 	}
 	return false

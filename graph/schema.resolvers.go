@@ -210,6 +210,15 @@ func (r *queryResolver) MimeTypes(ctx context.Context, options *model.MimeTypeLi
 	return mimeTypes, nil
 }
 
+// PronomIds is the resolver for the pronomIds field.
+func (r *queryResolver) PronomIds(ctx context.Context, options *model.PronomIDListOptions) (*model.PronomIDList, error) {
+	pronoms, err := service.GetPronomsForCollectionId(ctx, r.ClientClerkHandler, options, r.AllowedTenants)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetPronomsForCollectionId: %v", err)
+	}
+	return pronoms, nil
+}
+
 // StoragePartitions is the resolver for the storagePartitions field.
 func (r *storageLocationResolver) StoragePartitions(ctx context.Context, obj *model.StorageLocation, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error) {
 	storagePartitions, err := service.GetStoragePartitionsForLocation(ctx, r.ClientClerkHandler, obj, options)
