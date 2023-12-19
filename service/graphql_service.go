@@ -254,6 +254,9 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 			}
 			optionsPb.Take = int32(*options.Take)
 		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
+		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
 		}
@@ -295,6 +298,9 @@ func GetFilesForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandl
 				return nil, errors.New("You could not retrieve more than 1000 files")
 			}
 			optionsPb.Take = int32(*options.Take)
+		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
 		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
@@ -368,6 +374,9 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 		if options.CollectionID != nil {
 			optionsPb.Id = *options.CollectionID
 		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
+		}
 		if options.Search != nil {
 			optionsPb.SearchField = *options.Search
 		}
@@ -416,6 +425,9 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 			}
 			optionsPb.Take = int32(*options.Take)
 		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
+		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
 		}
@@ -457,6 +469,9 @@ func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 				return nil, errors.New("You could not retrieve more than 1000 files")
 			}
 			optionsPb.Take = int32(*options.Take)
+		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
 		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
@@ -518,6 +533,9 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
+		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
 		}
 		if options.ObjectID != nil {
 			optionsPb.Id = *options.ObjectID
@@ -597,6 +615,9 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
 		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
+		}
 		if options.ObjectID != nil {
 			optionsPb.Id = *options.ObjectID
 		}
@@ -646,6 +667,9 @@ func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHa
 				return nil, errors.New("You could not retrieve more than 1000 object instances")
 			}
 			optionsPb.Take = int32(*options.Take)
+		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
 		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
@@ -707,6 +731,9 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
+		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
 		}
 		if options.ObjectInstanceID != nil {
 			optionsPb.Id = *options.ObjectInstanceID
@@ -852,6 +879,9 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 		if options.StorageLocationID != nil {
 			optionsPb.Id = *options.StorageLocationID
 		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
+		}
 		if options.Search != nil {
 			optionsPb.SearchField = *options.Search
 		}
@@ -899,6 +929,9 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 			}
 			optionsPb.Take = int32(*options.Take)
 		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
+		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
 		}
@@ -940,6 +973,9 @@ func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandl
 				return nil, errors.New("You could not retrieve more than 1000 object instances")
 			}
 			optionsPb.Take = int32(*options.Take)
+		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
 		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
