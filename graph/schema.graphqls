@@ -324,6 +324,7 @@ enum MimeTypeSortKey {
 }
 
 input MimeTypeListOptions {
+  tenantId: ID
   collectionId: ID
   skip: Int
   take: Int
@@ -348,6 +349,7 @@ enum PronomIdSortKey {
 }
 
 input PronomIdListOptions {
+  tenantId: ID
   # filter by collection
   collectionId: ID
   skip: Int

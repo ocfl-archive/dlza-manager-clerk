@@ -139,6 +139,7 @@ func (this MimeTypeList) GetItems() []Node {
 func (this MimeTypeList) GetTotalItems() int { return this.TotalItems }
 
 type MimeTypeListOptions struct {
+	TenantID      *string          `json:"tenantId,omitempty"`
 	CollectionID  *string          `json:"collectionId,omitempty"`
 	Skip          *int             `json:"skip,omitempty"`
 	Take          *int             `json:"take,omitempty"`
@@ -313,6 +314,7 @@ func (this PronomIDList) GetItems() []Node {
 func (this PronomIDList) GetTotalItems() int { return this.TotalItems }
 
 type PronomIDListOptions struct {
+	TenantID      *string          `json:"tenantId,omitempty"`
 	CollectionID  *string          `json:"collectionId,omitempty"`
 	Skip          *int             `json:"skip,omitempty"`
 	Take          *int             `json:"take,omitempty"`

@@ -11187,13 +11187,22 @@ func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"collectionId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"tenantId", "collectionId", "skip", "take", "sortDirection", "sortKey"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "tenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
 		case "collectionId":
 			var err error
 
@@ -11501,13 +11510,22 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"collectionId", "skip", "take", "sortDirection", "sortKey"}
+	fieldsInOrder := [...]string{"tenantId", "collectionId", "skip", "take", "sortDirection", "sortKey"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "tenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
 		case "collectionId":
 			var err error
 
