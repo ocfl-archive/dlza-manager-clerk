@@ -1174,6 +1174,9 @@ func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.Cler
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
 		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
+		}
 		if options.CollectionID != nil {
 			optionsPb.Id = *options.CollectionID
 		}
@@ -1231,6 +1234,9 @@ func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 		}
 		if options.Skip != nil {
 			optionsPb.Skip = int32(*options.Skip)
+		}
+		if options.TenantID != nil {
+			optionsPb.SecondId = *options.TenantID
 		}
 		if options.CollectionID != nil {
 			optionsPb.Id = *options.CollectionID
