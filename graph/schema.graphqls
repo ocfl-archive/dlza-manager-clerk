@@ -80,6 +80,7 @@ input StorageLocationListOptions {
   search: String
 }
 input StoragePartitionListOptions {
+  tenantId: ID
   storageLocationId: ID
   skip: Int
   take: Int
@@ -89,6 +90,7 @@ input StoragePartitionListOptions {
   search: String
 }
 input ObjectListOptions {
+  tenantId: ID
   collectionId: ID
   skip: Int
   take: Int
@@ -98,6 +100,7 @@ input ObjectListOptions {
   search: String
 }
 input ObjectInstanceListOptions {
+  tenantId: ID
   ObjectId: ID
   skip: Int
   take: Int
@@ -107,6 +110,7 @@ input ObjectInstanceListOptions {
   search: String
 }
 input ObjectInstanceCheckListOptions {
+  tenantId: ID
   objectInstanceId: ID
   skip: Int
   take: Int
@@ -116,6 +120,7 @@ input ObjectInstanceCheckListOptions {
   search: String
 }
 input FileListOptions {
+  tenantId: ID
   objectId: ID
   collectionId: ID
   skip: Int

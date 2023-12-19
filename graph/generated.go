@@ -11095,13 +11095,22 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"objectId", "collectionId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"tenantId", "objectId", "collectionId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "tenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
 		case "objectId":
 			var err error
 
@@ -11243,13 +11252,22 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"objectInstanceId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"tenantId", "objectInstanceId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "tenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
 		case "objectInstanceId":
 			var err error
 
@@ -11317,13 +11335,22 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ObjectId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"tenantId", "ObjectId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "tenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
 		case "ObjectId":
 			var err error
 
@@ -11391,13 +11418,22 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"collectionId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"tenantId", "collectionId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "tenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
 		case "collectionId":
 			var err error
 
@@ -11613,13 +11649,22 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"storageLocationId", "skip", "take", "sortDirection", "sortKey", "search"}
+	fieldsInOrder := [...]string{"tenantId", "storageLocationId", "skip", "take", "sortDirection", "sortKey", "search"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "tenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
 		case "storageLocationId":
 			var err error
 

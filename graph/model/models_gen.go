@@ -102,6 +102,7 @@ func (this FileList) GetItems() []Node {
 func (this FileList) GetTotalItems() int { return this.TotalItems }
 
 type FileListOptions struct {
+	TenantID      *string        `json:"tenantId,omitempty"`
 	ObjectID      *string        `json:"objectId,omitempty"`
 	CollectionID  *string        `json:"collectionId,omitempty"`
 	Skip          *int           `json:"skip,omitempty"`
@@ -220,6 +221,7 @@ func (this ObjectInstanceCheckList) GetItems() []Node {
 func (this ObjectInstanceCheckList) GetTotalItems() int { return this.TotalItems }
 
 type ObjectInstanceCheckListOptions struct {
+	TenantID         *string                     `json:"tenantId,omitempty"`
 	ObjectInstanceID *string                     `json:"objectInstanceId,omitempty"`
 	Skip             *int                        `json:"skip,omitempty"`
 	Take             *int                        `json:"take,omitempty"`
@@ -247,6 +249,7 @@ func (this ObjectInstanceList) GetItems() []Node {
 func (this ObjectInstanceList) GetTotalItems() int { return this.TotalItems }
 
 type ObjectInstanceListOptions struct {
+	TenantID      *string                `json:"tenantId,omitempty"`
 	ObjectID      *string                `json:"ObjectId,omitempty"`
 	Skip          *int                   `json:"skip,omitempty"`
 	Take          *int                   `json:"take,omitempty"`
@@ -274,6 +277,7 @@ func (this ObjectList) GetItems() []Node {
 func (this ObjectList) GetTotalItems() int { return this.TotalItems }
 
 type ObjectListOptions struct {
+	TenantID      *string        `json:"tenantId,omitempty"`
 	CollectionID  *string        `json:"collectionId,omitempty"`
 	Skip          *int           `json:"skip,omitempty"`
 	Take          *int           `json:"take,omitempty"`
@@ -401,6 +405,7 @@ func (this StoragePartitionList) GetItems() []Node {
 func (this StoragePartitionList) GetTotalItems() int { return this.TotalItems }
 
 type StoragePartitionListOptions struct {
+	TenantID          *string                  `json:"tenantId,omitempty"`
 	StorageLocationID *string                  `json:"storageLocationId,omitempty"`
 	Skip              *int                     `json:"skip,omitempty"`
 	Take              *int                     `json:"take,omitempty"`
