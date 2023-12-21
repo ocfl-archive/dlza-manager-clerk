@@ -4,7 +4,7 @@ WORKDIR /dlza-manager-clerk
 ARG SSH_PUBLIC_KEY=$SSH_PUBLIC_KEY
 ARG SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY
 
-# ARG GITLAB_USER=gitlab-ci-token
+ARG GITLAB_USER=gitlab-ci-token
 # ARG GITLAB_PASS=$CI_JOB_TOKEN
 # ARG SSH_PRIVATE_KEY
 # ARG SSH_PUBLIC_KEY
@@ -54,7 +54,8 @@ RUN go mod download
 # RUN bash ./build.sh
 
 
-RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
+# RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
+RUN git clone -b develop https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
 RUN cd dlza-frontend
 RUN npm run build dlza-frontend
 RUN cd ..
