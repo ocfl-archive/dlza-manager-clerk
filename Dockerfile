@@ -52,6 +52,12 @@ RUN go mod download
 # RUN go get google.golang.org/protobuf
 # RUN go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
 # RUN bash ./build.sh
+
+
+RUN git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
+RUN cd dlza-frontend
+RUN npm run build dlza-frontend
+RUN cd ..
 RUN go build 
 
 

@@ -80,14 +80,14 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
 	})
 	router.GET("/graphql", func(ctx *gin.Context) {
-		ctx.FileFromFS("ui/build/playground.html", http.FS(UiFS))
+		ctx.FileFromFS("dlza-frontend/build/playground.html", http.FS(UiFS))
 	})
 	graphql := router.Group("/graphql").Use(ginkeycloak.Auth(ginkeycloak.AuthCheck(), keycloakConfig))
 	{
 		graphql.POST("", srv.graphqlHandler(srv.ClientClerkHandler))
 	}
 	router.Use(func(ctx *gin.Context) {
-		fsys, _ := fs.Sub(UiFS, "ui/build")
+		fsys, _ := fs.Sub(UiFS, "dlza-frontend/build")
 		path := ctx.Request.URL.Path
 
 		ctx.FileFromFS(path, http.FS(fsys))

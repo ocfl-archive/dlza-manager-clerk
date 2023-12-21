@@ -34,7 +34,7 @@ import (
 var configParam = flag.String("config", "", "config file in toml format, no need for filetype for this param")
 var filetype = flag.String("filetype", "", "config file format, default is .yml")
 
-//go:embed all:ui/build
+//go:embed all:dlza-frontend/build
 var uiFS embed.FS
 
 //go:embed graph/schema.graphqls
