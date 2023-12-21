@@ -54,7 +54,7 @@ RUN go mod download
 # RUN bash ./build.sh
 
 
-RUN git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
+RUN git clone -b develop https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
 RUN cd dlza-frontend
 RUN npm run build dlza-frontend
 RUN cd ..
