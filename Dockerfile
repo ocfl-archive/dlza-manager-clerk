@@ -5,7 +5,7 @@ ARG SSH_PUBLIC_KEY=$SSH_PUBLIC_KEY
 ARG SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY
 
 ARG GITLAB_USER=gitlab-ci-token
-# ARG GITLAB_PASS=$CI_JOB_TOKEN
+ARG GITLAB_PASS=$CI_JOB_TOKEN
 # ARG SSH_PRIVATE_KEY
 # ARG SSH_PUBLIC_KEY
 
@@ -40,8 +40,8 @@ RUN chmod 600 ~/.ssh/id_rsa
 RUN chmod 644 ~/.ssh/authorized_keys
 RUN ssh-keyscan gitlab.switch.ch >> ~/.ssh/known_hosts
 RUN chmod 644 ~/.ssh/known_hosts
-# RUN git config --global url."ssh://git@gitlab.switch.ch/".insteadOf "https://gitlab.switch.ch/"
-RUN git config --global --add url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.switch.ch".insteadOf "https://gitlab.switch.ch"
+RUN git config --global url."ssh://git@gitlab.switch.ch/".insteadOf "https://gitlab.switch.ch/"
+# RUN git config --global --add url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.switch.ch".insteadOf "https://gitlab.switch.ch"
 # RUN ssh -A -v -l git gitlab.switch.ch
 
 # with DOCKER_BUILDKIT=1 for ssh
@@ -55,7 +55,7 @@ RUN go mod download
 
 
 # RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
-RUN git clone -b develop https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
+RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
 RUN cd dlza-frontend
 RUN npm run build dlza-frontend
 RUN cd ..
