@@ -58,8 +58,8 @@ RUN go mod download
 
 # RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
 RUN git clone -b develop git@gitlab.switch.ch:ub-unibas/dlza/dlza-frontend.git
-# RUN cd dlza-frontend
-RUN npm run build dlza-frontend
+RUN cd dlza-frontend && npm run build
+# RUN npm run build dlza-frontend
 # RUN cd ..
 RUN go build 
 
