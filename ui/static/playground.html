@@ -61,10 +61,14 @@
                 clientId: 'graphql-demo'
             });
             try {
-                await keycloak.init({
-                    onLoad: 'login-required',
+               const authenticated =  await keycloak.init({
+                    onLoad: 'check-sso',
                     checkLoginIframe: false
                 });
+                console.log(`User is ${authenticated ? 'authenticated' : 'not authenticated'}`);
+                if(!authenticated) {
+                    document.location.href="/";
+                }
             } catch (error) {
                 console.error('Failed to initialize adapter:', error);
             }
