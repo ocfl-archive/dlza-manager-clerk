@@ -24,7 +24,8 @@ RUN apt-get update && \
         git \
         openssh-client \
         ca-certificates \
-        protobuf-compiler 
+        protobuf-compiler \
+        nodejs
 # RUN apk add --no-cache ca-certificates git openssh-client 
 # RUN 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
 RUN eval $(ssh-agent -s)
