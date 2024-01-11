@@ -59,6 +59,7 @@ RUN go mod download
 # RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
 RUN npm i -g vite
 RUN git clone git@gitlab.switch.ch:ub-unibas/dlza/dlza-frontend.git
+RUN sed -i "s|dlza-manager.ub-dlza-test.k8s-001.unibas.ch|dlza-manager.ub-dlza-prod.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
 RUN cd dlza-frontend  && npm install && npm run build
 # RUN npm run build dlza-frontend
 # RUN cd ..
