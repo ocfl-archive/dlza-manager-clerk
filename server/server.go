@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"slices"
 	"strings"
 
 	"emperror.dev/errors"
@@ -89,7 +90,9 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	router.Use(func(ctx *gin.Context) {
 		fsys, _ := fs.Sub(UiFS, "dlza-frontend/build")
 		path := ctx.Request.URL.Path
-
+		if slices.Contains([]string{"/collections", "/tenants", "/objects", "/files"}, path) {
+			ctx.Redirect(http.StatusMovedPermanently, "/")
+		}
 		ctx.FileFromFS(path, http.FS(fsys))
 	})
 
