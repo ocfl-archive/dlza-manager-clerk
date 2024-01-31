@@ -60,7 +60,7 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	tenantsPb, err := clientClerkHandler.FindAllTenantsPaginated(ctx, &optionsPb)
@@ -104,7 +104,7 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.Cle
 			optionsPb.SecondId = *options.CollectionID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
@@ -146,7 +146,7 @@ func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHan
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	collectionsPb, err := clientClerkHandler.GetCollectionsByTenantIdPaginated(ctx, &optionsPb)
@@ -207,7 +207,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 			optionsPb.Id = *options.TenantID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 
@@ -261,7 +261,7 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &optionsPb)
@@ -306,7 +306,7 @@ func GetFilesForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandl
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	filesPb, err := clientClerkHandler.GetFilesByCollectionIdPaginated(ctx, &optionsPb)
@@ -378,7 +378,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 			optionsPb.SecondId = *options.TenantID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &optionsPb)
@@ -432,7 +432,7 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &optionsPb)
@@ -477,7 +477,7 @@ func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &optionsPb)
@@ -541,7 +541,7 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 			optionsPb.Id = *options.ObjectID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByObjectIdPaginated(ctx, &optionsPb)
@@ -622,7 +622,7 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 			optionsPb.Id = *options.ObjectID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	filesPb, err := clientClerkHandler.GetFilesByObjectIdPaginated(ctx, &optionsPb)
@@ -675,7 +675,7 @@ func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHa
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &optionsPb)
@@ -739,7 +739,7 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 			optionsPb.Id = *options.ObjectInstanceID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	objectInstanceChecksPb, err := clientClerkHandler.GetObjectInstanceChecksByObjectInstanceIdPaginated(ctx, &optionsPb)
@@ -811,7 +811,7 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 			optionsPb.SecondId = *options.CollectionID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
@@ -883,7 +883,7 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 			optionsPb.SecondId = *options.TenantID
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &optionsPb)
@@ -936,7 +936,7 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	storagePartitionsPb, err := clientClerkHandler.GetStoragePartitionsByLocationIdPaginated(ctx, &optionsPb)
@@ -981,7 +981,7 @@ func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandl
 			optionsPb.Skip = int32(*options.Skip)
 		}
 		if options.Search != nil {
-			optionsPb.SearchField = *options.Search
+			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
 	objectInstancesPb, err := clientClerkHandler.GetObjectInstancesByStoragePartitionIdPaginated(ctx, &optionsPb)

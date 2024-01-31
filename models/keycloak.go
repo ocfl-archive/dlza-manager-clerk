@@ -1,6 +1,12 @@
 package models
 
-import "github.com/golang-jwt/jwt/v4"
+import (
+	"context"
+
+	"github.com/golang-jwt/jwt/v4"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/constants"
+	"golang.org/x/exp/slices"
+)
 
 type Keycloak struct {
 	Addr         string `yaml:"addr" toml:"addr"`
@@ -8,6 +14,7 @@ type Keycloak struct {
 	Callback     string `yaml:"callback" toml:"callback"`
 	ClientId     string `yaml:"clientId" toml:"clientId"`
 	ClientSecret string `yaml:"clientSecret" toml:"clientSecret"`
+	AdminRole    string `yaml:"admin_role" toml:"adminRole"`
 }
 
 type KeyCloakToken struct {
@@ -44,4 +51,32 @@ type KeyCloakToken struct {
 
 type ServiceRole struct {
 	Roles []string `json:"roles"`
+}
+
+// GetKeycloakContext retrieves keycloack info from context
+func GetKeycloakContext(ctx context.Context) map[string][]string {
+	var groups, accessKey []string
+	if ctx.Value(constants.KEYCLOAK_GROUPS_CTX) != nil {
+		groups = ctx.Value(constants.KEYCLOAK_GROUPS_CTX).([]string)
+	}
+	if ctx.Value(constants.KEYCLOAK_ACCESS_KEY_CTX) != nil {
+		accessKey = ctx.Value(constants.KEYCLOAK_ACCESS_KEY_CTX).([]string)
+	}
+
+	return map[string][]string{
+		"keycloak_groups": groups,
+		"access_key":      accessKey,
+	}
+}
+
+func IsAdmin(ctx context.Context) bool {
+	var groups []string
+	if ctx.Value(constants.KEYCLOAK_GROUPS_CTX) != nil {
+		groups = ctx.Value(constants.KEYCLOAK_GROUPS_CTX).([]string)
+	}
+
+	if ctx.Value(constants.ADMIN_ROLE) == "" {
+		return false
+	}
+	return slices.Contains(groups, ctx.Value(constants.ADMIN_ROLE).(string))
 }
