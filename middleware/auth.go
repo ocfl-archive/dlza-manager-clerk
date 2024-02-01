@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -38,8 +37,10 @@ func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.
 				urlPath := c.Request.URL.Path
 				session.Set("url_path", urlPath)
 				session.Save()
-				c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
+				c.Redirect(http.StatusFound, "/auth/login")
+				// c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
 				c.Abort()
+				return
 			} else {
 				if refreshedToken != nil {
 					c.SetCookie("access_token", refreshedToken.AccessToken, int(time.Until(refreshedToken.Expiry).Seconds()), "/", domain, false, true)
@@ -55,7 +56,8 @@ func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.
 			urlPath := c.Request.URL.Path
 			session.Set("url_path", urlPath)
 			session.Save()
-			c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
+			c.Redirect(http.StatusFound, "/auth/login")
+			// c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
 			c.Abort()
 			return
 		}
@@ -72,8 +74,6 @@ func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.
 
 		_, err = jwt.ParseWithClaims(rawAccessToken, &userClaim, nil)
 		if err != nil && err.Error() != "no Keyfunc was provided." {
-			// fmt.Println("erwrwe", err.Error(), "trq")
-			fmt.Println("VerifyToken jwt.ParseWithClaims err", err)
 			c.Error(errors.Errorf("VerifyToken jwt.ParseWithClaims:"+err.Error(), http.StatusUnauthorized))
 			return
 		}

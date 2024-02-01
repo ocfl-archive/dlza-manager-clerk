@@ -146,7 +146,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 			return
 		}
 		if c.Request.URL.Query().Get("state") != state {
-			c.Error(errors.Errorf("state did not match : "+err.Error(), http.StatusBadRequest))
+			c.Error(errors.Errorf("state did not match : ", http.StatusBadRequest))
 			return
 		}
 
