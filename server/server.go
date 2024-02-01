@@ -114,7 +114,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 
 	// router := gin.Default()
 	router := srv.router
-	store := cookie.NewStore([]byte(middleware.GenerateStateOauth()))
+	store := cookie.NewStore([]byte("secretToBeChangedWithKubernetesSecret"))
 	router.Use(sessions.Sessions("mysession", store))
 
 	router.GET("/logout", func(c *gin.Context) {
@@ -190,6 +190,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 			return
 		}
 
+		fmt.Println("srv.domain", srv.domain)
 		c.SetCookie("access_token", resp.OAuth2Token.AccessToken, int(time.Until(resp.OAuth2Token.Expiry).Seconds()), "/", srv.domain, false, true)
 		session.Set("refresh_token", resp.OAuth2Token.RefreshToken)
 		session.Save()
