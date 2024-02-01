@@ -30,7 +30,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger *ubLogger.Logger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, router *gin.Engine) (*Server, error) {
+func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger *ubLogger.Logger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, router *gin.Engine, domain string) (*Server, error) {
 	server := &Server{
 		addr:               addr,
 		extAddr:            extAddr,
@@ -41,6 +41,7 @@ func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certif
 		keycloak:           keycloak,
 		ClientClerkHandler: clientClerkHandler,
 		router:             router,
+		domain:             domain,
 	}
 	return server, nil
 }
@@ -56,6 +57,7 @@ type Server struct {
 	keycloak           models.Keycloak
 	ClientClerkHandler pb.ClerkHandlerServiceClient
 	router             *gin.Engine
+	domain             string
 }
 
 var UiFS embed.FS
@@ -131,8 +133,8 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 			return
 		}
 
-		c.SetCookie("state", state, 60, "/", "localhost", false, true)
-		c.SetCookie("nonce", nonce, 60, "/", "localhost", false, true)
+		c.SetCookie("state", state, 60, "/", srv.domain, false, true)
+		c.SetCookie("nonce", nonce, 60, "/", srv.domain, false, true)
 		c.Redirect(http.StatusFound, oauth2Config.AuthCodeURL(state, oidc.Nonce(nonce)))
 	})
 	router.GET("/auth/callback", func(c *gin.Context) {
@@ -188,18 +190,18 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 			return
 		}
 
-		c.SetCookie("access_token", resp.OAuth2Token.AccessToken, int(time.Until(resp.OAuth2Token.Expiry).Seconds()), "/", "localhost", false, true)
+		c.SetCookie("access_token", resp.OAuth2Token.AccessToken, int(time.Until(resp.OAuth2Token.Expiry).Seconds()), "/", srv.domain, false, true)
 		session.Set("refresh_token", resp.OAuth2Token.RefreshToken)
 		session.Save()
 
 		c.Redirect(http.StatusFound, "/")
 	})
-	graphql := router.Group("/graphql").Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak))
+	graphql := router.Group("/graphql").Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak, srv.domain))
 	{
 		graphql.POST("", srv.graphqlHandler(srv.ClientClerkHandler))
 	}
 
-	router.Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak)).Use(func(ctx *gin.Context) {
+	router.Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak, srv.domain)).Use(func(ctx *gin.Context) {
 		fsys, _ := fs.Sub(UiFS, "dlza-frontend/build")
 		path := ctx.Request.URL.Path
 		if slices.Contains([]string{"/collections", "/tenants", "/objects", "/files"}, path) {
@@ -210,7 +212,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 
 	router.GET("/schema", func(ctx *gin.Context) {
 		ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
-	}).Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak))
+	}).Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak, srv.domain))
 
 	srv.server = http.Server{
 		Addr:      srv.addr,

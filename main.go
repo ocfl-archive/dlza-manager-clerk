@@ -167,7 +167,7 @@ func main() {
 		Callback:     conf.GraphQLConfig.Keycloak.Callback,
 		ClientId:     conf.GraphQLConfig.Keycloak.ClientId,
 		ClientSecret: conf.GraphQLConfig.Keycloak.ClientSecret,
-	}, clerkHandlerServiceClient, routes)
+	}, clerkHandlerServiceClient, routes, conf.GraphQLConfig.Domain)
 	if err != nil {
 		emperror.Panic(errors.Wrap(err, "cannot create server"))
 	}

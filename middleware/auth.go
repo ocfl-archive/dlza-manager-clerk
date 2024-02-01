@@ -26,7 +26,7 @@ func GenerateStateOauth() string {
 	return state
 }
 
-func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.IDTokenVerifier, oauth2Config oauth2.Config, keycloak models.Keycloak) gin.HandlerFunc {
+func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.IDTokenVerifier, oauth2Config oauth2.Config, keycloak models.Keycloak, domain string) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
@@ -42,7 +42,7 @@ func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.
 				c.Abort()
 			} else {
 				if refreshedToken != nil {
-					c.SetCookie("access_token", refreshedToken.AccessToken, int(time.Until(refreshedToken.Expiry).Seconds()), "/", "localhost", false, true)
+					c.SetCookie("access_token", refreshedToken.AccessToken, int(time.Until(refreshedToken.Expiry).Seconds()), "/", domain, false, true)
 					session.Set("refresh_token", refreshedToken.RefreshToken)
 				}
 			}

@@ -1,6 +1,7 @@
 graphql_config :  
   addr : "localhost:9087" #modify if needed 
   extaddr : "https://localhost:9087" #modify if needed 
+  donain: "localhost"
   #certificate = ""
   #certificatekey = ""
   #rootca = ["/tmp/ca.cert.pem"]
