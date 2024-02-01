@@ -95,7 +95,7 @@ func RefreshToken(c *gin.Context, ctx context.Context, oauth2Config oauth2.Confi
 	if refreshToken == nil {
 		return nil, errors.Errorf("RefreshToken, no refresh_token in session")
 	}
-	// fmt.Println("refreshToken : ", refreshToken, "err", errT)
+
 	ts := oauth2Config.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshToken.(string)})
 	tok, err := ts.Token()
 

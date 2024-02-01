@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"embed"
 	"encoding/json"
-	"fmt"
 	"io/fs"
 	"net/http"
 	"slices"
@@ -87,7 +86,6 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		return nil, err
 	}
 
-	fmt.Println("srv.keycloak.ClientSecret", srv.keycloak.ClientSecret)
 	oauth2Config := oauth2.Config{
 		ClientID:     srv.keycloak.ClientId,
 		ClientSecret: srv.keycloak.ClientSecret,
@@ -190,7 +188,6 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 			return
 		}
 
-		fmt.Println("srv.domain", srv.domain)
 		c.SetCookie("access_token", resp.OAuth2Token.AccessToken, int(time.Until(resp.OAuth2Token.Expiry).Seconds()), "/", srv.domain, false, true)
 		session.Set("refresh_token", resp.OAuth2Token.RefreshToken)
 		session.Save()
