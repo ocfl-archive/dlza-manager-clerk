@@ -14,6 +14,7 @@ type GraphQLConfig struct {
 	WebStatic string         `toml:"webstatic"`      // folder with static web files
 	Logging   *LoggingConfig `toml:"logging"`
 	Keycloak  Keycloak       `toml:"keycloak"`
+	Domain    string         `toml:"domain"` // domain setted for cookies
 }
 
 func LoadGraphQLConfig(data []byte) (*GraphQLConfig, error) {

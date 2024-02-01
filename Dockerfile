@@ -4,8 +4,8 @@ WORKDIR /dlza-manager-clerk
 ARG SSH_PUBLIC_KEY=$SSH_PUBLIC_KEY
 ARG SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY
 
-# ARG GITLAB_USER=gitlab-ci-token
-# ARG GITLAB_PASS=$CI_JOB_TOKEN
+ARG GITLAB_USER=gitlab-ci-token
+ARG GITLAB_PASS=$CI_JOB_TOKEN
 # ARG SSH_PRIVATE_KEY
 # ARG SSH_PUBLIC_KEY
 
@@ -24,7 +24,9 @@ RUN apt-get update && \
         git \
         openssh-client \
         ca-certificates \
-        protobuf-compiler 
+        protobuf-compiler \
+        nodejs \ 
+        npm
 # RUN apk add --no-cache ca-certificates git openssh-client 
 # RUN 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
 RUN eval $(ssh-agent -s)
@@ -52,6 +54,16 @@ RUN go mod download
 # RUN go get google.golang.org/protobuf
 # RUN go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
 # RUN bash ./build.sh
+
+
+# RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
+RUN npm i -g vite
+RUN git clone git@gitlab.switch.ch:ub-unibas/dlza/dlza-frontend.git
+## to override hardcode in frontend that targets "ub-dlza-test" namespace
+# RUN sed -i "s|dlza-manager.ub-dlza-test.k8s-001.unibas.ch|dlza-manager.ub-dlza-prod.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
+RUN cd dlza-frontend  && npm install && npm run build
+# RUN npm run build dlza-frontend
+# RUN cd ..
 RUN go build 
 
 
