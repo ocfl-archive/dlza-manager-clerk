@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -69,17 +68,20 @@ func main() {
 	statusController := controller.NewStatusController(clerkHandlerServiceClient)
 	routes := router.NewRouter(tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
 
-	server := &http.Server{
-		Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
-		Handler: routes,
-	}
-	go func() {
-		err = server.ListenAndServe()
-
-		if err != nil {
-			log.Fatalf("error: %s", err.Error())
+	/*
+		server := &http.Server{
+			Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
+			Handler: routes,
 		}
-	}()
+		go func() {
+			err = server.ListenAndServe()
+
+			if err != nil {
+				log.Fatalf("error: %s", err.Error())
+			}
+		}()
+
+	*/
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
