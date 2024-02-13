@@ -9,9 +9,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewRouter(orderController *controller.OrderController, tenantController *controller.TenantController,
+func NewRouter(tenantController *controller.TenantController,
 	storageLocationController *controller.StorageLocationController, collectionController *controller.CollectionController,
-	storagePartitionController *controller.StoragePartitionController) *gin.Engine {
+	storagePartitionController *controller.StoragePartitionController, statusController *controller.StatusController) *gin.Engine {
 	router := gin.Default()
 
 	//Swagger
@@ -19,8 +19,6 @@ func NewRouter(orderController *controller.OrderController, tenantController *co
 
 	baseRouter := router.Group("/api")
 	baseRouter.Use(auth.JwtAuthMiddleware())
-	orderRouter := baseRouter.Group("/order")
-	orderRouter.POST("", orderController.CopyFiles)
 
 	tenantRouter := baseRouter.Group("/tenant")
 	tenantRouter.GET("", tenantController.FindAllTenants)
@@ -42,6 +40,11 @@ func NewRouter(orderController *controller.OrderController, tenantController *co
 	collectionRouter.POST("", collectionController.CreateCollection)
 	collectionRouter.PATCH("", collectionController.UpdateCollection)
 	collectionRouter.DELETE("/:id", collectionController.DeleteCollectionById)
+
+	statusRouter := baseRouter.Group("/status")
+	statusRouter.GET("/:id", statusController.CheckStatus)
+	statusRouter.POST("", statusController.CreateStatus)
+	statusRouter.PATCH("", statusController.AlterStatus)
 
 	return router
 }
