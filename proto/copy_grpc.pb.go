@@ -14,11 +14,255 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
+// UploaderIngestServiceClient is the client API for UploaderIngestService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type UploaderIngestServiceClient interface {
+	CopyFile(ctx context.Context, in *IncomingOrder, opts ...grpc.CallOption) (*Status, error)
+}
+
+type uploaderIngestServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUploaderIngestServiceClient(cc grpc.ClientConnInterface) UploaderIngestServiceClient {
+	return &uploaderIngestServiceClient{cc}
+}
+
+func (c *uploaderIngestServiceClient) CopyFile(ctx context.Context, in *IncomingOrder, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, "/UploaderIngestService/CopyFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UploaderIngestServiceServer is the server API for UploaderIngestService service.
+// All implementations must embed UnimplementedUploaderIngestServiceServer
+// for forward compatibility
+type UploaderIngestServiceServer interface {
+	CopyFile(context.Context, *IncomingOrder) (*Status, error)
+	mustEmbedUnimplementedUploaderIngestServiceServer()
+}
+
+// UnimplementedUploaderIngestServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedUploaderIngestServiceServer struct {
+}
+
+func (UnimplementedUploaderIngestServiceServer) CopyFile(context.Context, *IncomingOrder) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CopyFile not implemented")
+}
+func (UnimplementedUploaderIngestServiceServer) mustEmbedUnimplementedUploaderIngestServiceServer() {}
+
+// UnsafeUploaderIngestServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UploaderIngestServiceServer will
+// result in compilation errors.
+type UnsafeUploaderIngestServiceServer interface {
+	mustEmbedUnimplementedUploaderIngestServiceServer()
+}
+
+func RegisterUploaderIngestServiceServer(s grpc.ServiceRegistrar, srv UploaderIngestServiceServer) {
+	s.RegisterService(&UploaderIngestService_ServiceDesc, srv)
+}
+
+func _UploaderIngestService_CopyFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IncomingOrder)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UploaderIngestServiceServer).CopyFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UploaderIngestService/CopyFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UploaderIngestServiceServer).CopyFile(ctx, req.(*IncomingOrder))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// UploaderIngestService_ServiceDesc is the grpc.ServiceDesc for UploaderIngestService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UploaderIngestService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "UploaderIngestService",
+	HandlerType: (*UploaderIngestServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CopyFile",
+			Handler:    _UploaderIngestService_CopyFile_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/copy.proto",
+}
+
+// UploaderHandlerServiceClient is the client API for UploaderHandlerService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type UploaderHandlerServiceClient interface {
+	TenantHasAccess(ctx context.Context, in *UploaderAccessObject, opts ...grpc.CallOption) (*Status, error)
+	SaveObjectAndFiles(ctx context.Context, in *ObjectAndFiles, opts ...grpc.CallOption) (*Id, error)
+	AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error)
+}
+
+type uploaderHandlerServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUploaderHandlerServiceClient(cc grpc.ClientConnInterface) UploaderHandlerServiceClient {
+	return &uploaderHandlerServiceClient{cc}
+}
+
+func (c *uploaderHandlerServiceClient) TenantHasAccess(ctx context.Context, in *UploaderAccessObject, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, "/UploaderHandlerService/TenantHasAccess", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *uploaderHandlerServiceClient) SaveObjectAndFiles(ctx context.Context, in *ObjectAndFiles, opts ...grpc.CallOption) (*Id, error) {
+	out := new(Id)
+	err := c.cc.Invoke(ctx, "/UploaderHandlerService/SaveObjectAndFiles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *uploaderHandlerServiceClient) AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, "/UploaderHandlerService/AlterStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UploaderHandlerServiceServer is the server API for UploaderHandlerService service.
+// All implementations must embed UnimplementedUploaderHandlerServiceServer
+// for forward compatibility
+type UploaderHandlerServiceServer interface {
+	TenantHasAccess(context.Context, *UploaderAccessObject) (*Status, error)
+	SaveObjectAndFiles(context.Context, *ObjectAndFiles) (*Id, error)
+	AlterStatus(context.Context, *StatusObject) (*Status, error)
+	mustEmbedUnimplementedUploaderHandlerServiceServer()
+}
+
+// UnimplementedUploaderHandlerServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedUploaderHandlerServiceServer struct {
+}
+
+func (UnimplementedUploaderHandlerServiceServer) TenantHasAccess(context.Context, *UploaderAccessObject) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TenantHasAccess not implemented")
+}
+func (UnimplementedUploaderHandlerServiceServer) SaveObjectAndFiles(context.Context, *ObjectAndFiles) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveObjectAndFiles not implemented")
+}
+func (UnimplementedUploaderHandlerServiceServer) AlterStatus(context.Context, *StatusObject) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AlterStatus not implemented")
+}
+func (UnimplementedUploaderHandlerServiceServer) mustEmbedUnimplementedUploaderHandlerServiceServer() {
+}
+
+// UnsafeUploaderHandlerServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UploaderHandlerServiceServer will
+// result in compilation errors.
+type UnsafeUploaderHandlerServiceServer interface {
+	mustEmbedUnimplementedUploaderHandlerServiceServer()
+}
+
+func RegisterUploaderHandlerServiceServer(s grpc.ServiceRegistrar, srv UploaderHandlerServiceServer) {
+	s.RegisterService(&UploaderHandlerService_ServiceDesc, srv)
+}
+
+func _UploaderHandlerService_TenantHasAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploaderAccessObject)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UploaderHandlerServiceServer).TenantHasAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UploaderHandlerService/TenantHasAccess",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UploaderHandlerServiceServer).TenantHasAccess(ctx, req.(*UploaderAccessObject))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UploaderHandlerService_SaveObjectAndFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ObjectAndFiles)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UploaderHandlerServiceServer).SaveObjectAndFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UploaderHandlerService/SaveObjectAndFiles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UploaderHandlerServiceServer).SaveObjectAndFiles(ctx, req.(*ObjectAndFiles))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UploaderHandlerService_AlterStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusObject)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UploaderHandlerServiceServer).AlterStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UploaderHandlerService/AlterStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UploaderHandlerServiceServer).AlterStatus(ctx, req.(*StatusObject))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// UploaderHandlerService_ServiceDesc is the grpc.ServiceDesc for UploaderHandlerService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UploaderHandlerService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "UploaderHandlerService",
+	HandlerType: (*UploaderHandlerServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "TenantHasAccess",
+			Handler:    _UploaderHandlerService_TenantHasAccess_Handler,
+		},
+		{
+			MethodName: "SaveObjectAndFiles",
+			Handler:    _UploaderHandlerService_SaveObjectAndFiles_Handler,
+		},
+		{
+			MethodName: "AlterStatus",
+			Handler:    _UploaderHandlerService_AlterStatus_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/copy.proto",
+}
+
 // ClerkIngestServiceClient is the client API for ClerkIngestService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ClerkIngestServiceClient interface {
-	CopyFiles(ctx context.Context, in *IncomingOrder, opts ...grpc.CallOption) (*Status, error)
 	CreateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error)
 }
 
@@ -28,15 +272,6 @@ type clerkIngestServiceClient struct {
 
 func NewClerkIngestServiceClient(cc grpc.ClientConnInterface) ClerkIngestServiceClient {
 	return &clerkIngestServiceClient{cc}
-}
-
-func (c *clerkIngestServiceClient) CopyFiles(ctx context.Context, in *IncomingOrder, opts ...grpc.CallOption) (*Status, error) {
-	out := new(Status)
-	err := c.cc.Invoke(ctx, "/ClerkIngestService/CopyFiles", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *clerkIngestServiceClient) CreateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error) {
@@ -52,7 +287,6 @@ func (c *clerkIngestServiceClient) CreateStoragePartition(ctx context.Context, i
 // All implementations must embed UnimplementedClerkIngestServiceServer
 // for forward compatibility
 type ClerkIngestServiceServer interface {
-	CopyFiles(context.Context, *IncomingOrder) (*Status, error)
 	CreateStoragePartition(context.Context, *StoragePartition) (*Status, error)
 	mustEmbedUnimplementedClerkIngestServiceServer()
 }
@@ -61,9 +295,6 @@ type ClerkIngestServiceServer interface {
 type UnimplementedClerkIngestServiceServer struct {
 }
 
-func (UnimplementedClerkIngestServiceServer) CopyFiles(context.Context, *IncomingOrder) (*Status, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CopyFiles not implemented")
-}
 func (UnimplementedClerkIngestServiceServer) CreateStoragePartition(context.Context, *StoragePartition) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateStoragePartition not implemented")
 }
@@ -78,24 +309,6 @@ type UnsafeClerkIngestServiceServer interface {
 
 func RegisterClerkIngestServiceServer(s grpc.ServiceRegistrar, srv ClerkIngestServiceServer) {
 	s.RegisterService(&ClerkIngestService_ServiceDesc, srv)
-}
-
-func _ClerkIngestService_CopyFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IncomingOrder)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ClerkIngestServiceServer).CopyFiles(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ClerkIngestService/CopyFiles",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClerkIngestServiceServer).CopyFiles(ctx, req.(*IncomingOrder))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _ClerkIngestService_CreateStoragePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -124,10 +337,6 @@ var ClerkIngestService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ClerkIngestServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CopyFiles",
-			Handler:    _ClerkIngestService_CopyFiles_Handler,
-		},
-		{
 			MethodName: "CreateStoragePartition",
 			Handler:    _ClerkIngestService_CreateStoragePartition_Handler,
 		},
@@ -143,7 +352,7 @@ type IngestHandlerServiceClient interface {
 	GetStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error)
 	GetCurrentStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error)
 	GetStoragePartitionForLocation(ctx context.Context, in *SizeAndId, opts ...grpc.CallOption) (*StoragePartition, error)
-	SaveObjectWithInstancesAndFiles(ctx context.Context, in *ObjectWithInstancesAndFiles, opts ...grpc.CallOption) (*Status, error)
+	SaveInstanceAndUpdatePartition(ctx context.Context, in *InstanceAndPartition, opts ...grpc.CallOption) (*Status, error)
 	GetStorageLocationById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StorageLocation, error)
 	GetAndSaveStoragePartitionWithRelevantAlias(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*StoragePartition, error)
 	UpdateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error)
@@ -152,6 +361,7 @@ type IngestHandlerServiceClient interface {
 	CreateObjectInstance(ctx context.Context, in *ObjectInstance, opts ...grpc.CallOption) (*Id, error)
 	GetStoragePartitionsByStorageLocationId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StoragePartitions, error)
 	DeleteObjectInstance(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error)
+	AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error)
 }
 
 type ingestHandlerServiceClient struct {
@@ -189,9 +399,9 @@ func (c *ingestHandlerServiceClient) GetStoragePartitionForLocation(ctx context.
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) SaveObjectWithInstancesAndFiles(ctx context.Context, in *ObjectWithInstancesAndFiles, opts ...grpc.CallOption) (*Status, error) {
+func (c *ingestHandlerServiceClient) SaveInstanceAndUpdatePartition(ctx context.Context, in *InstanceAndPartition, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/SaveObjectWithInstancesAndFiles", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/IngestHandlerService/SaveInstanceAndUpdatePartition", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -270,6 +480,15 @@ func (c *ingestHandlerServiceClient) DeleteObjectInstance(ctx context.Context, i
 	return out, nil
 }
 
+func (c *ingestHandlerServiceClient) AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, "/IngestHandlerService/AlterStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IngestHandlerServiceServer is the server API for IngestHandlerService service.
 // All implementations must embed UnimplementedIngestHandlerServiceServer
 // for forward compatibility
@@ -277,7 +496,7 @@ type IngestHandlerServiceServer interface {
 	GetStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error)
 	GetCurrentStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error)
 	GetStoragePartitionForLocation(context.Context, *SizeAndId) (*StoragePartition, error)
-	SaveObjectWithInstancesAndFiles(context.Context, *ObjectWithInstancesAndFiles) (*Status, error)
+	SaveInstanceAndUpdatePartition(context.Context, *InstanceAndPartition) (*Status, error)
 	GetStorageLocationById(context.Context, *Id) (*StorageLocation, error)
 	GetAndSaveStoragePartitionWithRelevantAlias(context.Context, *StoragePartition) (*StoragePartition, error)
 	UpdateStoragePartition(context.Context, *StoragePartition) (*Status, error)
@@ -286,6 +505,7 @@ type IngestHandlerServiceServer interface {
 	CreateObjectInstance(context.Context, *ObjectInstance) (*Id, error)
 	GetStoragePartitionsByStorageLocationId(context.Context, *Id) (*StoragePartitions, error)
 	DeleteObjectInstance(context.Context, *Id) (*Status, error)
+	AlterStatus(context.Context, *StatusObject) (*Status, error)
 	mustEmbedUnimplementedIngestHandlerServiceServer()
 }
 
@@ -302,8 +522,8 @@ func (UnimplementedIngestHandlerServiceServer) GetCurrentStorageLocationsByColle
 func (UnimplementedIngestHandlerServiceServer) GetStoragePartitionForLocation(context.Context, *SizeAndId) (*StoragePartition, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStoragePartitionForLocation not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) SaveObjectWithInstancesAndFiles(context.Context, *ObjectWithInstancesAndFiles) (*Status, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveObjectWithInstancesAndFiles not implemented")
+func (UnimplementedIngestHandlerServiceServer) SaveInstanceAndUpdatePartition(context.Context, *InstanceAndPartition) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveInstanceAndUpdatePartition not implemented")
 }
 func (UnimplementedIngestHandlerServiceServer) GetStorageLocationById(context.Context, *Id) (*StorageLocation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationById not implemented")
@@ -328,6 +548,9 @@ func (UnimplementedIngestHandlerServiceServer) GetStoragePartitionsByStorageLoca
 }
 func (UnimplementedIngestHandlerServiceServer) DeleteObjectInstance(context.Context, *Id) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteObjectInstance not implemented")
+}
+func (UnimplementedIngestHandlerServiceServer) AlterStatus(context.Context, *StatusObject) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AlterStatus not implemented")
 }
 func (UnimplementedIngestHandlerServiceServer) mustEmbedUnimplementedIngestHandlerServiceServer() {}
 
@@ -396,20 +619,20 @@ func _IngestHandlerService_GetStoragePartitionForLocation_Handler(srv interface{
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_SaveObjectWithInstancesAndFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ObjectWithInstancesAndFiles)
+func _IngestHandlerService_SaveInstanceAndUpdatePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InstanceAndPartition)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).SaveObjectWithInstancesAndFiles(ctx, in)
+		return srv.(IngestHandlerServiceServer).SaveInstanceAndUpdatePartition(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/SaveObjectWithInstancesAndFiles",
+		FullMethod: "/IngestHandlerService/SaveInstanceAndUpdatePartition",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).SaveObjectWithInstancesAndFiles(ctx, req.(*ObjectWithInstancesAndFiles))
+		return srv.(IngestHandlerServiceServer).SaveInstanceAndUpdatePartition(ctx, req.(*InstanceAndPartition))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -558,6 +781,24 @@ func _IngestHandlerService_DeleteObjectInstance_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IngestHandlerService_AlterStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusObject)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IngestHandlerServiceServer).AlterStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/IngestHandlerService/AlterStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IngestHandlerServiceServer).AlterStatus(ctx, req.(*StatusObject))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IngestHandlerService_ServiceDesc is the grpc.ServiceDesc for IngestHandlerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -578,8 +819,8 @@ var IngestHandlerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _IngestHandlerService_GetStoragePartitionForLocation_Handler,
 		},
 		{
-			MethodName: "SaveObjectWithInstancesAndFiles",
-			Handler:    _IngestHandlerService_SaveObjectWithInstancesAndFiles_Handler,
+			MethodName: "SaveInstanceAndUpdatePartition",
+			Handler:    _IngestHandlerService_SaveInstanceAndUpdatePartition_Handler,
 		},
 		{
 			MethodName: "GetStorageLocationById",
@@ -612,6 +853,10 @@ var IngestHandlerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteObjectInstance",
 			Handler:    _IngestHandlerService_DeleteObjectInstance_Handler,
+		},
+		{
+			MethodName: "AlterStatus",
+			Handler:    _IngestHandlerService_AlterStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -653,6 +898,9 @@ type ClerkHandlerServiceClient interface {
 	GetStorageLocationsByTenantIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StorageLocations, error)
 	GetStoragePartitionsByLocationIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*StoragePartitions, error)
 	GetObjectInstancesByStoragePartitionIdPaginated(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*ObjectInstances, error)
+	CheckStatus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StatusObject, error)
+	CreateStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Id, error)
+	AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error)
 }
 
 type clerkHandlerServiceClient struct {
@@ -942,6 +1190,33 @@ func (c *clerkHandlerServiceClient) GetObjectInstancesByStoragePartitionIdPagina
 	return out, nil
 }
 
+func (c *clerkHandlerServiceClient) CheckStatus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StatusObject, error) {
+	out := new(StatusObject)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/CheckStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) CreateStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Id, error) {
+	out := new(Id)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/CreateStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clerkHandlerServiceClient) AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, "/ClerkHandlerService/AlterStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClerkHandlerServiceServer is the server API for ClerkHandlerService service.
 // All implementations must embed UnimplementedClerkHandlerServiceServer
 // for forward compatibility
@@ -977,6 +1252,9 @@ type ClerkHandlerServiceServer interface {
 	GetStorageLocationsByTenantIdPaginated(context.Context, *Pagination) (*StorageLocations, error)
 	GetStoragePartitionsByLocationIdPaginated(context.Context, *Pagination) (*StoragePartitions, error)
 	GetObjectInstancesByStoragePartitionIdPaginated(context.Context, *Pagination) (*ObjectInstances, error)
+	CheckStatus(context.Context, *Id) (*StatusObject, error)
+	CreateStatus(context.Context, *StatusObject) (*Id, error)
+	AlterStatus(context.Context, *StatusObject) (*Status, error)
 	mustEmbedUnimplementedClerkHandlerServiceServer()
 }
 
@@ -1076,6 +1354,15 @@ func (UnimplementedClerkHandlerServiceServer) GetStoragePartitionsByLocationIdPa
 }
 func (UnimplementedClerkHandlerServiceServer) GetObjectInstancesByStoragePartitionIdPaginated(context.Context, *Pagination) (*ObjectInstances, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectInstancesByStoragePartitionIdPaginated not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) CheckStatus(context.Context, *Id) (*StatusObject, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckStatus not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) CreateStatus(context.Context, *StatusObject) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateStatus not implemented")
+}
+func (UnimplementedClerkHandlerServiceServer) AlterStatus(context.Context, *StatusObject) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AlterStatus not implemented")
 }
 func (UnimplementedClerkHandlerServiceServer) mustEmbedUnimplementedClerkHandlerServiceServer() {}
 
@@ -1648,6 +1935,60 @@ func _ClerkHandlerService_GetObjectInstancesByStoragePartitionIdPaginated_Handle
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClerkHandlerService_CheckStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).CheckStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/CheckStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).CheckStatus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_CreateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusObject)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).CreateStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/CreateStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).CreateStatus(ctx, req.(*StatusObject))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClerkHandlerService_AlterStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusObject)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClerkHandlerServiceServer).AlterStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ClerkHandlerService/AlterStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClerkHandlerServiceServer).AlterStatus(ctx, req.(*StatusObject))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClerkHandlerService_ServiceDesc is the grpc.ServiceDesc for ClerkHandlerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1778,6 +2119,18 @@ var ClerkHandlerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetObjectInstancesByStoragePartitionIdPaginated",
 			Handler:    _ClerkHandlerService_GetObjectInstancesByStoragePartitionIdPaginated_Handler,
+		},
+		{
+			MethodName: "CheckStatus",
+			Handler:    _ClerkHandlerService_CheckStatus_Handler,
+		},
+		{
+			MethodName: "CreateStatus",
+			Handler:    _ClerkHandlerService_CreateStatus_Handler,
+		},
+		{
+			MethodName: "AlterStatus",
+			Handler:    _ClerkHandlerService_AlterStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

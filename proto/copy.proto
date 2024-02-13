@@ -4,8 +4,17 @@ syntax="proto3";
 
 option go_package = "./proto";
 
+service UploaderIngestService {
+  rpc CopyFile(IncomingOrder) returns (Status) {};
+}
+
+service UploaderHandlerService {
+  rpc TenantHasAccess(UploaderAccessObject) returns (Status) {};
+  rpc SaveObjectAndFiles(ObjectAndFiles) returns (Id);
+  rpc AlterStatus(StatusObject) returns (Status){}
+}
+
 service ClerkIngestService {
-  rpc CopyFiles(IncomingOrder) returns (Status) {};
   rpc CreateStoragePartition(StoragePartition) returns (Status) {};
 }
 
@@ -13,7 +22,7 @@ service IngestHandlerService {
   rpc GetStorageLocationsByCollectionAlias(CollectionAlias) returns (StorageLocations){};
   rpc GetCurrentStorageLocationsByCollectionAlias(CollectionAlias) returns (StorageLocations){};
   rpc GetStoragePartitionForLocation(SizeAndId) returns (StoragePartition);
-  rpc SaveObjectWithInstancesAndFiles(ObjectWithInstancesAndFiles) returns (Status);
+  rpc SaveInstanceAndUpdatePartition(InstanceAndPartition) returns (Status);
   rpc GetStorageLocationById(Id) returns (StorageLocation);
   rpc GetAndSaveStoragePartitionWithRelevantAlias(StoragePartition) returns (StoragePartition);
   rpc UpdateStoragePartition(StoragePartition) returns (Status);
@@ -22,6 +31,7 @@ service IngestHandlerService {
   rpc CreateObjectInstance(ObjectInstance) returns (Id);
   rpc GetStoragePartitionsByStorageLocationId(Id) returns (StoragePartitions);
   rpc DeleteObjectInstance(Id) returns (Status);
+  rpc AlterStatus(StatusObject) returns (Status){}
 }
 
 service ClerkHandlerService {
@@ -59,9 +69,13 @@ service ClerkHandlerService {
   rpc GetFilesByObjectIdPaginated(Pagination) returns (Files){}
   rpc GetObjectInstanceChecksByObjectInstanceIdPaginated(Pagination) returns (ObjectInstanceChecks){}
 
-  rpc GetStorageLocationsByTenantIdPaginated(Pagination) returns (StorageLocations){};
+  rpc GetStorageLocationsByTenantIdPaginated(Pagination) returns (StorageLocations){}
   rpc GetStoragePartitionsByLocationIdPaginated(Pagination) returns (StoragePartitions){}
   rpc GetObjectInstancesByStoragePartitionIdPaginated(Pagination) returns (ObjectInstances){}
+
+  rpc CheckStatus(Id) returns (StatusObject){}
+  rpc CreateStatus(StatusObject) returns (Id){}
+  rpc AlterStatus(StatusObject) returns (Status){}
 }
 
 service DispatcherHandlerService {
@@ -74,6 +88,17 @@ service DispatcherIngestService {
 
 message NoParam {}
 
+message StatusObject {
+  string Id = 1;
+  string Status = 2;
+  string LastChanged = 3;
+}
+
+message UploaderAccessObject {
+  string Key = 1;
+  string Collection = 2;
+}
+
 message Pagination {
   string Id = 1;
   string SecondId = 2;
@@ -85,14 +110,12 @@ message Pagination {
   string searchField = 8;
 }
 
-message ObjectPath {
-  string FilePath = 1;
-  string InfoFilePath = 2;
-}
-
 message IncomingOrder {
   string CollectionAlias = 1;
-  repeated ObjectPath ObjectPaths = 2;
+  string StatusId =2;
+  string FilePath = 3;
+  string InfoFilePath = 4;
+  Object Object = 5;
 
 }
 
@@ -163,12 +186,13 @@ message Object {
   string Address = 11;
   string Created = 12;
   string LastChanged = 13;
-  int32 Size = 14;
+  int64 Size = 14;
   string CollectionId =15;
   string Checksum = 16;
   string Id = 17;
   int64 TotalFileSize = 18;
   int32 TotalFileCount = 19;
+  string Collection = 20;
 }
 
 message Objects {
@@ -178,7 +202,7 @@ message Objects {
 
 message ObjectInstance {
   string  Path = 1;
-  int32   Size = 2;
+  int64 Size = 2;
   string Created = 3;
   string Status = 4;
   string StoragePartitionId = 5;
@@ -191,11 +215,15 @@ message ObjectInstances {
   int32 TotalItems = 2;
 }
 
-message ObjectWithInstancesAndFiles {
+message ObjectAndFiles {
   string  CollectionAlias = 1;
   Object  Object = 2;
-  repeated ObjectInstance ObjectInstances = 3;
-  repeated File Files = 4;
+  repeated File Files = 3;
+}
+
+message InstanceAndPartition {
+  ObjectInstance ObjectInstance = 1;
+  StoragePartition storagePartition = 2;
 }
 
 message StorageLocations {

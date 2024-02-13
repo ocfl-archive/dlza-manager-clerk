@@ -14,6 +14,8 @@ import (
 	"strconv"
 	"syscall"
 
+	"emperror.dev/emperror"
+	"emperror.dev/errors"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/certs"
@@ -22,10 +24,6 @@ import (
 	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
 	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/service"
-
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -47,7 +45,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	//////ClerkIngest gRPC connection
 	connectionClerkIngest, err := grpc.Dial(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -60,16 +58,15 @@ func main() {
 	}
 
 	clerkIngestServiceClient := pb.NewClerkIngestServiceClient(connectionClerkIngest)
-	orderService := service.NewOrderService(clerkIngestServiceClient)
 
 	clerkHandlerServiceClient := pb.NewClerkHandlerServiceClient(connectionClerkHandler)
 
-	orderController := controller.NewOrderController(orderService)
 	tenantController := controller.NewTenantController(clerkHandlerServiceClient)
 	storageLocationController := controller.NewStorageLocationController(clerkHandlerServiceClient)
 	storagePartitionController := controller.NewStoragePartitionController(clerkIngestServiceClient)
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
-	routes := router.NewRouter(orderController, tenantController, storageLocationController, collectionController, storagePartitionController)
+	statusController := controller.NewStatusController(clerkHandlerServiceClient)
+	routes := router.NewRouter(tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
