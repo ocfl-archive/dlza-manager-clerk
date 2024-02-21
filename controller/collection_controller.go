@@ -11,12 +11,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func NewCollectionController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) Controller {
+	return &CollectionController{ClientClerkHandler: clientClerkIngestHandler}
+}
+
 type CollectionController struct {
 	ClientClerkHandler pb.ClerkHandlerServiceClient
 }
 
-func NewCollectionController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) *CollectionController {
-	return &CollectionController{ClientClerkHandler: clientClerkIngestHandler}
+func (col *CollectionController) Path() string {
+	return "/collection"
+}
+
+func (col *CollectionController) InitRoutes(collectionRouter *gin.RouterGroup) {
+	collectionRouter.GET("/:id", col.GetCollectionsByTenantId)
+	collectionRouter.POST("", col.CreateCollection)
+	collectionRouter.PATCH("", col.UpdateCollection)
+	collectionRouter.DELETE("/:id", col.DeleteCollectionById)
 }
 
 // CreateCollection godoc
@@ -124,3 +135,5 @@ func (col *CollectionController) GetCollectionsByTenantId(ctx *gin.Context) {
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusOK, collections.Collections)
 }
+
+var _ Controller = (*CollectionController)(nil)

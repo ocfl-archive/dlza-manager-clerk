@@ -11,7 +11,17 @@ type StatusController struct {
 	ClientClerkHandlerService pb.ClerkHandlerServiceClient
 }
 
-func NewStatusController(clientClerkHandlerService pb.ClerkHandlerServiceClient) *StatusController {
+func (s *StatusController) InitRoutes(statusRouter *gin.RouterGroup) {
+	statusRouter.GET("/:id", s.CheckStatus)
+	statusRouter.POST("", s.CreateStatus)
+	statusRouter.PATCH("", s.AlterStatus)
+}
+
+func (s *StatusController) Path() string {
+	return "/status"
+}
+
+func NewStatusController(clientClerkHandlerService pb.ClerkHandlerServiceClient) Controller {
 	return &StatusController{ClientClerkHandlerService: clientClerkHandlerService}
 }
 

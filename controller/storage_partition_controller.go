@@ -13,7 +13,15 @@ type StoragePartitionController struct {
 	ClientClerkIngestService pb.ClerkIngestServiceClient
 }
 
-func NewStoragePartitionController(clientClerkIngestService pb.ClerkIngestServiceClient) *StoragePartitionController {
+func (s *StoragePartitionController) InitRoutes(storagePartitionRouter *gin.RouterGroup) {
+	storagePartitionRouter.POST("", s.CreateStoragePartition)
+}
+
+func (s *StoragePartitionController) Path() string {
+	return "/storage-partition"
+}
+
+func NewStoragePartitionController(clientClerkIngestService pb.ClerkIngestServiceClient) Controller {
 	return &StoragePartitionController{ClientClerkIngestService: clientClerkIngestService}
 }
 
