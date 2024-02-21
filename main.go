@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"embed"
@@ -10,7 +9,6 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -75,25 +73,27 @@ func main() {
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
 	statusController := controller.NewStatusController(clerkHandlerServiceClient)
 	routes := router.NewRouter(tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
+	/*
+		server := &http.Server{
+			Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
+			Handler: routes,
+		}
+		var serverRunning bool = false
+		go func() {
+			serverRunning = true
+			err = server.ListenAndServe()
+			serverRunning = false
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
+				log.Panicf("error: %s", err.Error())
+			}
+		}()
+		defer func() {
+			if serverRunning {
+				server.Close()
+			}
+		}()
 
-	server := &http.Server{
-		Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
-		Handler: routes,
-	}
-	var serverRunning bool = false
-	go func() {
-		serverRunning = true
-		err = server.ListenAndServe()
-		serverRunning = false
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Panicf("error: %s", err.Error())
-		}
-	}()
-	defer func() {
-		if serverRunning {
-			server.Close()
-		}
-	}()
+	*/
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
@@ -206,7 +206,7 @@ func main() {
 	fmt.Println("press ctrl+c to stop server")
 	s := <-done
 	fmt.Println("got signal:", s)
-	server.Shutdown(context.Background())
-	serverRunning = false
+	//server.Shutdown(context.Background())
+	//serverRunning = false
 
 }
