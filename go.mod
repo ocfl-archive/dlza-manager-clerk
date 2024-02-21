@@ -1,6 +1,6 @@
 module gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk
 
-go 1.21
+go 1.22
 
 require (
 	emperror.dev/emperror v0.33.0

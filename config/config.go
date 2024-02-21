@@ -1,10 +1,9 @@
 package config
 
 import (
-	"log"
-
 	"github.com/jinzhu/configor"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	"log"
 )
 
 type Service struct {
@@ -22,22 +21,13 @@ type Config struct {
 }
 
 // GetConfig creates a new config from a given environment
-func GetConfig(configFile string, fileType string) (config Config, err error) {
+func GetConfig(configFile string) (config Config, err error) {
 	if configFile == "" {
-		defaultConfig := "config.yml"
-		if fileType == "toml" {
-			defaultConfig = "config.toml"
-		}
-		err = configor.Load(&config, defaultConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		err = configor.Load(&config, configFile)
-		if err != nil {
-			log.Fatal(err)
-		}
+		configFile = "config.yml"
 	}
-
+	err = configor.Load(&config, configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return
 }

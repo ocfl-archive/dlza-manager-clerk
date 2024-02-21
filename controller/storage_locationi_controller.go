@@ -15,7 +15,17 @@ type StorageLocationController struct {
 	ClientClerkIngestHandler pb.ClerkHandlerServiceClient
 }
 
-func NewStorageLocationController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) *StorageLocationController {
+func (s *StorageLocationController) InitRoutes(storageLocationRouter *gin.RouterGroup) {
+	storageLocationRouter.GET("/:id", s.GetStorageLocationsByTenantId)
+	storageLocationRouter.POST("", s.SaveStorageLocation)
+	storageLocationRouter.DELETE("/:id", s.DeleteStorageLocationById)
+}
+
+func (s *StorageLocationController) Path() string {
+	return "/storage-location"
+}
+
+func NewStorageLocationController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) Controller {
 	return &StorageLocationController{ClientClerkIngestHandler: clientClerkIngestHandler}
 }
 

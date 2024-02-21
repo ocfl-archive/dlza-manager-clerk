@@ -11,12 +11,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func NewTenantController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) Controller {
+	return &TenantController{ClientClerkIngestHandler: clientClerkIngestHandler}
+}
+
 type TenantController struct {
 	ClientClerkIngestHandler pb.ClerkHandlerServiceClient
 }
 
-func NewTenantController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) *TenantController {
-	return &TenantController{ClientClerkIngestHandler: clientClerkIngestHandler}
+func (t *TenantController) Path() string {
+	return "/tenant"
+}
+
+func (t *TenantController) InitRoutes(tenantRouter *gin.RouterGroup) {
+
+	tenantRouter.GET("", t.FindAllTenants)
+	tenantRouter.GET("/:id", t.FindTenantById)
+	tenantRouter.POST("", t.SaveTenant)
+	tenantRouter.PATCH("", t.UpdateTenant)
+	tenantRouter.DELETE("/:id", t.DeleteTenant)
 }
 
 // SaveTenant godoc

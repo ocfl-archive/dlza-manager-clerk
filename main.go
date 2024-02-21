@@ -24,13 +24,13 @@ import (
 	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
 	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
+	//dlzaManagerClient "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager/pkg/ingest/client"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 var configParam = flag.String("config", "", "config file in toml format, no need for filetype for this param")
-var filetype = flag.String("filetype", "", "config file format, default is .yml")
 
 //go:embed all:dlza-frontend/build
 var uiFS embed.FS
@@ -41,21 +41,27 @@ var schemaFS embed.FS
 func main() {
 
 	flag.Parse()
-	conf, err := config.GetConfig(*configParam, *filetype)
+	conf, err := config.GetConfig(*configParam)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//clerkIngestClient, clerkIngestCloser, err := dlzaManagerClient.NewClient(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//defer clerkIngestCloser.Close()
+
 	//////ClerkIngest gRPC connection
 	connectionClerkIngest, err := grpc.Dial(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+	defer connectionClerkIngest.Close()
 
 	//////ClerkHandler gRPC connection
 	connectionClerkHandler, err := grpc.Dial(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+	defer connectionClerkHandler.Close()
 
 	clerkIngestServiceClient := pb.NewClerkIngestServiceClient(connectionClerkIngest)
 
@@ -67,17 +73,23 @@ func main() {
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
 	statusController := controller.NewStatusController(clerkHandlerServiceClient)
 	routes := router.NewRouter(tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
-
 	/*
 		server := &http.Server{
 			Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
 			Handler: routes,
 		}
+		var serverRunning bool = false
 		go func() {
+			serverRunning = true
 			err = server.ListenAndServe()
-
-			if err != nil {
-				log.Fatalf("error: %s", err.Error())
+			serverRunning = false
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
+				log.Panicf("error: %s", err.Error())
+			}
+		}()
+		defer func() {
+			if serverRunning {
+				server.Close()
 			}
 		}()
 
@@ -187,13 +199,14 @@ func main() {
 	if err != nil {
 		emperror.Panic(errors.Wrap(err, "cannot start server"))
 	}
+	defer cancel()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 	fmt.Println("press ctrl+c to stop server")
 	s := <-done
 	fmt.Println("got signal:", s)
-
-	cancel()
+	//server.Shutdown(context.Background())
+	//serverRunning = false
 
 }
