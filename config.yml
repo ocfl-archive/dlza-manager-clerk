@@ -22,7 +22,7 @@ graphql_config :
 handler: 
   host : localhost
   port : 9082  #modify if needed 
-ingester:
+storage-handler:
   host : localhost
   port : 9083  #modify if needed 
 clerk: 

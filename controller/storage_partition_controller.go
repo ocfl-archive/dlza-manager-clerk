@@ -10,7 +10,7 @@ import (
 )
 
 type StoragePartitionController struct {
-	ClientClerkIngestService pb.ClerkIngestServiceClient
+	ClientClerkStorageHandlerService pb.ClerkStorageHandlerServiceClient
 }
 
 func (s *StoragePartitionController) InitRoutes(storagePartitionRouter *gin.RouterGroup) {
@@ -21,8 +21,8 @@ func (s *StoragePartitionController) Path() string {
 	return "/storage-partition"
 }
 
-func NewStoragePartitionController(clientClerkIngestService pb.ClerkIngestServiceClient) Controller {
-	return &StoragePartitionController{ClientClerkIngestService: clientClerkIngestService}
+func NewStoragePartitionController(clientClerkStorageHandlerService pb.ClerkStorageHandlerServiceClient) Controller {
+	return &StoragePartitionController{ClientClerkStorageHandlerService: clientClerkStorageHandlerService}
 }
 
 // CreateStoragePartition godoc
@@ -45,7 +45,7 @@ func (s *StoragePartitionController) CreateStoragePartition(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
-	_, err = s.ClientClerkIngestService.CreateStoragePartition(cont, &storagePartition)
+	_, err = s.ClientClerkStorageHandlerService.CreateStoragePartition(cont, &storagePartition)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

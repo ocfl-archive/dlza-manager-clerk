@@ -11,12 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewTenantController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) Controller {
-	return &TenantController{ClientClerkIngestHandler: clientClerkIngestHandler}
+func NewTenantController(clientClerkHandler pb.ClerkHandlerServiceClient) Controller {
+	return &TenantController{ClientClerkHandler: clientClerkHandler}
 }
 
 type TenantController struct {
-	ClientClerkIngestHandler pb.ClerkHandlerServiceClient
+	ClientClerkHandler pb.ClerkHandlerServiceClient
 }
 
 func (t *TenantController) Path() string {
@@ -52,7 +52,7 @@ func (t *TenantController) SaveTenant(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
-	_, err = t.ClientClerkIngestHandler.SaveTenant(cont, &tenant)
+	_, err = t.ClientClerkHandler.SaveTenant(cont, &tenant)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -81,7 +81,7 @@ func (t *TenantController) UpdateTenant(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"message": "request failed"})
 		return
 	}
-	_, err = t.ClientClerkIngestHandler.UpdateTenant(cont, &tenant)
+	_, err = t.ClientClerkHandler.UpdateTenant(cont, &tenant)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -106,7 +106,7 @@ func (t *TenantController) DeleteTenant(ctx *gin.Context) {
 	defer cancel()
 	id := ctx.Param("id")
 
-	_, err := t.ClientClerkIngestHandler.DeleteTenant(cont, &pb.Id{Id: id})
+	_, err := t.ClientClerkHandler.DeleteTenant(cont, &pb.Id{Id: id})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -129,7 +129,7 @@ func (t *TenantController) FindTenantById(ctx *gin.Context) {
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
 	id := ctx.Param("id")
-	tenant, err := t.ClientClerkIngestHandler.FindTenantById(cont, &pb.Id{Id: id})
+	tenant, err := t.ClientClerkHandler.FindTenantById(cont, &pb.Id{Id: id})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -151,7 +151,7 @@ func (t *TenantController) FindAllTenants(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
-	tenants, err := t.ClientClerkIngestHandler.FindAllTenants(cont, &pb.NoParam{})
+	tenants, err := t.ClientClerkHandler.FindAllTenants(cont, &pb.NoParam{})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

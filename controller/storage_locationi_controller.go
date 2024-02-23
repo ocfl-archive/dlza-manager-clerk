@@ -12,7 +12,7 @@ import (
 )
 
 type StorageLocationController struct {
-	ClientClerkIngestHandler pb.ClerkHandlerServiceClient
+	ClientClerkHandler pb.ClerkHandlerServiceClient
 }
 
 func (s *StorageLocationController) InitRoutes(storageLocationRouter *gin.RouterGroup) {
@@ -25,8 +25,8 @@ func (s *StorageLocationController) Path() string {
 	return "/storage-location"
 }
 
-func NewStorageLocationController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) Controller {
-	return &StorageLocationController{ClientClerkIngestHandler: clientClerkIngestHandler}
+func NewStorageLocationController(clientClerkHandler pb.ClerkHandlerServiceClient) Controller {
+	return &StorageLocationController{ClientClerkHandler: clientClerkHandler}
 }
 
 // SaveStorageLocation godoc
@@ -49,7 +49,7 @@ func (s *StorageLocationController) SaveStorageLocation(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
-	_, err = s.ClientClerkIngestHandler.SaveStorageLocation(cont, &storageLocation)
+	_, err = s.ClientClerkHandler.SaveStorageLocation(cont, &storageLocation)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -74,7 +74,7 @@ func (s *StorageLocationController) DeleteStorageLocationById(ctx *gin.Context) 
 	defer cancel()
 	id := ctx.Param("id")
 
-	_, err := s.ClientClerkIngestHandler.DeleteStorageLocationById(cont, &pb.Id{Id: id})
+	_, err := s.ClientClerkHandler.DeleteStorageLocationById(cont, &pb.Id{Id: id})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -97,7 +97,7 @@ func (s *StorageLocationController) GetStorageLocationsByTenantId(ctx *gin.Conte
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
 	id := ctx.Param("id")
-	storageLocations, err := s.ClientClerkIngestHandler.GetStorageLocationsByTenantId(cont, &pb.Id{Id: id})
+	storageLocations, err := s.ClientClerkHandler.GetStorageLocationsByTenantId(cont, &pb.Id{Id: id})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

@@ -14,86 +14,87 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// UploaderIngestServiceClient is the client API for UploaderIngestService service.
+// UploaderStorageHandlerServiceClient is the client API for UploaderStorageHandlerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UploaderIngestServiceClient interface {
+type UploaderStorageHandlerServiceClient interface {
 	CopyFile(ctx context.Context, in *IncomingOrder, opts ...grpc.CallOption) (*Status, error)
 }
 
-type uploaderIngestServiceClient struct {
+type uploaderStorageHandlerServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUploaderIngestServiceClient(cc grpc.ClientConnInterface) UploaderIngestServiceClient {
-	return &uploaderIngestServiceClient{cc}
+func NewUploaderStorageHandlerServiceClient(cc grpc.ClientConnInterface) UploaderStorageHandlerServiceClient {
+	return &uploaderStorageHandlerServiceClient{cc}
 }
 
-func (c *uploaderIngestServiceClient) CopyFile(ctx context.Context, in *IncomingOrder, opts ...grpc.CallOption) (*Status, error) {
+func (c *uploaderStorageHandlerServiceClient) CopyFile(ctx context.Context, in *IncomingOrder, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/UploaderIngestService/CopyFile", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/UploaderStorageHandlerService/CopyFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// UploaderIngestServiceServer is the server API for UploaderIngestService service.
-// All implementations must embed UnimplementedUploaderIngestServiceServer
+// UploaderStorageHandlerServiceServer is the server API for UploaderStorageHandlerService service.
+// All implementations must embed UnimplementedUploaderStorageHandlerServiceServer
 // for forward compatibility
-type UploaderIngestServiceServer interface {
+type UploaderStorageHandlerServiceServer interface {
 	CopyFile(context.Context, *IncomingOrder) (*Status, error)
-	mustEmbedUnimplementedUploaderIngestServiceServer()
+	mustEmbedUnimplementedUploaderStorageHandlerServiceServer()
 }
 
-// UnimplementedUploaderIngestServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedUploaderIngestServiceServer struct {
+// UnimplementedUploaderStorageHandlerServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedUploaderStorageHandlerServiceServer struct {
 }
 
-func (UnimplementedUploaderIngestServiceServer) CopyFile(context.Context, *IncomingOrder) (*Status, error) {
+func (UnimplementedUploaderStorageHandlerServiceServer) CopyFile(context.Context, *IncomingOrder) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CopyFile not implemented")
 }
-func (UnimplementedUploaderIngestServiceServer) mustEmbedUnimplementedUploaderIngestServiceServer() {}
+func (UnimplementedUploaderStorageHandlerServiceServer) mustEmbedUnimplementedUploaderStorageHandlerServiceServer() {
+}
 
-// UnsafeUploaderIngestServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UploaderIngestServiceServer will
+// UnsafeUploaderStorageHandlerServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UploaderStorageHandlerServiceServer will
 // result in compilation errors.
-type UnsafeUploaderIngestServiceServer interface {
-	mustEmbedUnimplementedUploaderIngestServiceServer()
+type UnsafeUploaderStorageHandlerServiceServer interface {
+	mustEmbedUnimplementedUploaderStorageHandlerServiceServer()
 }
 
-func RegisterUploaderIngestServiceServer(s grpc.ServiceRegistrar, srv UploaderIngestServiceServer) {
-	s.RegisterService(&UploaderIngestService_ServiceDesc, srv)
+func RegisterUploaderStorageHandlerServiceServer(s grpc.ServiceRegistrar, srv UploaderStorageHandlerServiceServer) {
+	s.RegisterService(&UploaderStorageHandlerService_ServiceDesc, srv)
 }
 
-func _UploaderIngestService_CopyFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UploaderStorageHandlerService_CopyFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IncomingOrder)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UploaderIngestServiceServer).CopyFile(ctx, in)
+		return srv.(UploaderStorageHandlerServiceServer).CopyFile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UploaderIngestService/CopyFile",
+		FullMethod: "/UploaderStorageHandlerService/CopyFile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UploaderIngestServiceServer).CopyFile(ctx, req.(*IncomingOrder))
+		return srv.(UploaderStorageHandlerServiceServer).CopyFile(ctx, req.(*IncomingOrder))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// UploaderIngestService_ServiceDesc is the grpc.ServiceDesc for UploaderIngestService service.
+// UploaderStorageHandlerService_ServiceDesc is the grpc.ServiceDesc for UploaderStorageHandlerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var UploaderIngestService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "UploaderIngestService",
-	HandlerType: (*UploaderIngestServiceServer)(nil),
+var UploaderStorageHandlerService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "UploaderStorageHandlerService",
+	HandlerType: (*UploaderStorageHandlerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CopyFile",
-			Handler:    _UploaderIngestService_CopyFile_Handler,
+			Handler:    _UploaderStorageHandlerService_CopyFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -259,96 +260,97 @@ var UploaderHandlerService_ServiceDesc = grpc.ServiceDesc{
 	Metadata: "proto/copy.proto",
 }
 
-// ClerkIngestServiceClient is the client API for ClerkIngestService service.
+// ClerkStorageHandlerServiceClient is the client API for ClerkStorageHandlerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ClerkIngestServiceClient interface {
+type ClerkStorageHandlerServiceClient interface {
 	CreateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error)
 }
 
-type clerkIngestServiceClient struct {
+type clerkStorageHandlerServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewClerkIngestServiceClient(cc grpc.ClientConnInterface) ClerkIngestServiceClient {
-	return &clerkIngestServiceClient{cc}
+func NewClerkStorageHandlerServiceClient(cc grpc.ClientConnInterface) ClerkStorageHandlerServiceClient {
+	return &clerkStorageHandlerServiceClient{cc}
 }
 
-func (c *clerkIngestServiceClient) CreateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error) {
+func (c *clerkStorageHandlerServiceClient) CreateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/ClerkIngestService/CreateStoragePartition", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ClerkStorageHandlerService/CreateStoragePartition", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ClerkIngestServiceServer is the server API for ClerkIngestService service.
-// All implementations must embed UnimplementedClerkIngestServiceServer
+// ClerkStorageHandlerServiceServer is the server API for ClerkStorageHandlerService service.
+// All implementations must embed UnimplementedClerkStorageHandlerServiceServer
 // for forward compatibility
-type ClerkIngestServiceServer interface {
+type ClerkStorageHandlerServiceServer interface {
 	CreateStoragePartition(context.Context, *StoragePartition) (*Status, error)
-	mustEmbedUnimplementedClerkIngestServiceServer()
+	mustEmbedUnimplementedClerkStorageHandlerServiceServer()
 }
 
-// UnimplementedClerkIngestServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedClerkIngestServiceServer struct {
+// UnimplementedClerkStorageHandlerServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedClerkStorageHandlerServiceServer struct {
 }
 
-func (UnimplementedClerkIngestServiceServer) CreateStoragePartition(context.Context, *StoragePartition) (*Status, error) {
+func (UnimplementedClerkStorageHandlerServiceServer) CreateStoragePartition(context.Context, *StoragePartition) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateStoragePartition not implemented")
 }
-func (UnimplementedClerkIngestServiceServer) mustEmbedUnimplementedClerkIngestServiceServer() {}
+func (UnimplementedClerkStorageHandlerServiceServer) mustEmbedUnimplementedClerkStorageHandlerServiceServer() {
+}
 
-// UnsafeClerkIngestServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ClerkIngestServiceServer will
+// UnsafeClerkStorageHandlerServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ClerkStorageHandlerServiceServer will
 // result in compilation errors.
-type UnsafeClerkIngestServiceServer interface {
-	mustEmbedUnimplementedClerkIngestServiceServer()
+type UnsafeClerkStorageHandlerServiceServer interface {
+	mustEmbedUnimplementedClerkStorageHandlerServiceServer()
 }
 
-func RegisterClerkIngestServiceServer(s grpc.ServiceRegistrar, srv ClerkIngestServiceServer) {
-	s.RegisterService(&ClerkIngestService_ServiceDesc, srv)
+func RegisterClerkStorageHandlerServiceServer(s grpc.ServiceRegistrar, srv ClerkStorageHandlerServiceServer) {
+	s.RegisterService(&ClerkStorageHandlerService_ServiceDesc, srv)
 }
 
-func _ClerkIngestService_CreateStoragePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ClerkStorageHandlerService_CreateStoragePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StoragePartition)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClerkIngestServiceServer).CreateStoragePartition(ctx, in)
+		return srv.(ClerkStorageHandlerServiceServer).CreateStoragePartition(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ClerkIngestService/CreateStoragePartition",
+		FullMethod: "/ClerkStorageHandlerService/CreateStoragePartition",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClerkIngestServiceServer).CreateStoragePartition(ctx, req.(*StoragePartition))
+		return srv.(ClerkStorageHandlerServiceServer).CreateStoragePartition(ctx, req.(*StoragePartition))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ClerkIngestService_ServiceDesc is the grpc.ServiceDesc for ClerkIngestService service.
+// ClerkStorageHandlerService_ServiceDesc is the grpc.ServiceDesc for ClerkStorageHandlerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ClerkIngestService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ClerkIngestService",
-	HandlerType: (*ClerkIngestServiceServer)(nil),
+var ClerkStorageHandlerService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ClerkStorageHandlerService",
+	HandlerType: (*ClerkStorageHandlerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateStoragePartition",
-			Handler:    _ClerkIngestService_CreateStoragePartition_Handler,
+			Handler:    _ClerkStorageHandlerService_CreateStoragePartition_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/copy.proto",
 }
 
-// IngestHandlerServiceClient is the client API for IngestHandlerService service.
+// StorageHandlerHandlerServiceClient is the client API for StorageHandlerHandlerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type IngestHandlerServiceClient interface {
+type StorageHandlerHandlerServiceClient interface {
 	GetStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error)
 	GetCurrentStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error)
 	GetStoragePartitionForLocation(ctx context.Context, in *SizeAndId, opts ...grpc.CallOption) (*StoragePartition, error)
@@ -364,135 +366,135 @@ type IngestHandlerServiceClient interface {
 	AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error)
 }
 
-type ingestHandlerServiceClient struct {
+type storageHandlerHandlerServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewIngestHandlerServiceClient(cc grpc.ClientConnInterface) IngestHandlerServiceClient {
-	return &ingestHandlerServiceClient{cc}
+func NewStorageHandlerHandlerServiceClient(cc grpc.ClientConnInterface) StorageHandlerHandlerServiceClient {
+	return &storageHandlerHandlerServiceClient{cc}
 }
 
-func (c *ingestHandlerServiceClient) GetStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error) {
+func (c *storageHandlerHandlerServiceClient) GetStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error) {
 	out := new(StorageLocations)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetStorageLocationsByCollectionAlias", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetStorageLocationsByCollectionAlias", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) GetCurrentStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error) {
+func (c *storageHandlerHandlerServiceClient) GetCurrentStorageLocationsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*StorageLocations, error) {
 	out := new(StorageLocations)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetCurrentStorageLocationsByCollectionAlias", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetCurrentStorageLocationsByCollectionAlias", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) GetStoragePartitionForLocation(ctx context.Context, in *SizeAndId, opts ...grpc.CallOption) (*StoragePartition, error) {
+func (c *storageHandlerHandlerServiceClient) GetStoragePartitionForLocation(ctx context.Context, in *SizeAndId, opts ...grpc.CallOption) (*StoragePartition, error) {
 	out := new(StoragePartition)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetStoragePartitionForLocation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetStoragePartitionForLocation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) SaveInstanceAndUpdatePartition(ctx context.Context, in *InstanceAndPartition, opts ...grpc.CallOption) (*Status, error) {
+func (c *storageHandlerHandlerServiceClient) SaveInstanceAndUpdatePartition(ctx context.Context, in *InstanceAndPartition, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/SaveInstanceAndUpdatePartition", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/SaveInstanceAndUpdatePartition", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) GetStorageLocationById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StorageLocation, error) {
+func (c *storageHandlerHandlerServiceClient) GetStorageLocationById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StorageLocation, error) {
 	out := new(StorageLocation)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetStorageLocationById", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetStorageLocationById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) GetAndSaveStoragePartitionWithRelevantAlias(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*StoragePartition, error) {
+func (c *storageHandlerHandlerServiceClient) GetAndSaveStoragePartitionWithRelevantAlias(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*StoragePartition, error) {
 	out := new(StoragePartition)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetAndSaveStoragePartitionWithRelevantAlias", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetAndSaveStoragePartitionWithRelevantAlias", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) UpdateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error) {
+func (c *storageHandlerHandlerServiceClient) UpdateStoragePartition(ctx context.Context, in *StoragePartition, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/UpdateStoragePartition", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/UpdateStoragePartition", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) GetObjectsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*Objects, error) {
+func (c *storageHandlerHandlerServiceClient) GetObjectsByCollectionAlias(ctx context.Context, in *CollectionAlias, opts ...grpc.CallOption) (*Objects, error) {
 	out := new(Objects)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetObjectsByCollectionAlias", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetObjectsByCollectionAlias", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) GetObjectsInstancesByObjectId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectInstances, error) {
+func (c *storageHandlerHandlerServiceClient) GetObjectsInstancesByObjectId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ObjectInstances, error) {
 	out := new(ObjectInstances)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetObjectsInstancesByObjectId", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetObjectsInstancesByObjectId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) CreateObjectInstance(ctx context.Context, in *ObjectInstance, opts ...grpc.CallOption) (*Id, error) {
+func (c *storageHandlerHandlerServiceClient) CreateObjectInstance(ctx context.Context, in *ObjectInstance, opts ...grpc.CallOption) (*Id, error) {
 	out := new(Id)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/CreateObjectInstance", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/CreateObjectInstance", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) GetStoragePartitionsByStorageLocationId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StoragePartitions, error) {
+func (c *storageHandlerHandlerServiceClient) GetStoragePartitionsByStorageLocationId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*StoragePartitions, error) {
 	out := new(StoragePartitions)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/GetStoragePartitionsByStorageLocationId", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/GetStoragePartitionsByStorageLocationId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) DeleteObjectInstance(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error) {
+func (c *storageHandlerHandlerServiceClient) DeleteObjectInstance(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/DeleteObjectInstance", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/DeleteObjectInstance", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *ingestHandlerServiceClient) AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error) {
+func (c *storageHandlerHandlerServiceClient) AlterStatus(ctx context.Context, in *StatusObject, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/IngestHandlerService/AlterStatus", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/StorageHandlerHandlerService/AlterStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// IngestHandlerServiceServer is the server API for IngestHandlerService service.
-// All implementations must embed UnimplementedIngestHandlerServiceServer
+// StorageHandlerHandlerServiceServer is the server API for StorageHandlerHandlerService service.
+// All implementations must embed UnimplementedStorageHandlerHandlerServiceServer
 // for forward compatibility
-type IngestHandlerServiceServer interface {
+type StorageHandlerHandlerServiceServer interface {
 	GetStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error)
 	GetCurrentStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error)
 	GetStoragePartitionForLocation(context.Context, *SizeAndId) (*StoragePartition, error)
@@ -506,357 +508,358 @@ type IngestHandlerServiceServer interface {
 	GetStoragePartitionsByStorageLocationId(context.Context, *Id) (*StoragePartitions, error)
 	DeleteObjectInstance(context.Context, *Id) (*Status, error)
 	AlterStatus(context.Context, *StatusObject) (*Status, error)
-	mustEmbedUnimplementedIngestHandlerServiceServer()
+	mustEmbedUnimplementedStorageHandlerHandlerServiceServer()
 }
 
-// UnimplementedIngestHandlerServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedIngestHandlerServiceServer struct {
+// UnimplementedStorageHandlerHandlerServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedStorageHandlerHandlerServiceServer struct {
 }
 
-func (UnimplementedIngestHandlerServiceServer) GetStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationsByCollectionAlias not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) GetCurrentStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetCurrentStorageLocationsByCollectionAlias(context.Context, *CollectionAlias) (*StorageLocations, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCurrentStorageLocationsByCollectionAlias not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) GetStoragePartitionForLocation(context.Context, *SizeAndId) (*StoragePartition, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetStoragePartitionForLocation(context.Context, *SizeAndId) (*StoragePartition, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStoragePartitionForLocation not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) SaveInstanceAndUpdatePartition(context.Context, *InstanceAndPartition) (*Status, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) SaveInstanceAndUpdatePartition(context.Context, *InstanceAndPartition) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveInstanceAndUpdatePartition not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) GetStorageLocationById(context.Context, *Id) (*StorageLocation, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetStorageLocationById(context.Context, *Id) (*StorageLocation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageLocationById not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) GetAndSaveStoragePartitionWithRelevantAlias(context.Context, *StoragePartition) (*StoragePartition, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetAndSaveStoragePartitionWithRelevantAlias(context.Context, *StoragePartition) (*StoragePartition, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAndSaveStoragePartitionWithRelevantAlias not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) UpdateStoragePartition(context.Context, *StoragePartition) (*Status, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) UpdateStoragePartition(context.Context, *StoragePartition) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateStoragePartition not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) GetObjectsByCollectionAlias(context.Context, *CollectionAlias) (*Objects, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetObjectsByCollectionAlias(context.Context, *CollectionAlias) (*Objects, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectsByCollectionAlias not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) GetObjectsInstancesByObjectId(context.Context, *Id) (*ObjectInstances, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetObjectsInstancesByObjectId(context.Context, *Id) (*ObjectInstances, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetObjectsInstancesByObjectId not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) CreateObjectInstance(context.Context, *ObjectInstance) (*Id, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) CreateObjectInstance(context.Context, *ObjectInstance) (*Id, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateObjectInstance not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) GetStoragePartitionsByStorageLocationId(context.Context, *Id) (*StoragePartitions, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) GetStoragePartitionsByStorageLocationId(context.Context, *Id) (*StoragePartitions, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStoragePartitionsByStorageLocationId not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) DeleteObjectInstance(context.Context, *Id) (*Status, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) DeleteObjectInstance(context.Context, *Id) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteObjectInstance not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) AlterStatus(context.Context, *StatusObject) (*Status, error) {
+func (UnimplementedStorageHandlerHandlerServiceServer) AlterStatus(context.Context, *StatusObject) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AlterStatus not implemented")
 }
-func (UnimplementedIngestHandlerServiceServer) mustEmbedUnimplementedIngestHandlerServiceServer() {}
+func (UnimplementedStorageHandlerHandlerServiceServer) mustEmbedUnimplementedStorageHandlerHandlerServiceServer() {
+}
 
-// UnsafeIngestHandlerServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to IngestHandlerServiceServer will
+// UnsafeStorageHandlerHandlerServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StorageHandlerHandlerServiceServer will
 // result in compilation errors.
-type UnsafeIngestHandlerServiceServer interface {
-	mustEmbedUnimplementedIngestHandlerServiceServer()
+type UnsafeStorageHandlerHandlerServiceServer interface {
+	mustEmbedUnimplementedStorageHandlerHandlerServiceServer()
 }
 
-func RegisterIngestHandlerServiceServer(s grpc.ServiceRegistrar, srv IngestHandlerServiceServer) {
-	s.RegisterService(&IngestHandlerService_ServiceDesc, srv)
+func RegisterStorageHandlerHandlerServiceServer(s grpc.ServiceRegistrar, srv StorageHandlerHandlerServiceServer) {
+	s.RegisterService(&StorageHandlerHandlerService_ServiceDesc, srv)
 }
 
-func _IngestHandlerService_GetStorageLocationsByCollectionAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetStorageLocationsByCollectionAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CollectionAlias)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetStorageLocationsByCollectionAlias(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetStorageLocationsByCollectionAlias(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetStorageLocationsByCollectionAlias",
+		FullMethod: "/StorageHandlerHandlerService/GetStorageLocationsByCollectionAlias",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetStorageLocationsByCollectionAlias(ctx, req.(*CollectionAlias))
+		return srv.(StorageHandlerHandlerServiceServer).GetStorageLocationsByCollectionAlias(ctx, req.(*CollectionAlias))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_GetCurrentStorageLocationsByCollectionAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetCurrentStorageLocationsByCollectionAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CollectionAlias)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetCurrentStorageLocationsByCollectionAlias(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetCurrentStorageLocationsByCollectionAlias(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetCurrentStorageLocationsByCollectionAlias",
+		FullMethod: "/StorageHandlerHandlerService/GetCurrentStorageLocationsByCollectionAlias",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetCurrentStorageLocationsByCollectionAlias(ctx, req.(*CollectionAlias))
+		return srv.(StorageHandlerHandlerServiceServer).GetCurrentStorageLocationsByCollectionAlias(ctx, req.(*CollectionAlias))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_GetStoragePartitionForLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetStoragePartitionForLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SizeAndId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetStoragePartitionForLocation(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetStoragePartitionForLocation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetStoragePartitionForLocation",
+		FullMethod: "/StorageHandlerHandlerService/GetStoragePartitionForLocation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetStoragePartitionForLocation(ctx, req.(*SizeAndId))
+		return srv.(StorageHandlerHandlerServiceServer).GetStoragePartitionForLocation(ctx, req.(*SizeAndId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_SaveInstanceAndUpdatePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_SaveInstanceAndUpdatePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(InstanceAndPartition)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).SaveInstanceAndUpdatePartition(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).SaveInstanceAndUpdatePartition(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/SaveInstanceAndUpdatePartition",
+		FullMethod: "/StorageHandlerHandlerService/SaveInstanceAndUpdatePartition",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).SaveInstanceAndUpdatePartition(ctx, req.(*InstanceAndPartition))
+		return srv.(StorageHandlerHandlerServiceServer).SaveInstanceAndUpdatePartition(ctx, req.(*InstanceAndPartition))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_GetStorageLocationById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetStorageLocationById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetStorageLocationById(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetStorageLocationById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetStorageLocationById",
+		FullMethod: "/StorageHandlerHandlerService/GetStorageLocationById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetStorageLocationById(ctx, req.(*Id))
+		return srv.(StorageHandlerHandlerServiceServer).GetStorageLocationById(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_GetAndSaveStoragePartitionWithRelevantAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetAndSaveStoragePartitionWithRelevantAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StoragePartition)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetAndSaveStoragePartitionWithRelevantAlias(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetAndSaveStoragePartitionWithRelevantAlias(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetAndSaveStoragePartitionWithRelevantAlias",
+		FullMethod: "/StorageHandlerHandlerService/GetAndSaveStoragePartitionWithRelevantAlias",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetAndSaveStoragePartitionWithRelevantAlias(ctx, req.(*StoragePartition))
+		return srv.(StorageHandlerHandlerServiceServer).GetAndSaveStoragePartitionWithRelevantAlias(ctx, req.(*StoragePartition))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_UpdateStoragePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_UpdateStoragePartition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StoragePartition)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).UpdateStoragePartition(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).UpdateStoragePartition(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/UpdateStoragePartition",
+		FullMethod: "/StorageHandlerHandlerService/UpdateStoragePartition",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).UpdateStoragePartition(ctx, req.(*StoragePartition))
+		return srv.(StorageHandlerHandlerServiceServer).UpdateStoragePartition(ctx, req.(*StoragePartition))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_GetObjectsByCollectionAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetObjectsByCollectionAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CollectionAlias)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetObjectsByCollectionAlias(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetObjectsByCollectionAlias(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetObjectsByCollectionAlias",
+		FullMethod: "/StorageHandlerHandlerService/GetObjectsByCollectionAlias",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetObjectsByCollectionAlias(ctx, req.(*CollectionAlias))
+		return srv.(StorageHandlerHandlerServiceServer).GetObjectsByCollectionAlias(ctx, req.(*CollectionAlias))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_GetObjectsInstancesByObjectId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetObjectsInstancesByObjectId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetObjectsInstancesByObjectId(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetObjectsInstancesByObjectId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetObjectsInstancesByObjectId",
+		FullMethod: "/StorageHandlerHandlerService/GetObjectsInstancesByObjectId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetObjectsInstancesByObjectId(ctx, req.(*Id))
+		return srv.(StorageHandlerHandlerServiceServer).GetObjectsInstancesByObjectId(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_CreateObjectInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_CreateObjectInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ObjectInstance)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).CreateObjectInstance(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).CreateObjectInstance(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/CreateObjectInstance",
+		FullMethod: "/StorageHandlerHandlerService/CreateObjectInstance",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).CreateObjectInstance(ctx, req.(*ObjectInstance))
+		return srv.(StorageHandlerHandlerServiceServer).CreateObjectInstance(ctx, req.(*ObjectInstance))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_GetStoragePartitionsByStorageLocationId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_GetStoragePartitionsByStorageLocationId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).GetStoragePartitionsByStorageLocationId(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).GetStoragePartitionsByStorageLocationId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/GetStoragePartitionsByStorageLocationId",
+		FullMethod: "/StorageHandlerHandlerService/GetStoragePartitionsByStorageLocationId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).GetStoragePartitionsByStorageLocationId(ctx, req.(*Id))
+		return srv.(StorageHandlerHandlerServiceServer).GetStoragePartitionsByStorageLocationId(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_DeleteObjectInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_DeleteObjectInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).DeleteObjectInstance(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).DeleteObjectInstance(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/DeleteObjectInstance",
+		FullMethod: "/StorageHandlerHandlerService/DeleteObjectInstance",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).DeleteObjectInstance(ctx, req.(*Id))
+		return srv.(StorageHandlerHandlerServiceServer).DeleteObjectInstance(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IngestHandlerService_AlterStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StorageHandlerHandlerService_AlterStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StatusObject)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(IngestHandlerServiceServer).AlterStatus(ctx, in)
+		return srv.(StorageHandlerHandlerServiceServer).AlterStatus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/IngestHandlerService/AlterStatus",
+		FullMethod: "/StorageHandlerHandlerService/AlterStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IngestHandlerServiceServer).AlterStatus(ctx, req.(*StatusObject))
+		return srv.(StorageHandlerHandlerServiceServer).AlterStatus(ctx, req.(*StatusObject))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// IngestHandlerService_ServiceDesc is the grpc.ServiceDesc for IngestHandlerService service.
+// StorageHandlerHandlerService_ServiceDesc is the grpc.ServiceDesc for StorageHandlerHandlerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var IngestHandlerService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "IngestHandlerService",
-	HandlerType: (*IngestHandlerServiceServer)(nil),
+var StorageHandlerHandlerService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "StorageHandlerHandlerService",
+	HandlerType: (*StorageHandlerHandlerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetStorageLocationsByCollectionAlias",
-			Handler:    _IngestHandlerService_GetStorageLocationsByCollectionAlias_Handler,
+			Handler:    _StorageHandlerHandlerService_GetStorageLocationsByCollectionAlias_Handler,
 		},
 		{
 			MethodName: "GetCurrentStorageLocationsByCollectionAlias",
-			Handler:    _IngestHandlerService_GetCurrentStorageLocationsByCollectionAlias_Handler,
+			Handler:    _StorageHandlerHandlerService_GetCurrentStorageLocationsByCollectionAlias_Handler,
 		},
 		{
 			MethodName: "GetStoragePartitionForLocation",
-			Handler:    _IngestHandlerService_GetStoragePartitionForLocation_Handler,
+			Handler:    _StorageHandlerHandlerService_GetStoragePartitionForLocation_Handler,
 		},
 		{
 			MethodName: "SaveInstanceAndUpdatePartition",
-			Handler:    _IngestHandlerService_SaveInstanceAndUpdatePartition_Handler,
+			Handler:    _StorageHandlerHandlerService_SaveInstanceAndUpdatePartition_Handler,
 		},
 		{
 			MethodName: "GetStorageLocationById",
-			Handler:    _IngestHandlerService_GetStorageLocationById_Handler,
+			Handler:    _StorageHandlerHandlerService_GetStorageLocationById_Handler,
 		},
 		{
 			MethodName: "GetAndSaveStoragePartitionWithRelevantAlias",
-			Handler:    _IngestHandlerService_GetAndSaveStoragePartitionWithRelevantAlias_Handler,
+			Handler:    _StorageHandlerHandlerService_GetAndSaveStoragePartitionWithRelevantAlias_Handler,
 		},
 		{
 			MethodName: "UpdateStoragePartition",
-			Handler:    _IngestHandlerService_UpdateStoragePartition_Handler,
+			Handler:    _StorageHandlerHandlerService_UpdateStoragePartition_Handler,
 		},
 		{
 			MethodName: "GetObjectsByCollectionAlias",
-			Handler:    _IngestHandlerService_GetObjectsByCollectionAlias_Handler,
+			Handler:    _StorageHandlerHandlerService_GetObjectsByCollectionAlias_Handler,
 		},
 		{
 			MethodName: "GetObjectsInstancesByObjectId",
-			Handler:    _IngestHandlerService_GetObjectsInstancesByObjectId_Handler,
+			Handler:    _StorageHandlerHandlerService_GetObjectsInstancesByObjectId_Handler,
 		},
 		{
 			MethodName: "CreateObjectInstance",
-			Handler:    _IngestHandlerService_CreateObjectInstance_Handler,
+			Handler:    _StorageHandlerHandlerService_CreateObjectInstance_Handler,
 		},
 		{
 			MethodName: "GetStoragePartitionsByStorageLocationId",
-			Handler:    _IngestHandlerService_GetStoragePartitionsByStorageLocationId_Handler,
+			Handler:    _StorageHandlerHandlerService_GetStoragePartitionsByStorageLocationId_Handler,
 		},
 		{
 			MethodName: "DeleteObjectInstance",
-			Handler:    _IngestHandlerService_DeleteObjectInstance_Handler,
+			Handler:    _StorageHandlerHandlerService_DeleteObjectInstance_Handler,
 		},
 		{
 			MethodName: "AlterStatus",
-			Handler:    _IngestHandlerService_AlterStatus_Handler,
+			Handler:    _StorageHandlerHandlerService_AlterStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -2224,87 +2227,87 @@ var DispatcherHandlerService_ServiceDesc = grpc.ServiceDesc{
 	Metadata: "proto/copy.proto",
 }
 
-// DispatcherIngestServiceClient is the client API for DispatcherIngestService service.
+// DispatcherStorageHandlerServiceClient is the client API for DispatcherStorageHandlerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type DispatcherIngestServiceClient interface {
+type DispatcherStorageHandlerServiceClient interface {
 	ChangeQualityForCollections(ctx context.Context, in *CollectionAliases, opts ...grpc.CallOption) (*Status, error)
 }
 
-type dispatcherIngestServiceClient struct {
+type dispatcherStorageHandlerServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDispatcherIngestServiceClient(cc grpc.ClientConnInterface) DispatcherIngestServiceClient {
-	return &dispatcherIngestServiceClient{cc}
+func NewDispatcherStorageHandlerServiceClient(cc grpc.ClientConnInterface) DispatcherStorageHandlerServiceClient {
+	return &dispatcherStorageHandlerServiceClient{cc}
 }
 
-func (c *dispatcherIngestServiceClient) ChangeQualityForCollections(ctx context.Context, in *CollectionAliases, opts ...grpc.CallOption) (*Status, error) {
+func (c *dispatcherStorageHandlerServiceClient) ChangeQualityForCollections(ctx context.Context, in *CollectionAliases, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
-	err := c.cc.Invoke(ctx, "/DispatcherIngestService/ChangeQualityForCollections", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/DispatcherStorageHandlerService/ChangeQualityForCollections", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// DispatcherIngestServiceServer is the server API for DispatcherIngestService service.
-// All implementations must embed UnimplementedDispatcherIngestServiceServer
+// DispatcherStorageHandlerServiceServer is the server API for DispatcherStorageHandlerService service.
+// All implementations must embed UnimplementedDispatcherStorageHandlerServiceServer
 // for forward compatibility
-type DispatcherIngestServiceServer interface {
+type DispatcherStorageHandlerServiceServer interface {
 	ChangeQualityForCollections(context.Context, *CollectionAliases) (*Status, error)
-	mustEmbedUnimplementedDispatcherIngestServiceServer()
+	mustEmbedUnimplementedDispatcherStorageHandlerServiceServer()
 }
 
-// UnimplementedDispatcherIngestServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedDispatcherIngestServiceServer struct {
+// UnimplementedDispatcherStorageHandlerServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedDispatcherStorageHandlerServiceServer struct {
 }
 
-func (UnimplementedDispatcherIngestServiceServer) ChangeQualityForCollections(context.Context, *CollectionAliases) (*Status, error) {
+func (UnimplementedDispatcherStorageHandlerServiceServer) ChangeQualityForCollections(context.Context, *CollectionAliases) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeQualityForCollections not implemented")
 }
-func (UnimplementedDispatcherIngestServiceServer) mustEmbedUnimplementedDispatcherIngestServiceServer() {
+func (UnimplementedDispatcherStorageHandlerServiceServer) mustEmbedUnimplementedDispatcherStorageHandlerServiceServer() {
 }
 
-// UnsafeDispatcherIngestServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to DispatcherIngestServiceServer will
+// UnsafeDispatcherStorageHandlerServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to DispatcherStorageHandlerServiceServer will
 // result in compilation errors.
-type UnsafeDispatcherIngestServiceServer interface {
-	mustEmbedUnimplementedDispatcherIngestServiceServer()
+type UnsafeDispatcherStorageHandlerServiceServer interface {
+	mustEmbedUnimplementedDispatcherStorageHandlerServiceServer()
 }
 
-func RegisterDispatcherIngestServiceServer(s grpc.ServiceRegistrar, srv DispatcherIngestServiceServer) {
-	s.RegisterService(&DispatcherIngestService_ServiceDesc, srv)
+func RegisterDispatcherStorageHandlerServiceServer(s grpc.ServiceRegistrar, srv DispatcherStorageHandlerServiceServer) {
+	s.RegisterService(&DispatcherStorageHandlerService_ServiceDesc, srv)
 }
 
-func _DispatcherIngestService_ChangeQualityForCollections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DispatcherStorageHandlerService_ChangeQualityForCollections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CollectionAliases)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DispatcherIngestServiceServer).ChangeQualityForCollections(ctx, in)
+		return srv.(DispatcherStorageHandlerServiceServer).ChangeQualityForCollections(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/DispatcherIngestService/ChangeQualityForCollections",
+		FullMethod: "/DispatcherStorageHandlerService/ChangeQualityForCollections",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DispatcherIngestServiceServer).ChangeQualityForCollections(ctx, req.(*CollectionAliases))
+		return srv.(DispatcherStorageHandlerServiceServer).ChangeQualityForCollections(ctx, req.(*CollectionAliases))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// DispatcherIngestService_ServiceDesc is the grpc.ServiceDesc for DispatcherIngestService service.
+// DispatcherStorageHandlerService_ServiceDesc is the grpc.ServiceDesc for DispatcherStorageHandlerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var DispatcherIngestService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "DispatcherIngestService",
-	HandlerType: (*DispatcherIngestServiceServer)(nil),
+var DispatcherStorageHandlerService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "DispatcherStorageHandlerService",
+	HandlerType: (*DispatcherStorageHandlerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "ChangeQualityForCollections",
-			Handler:    _DispatcherIngestService_ChangeQualityForCollections_Handler,
+			Handler:    _DispatcherStorageHandlerService_ChangeQualityForCollections_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

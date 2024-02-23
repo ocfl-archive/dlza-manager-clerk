@@ -4,7 +4,7 @@ syntax="proto3";
 
 option go_package = "./proto";
 
-service UploaderIngestService {
+service UploaderStorageHandlerService {
   rpc CopyFile(IncomingOrder) returns (Status) {};
 }
 
@@ -14,11 +14,11 @@ service UploaderHandlerService {
   rpc AlterStatus(StatusObject) returns (Status){}
 }
 
-service ClerkIngestService {
+service ClerkStorageHandlerService {
   rpc CreateStoragePartition(StoragePartition) returns (Status) {};
 }
 
-service IngestHandlerService {
+service StorageHandlerHandlerService {
   rpc GetStorageLocationsByCollectionAlias(CollectionAlias) returns (StorageLocations){};
   rpc GetCurrentStorageLocationsByCollectionAlias(CollectionAlias) returns (StorageLocations){};
   rpc GetStoragePartitionForLocation(SizeAndId) returns (StoragePartition);
@@ -82,7 +82,7 @@ service DispatcherHandlerService {
   rpc GetLowQualityCollections(NoParam) returns (CollectionAliases) {};
 }
 
-service DispatcherIngestService {
+service DispatcherStorageHandlerService {
   rpc ChangeQualityForCollections(CollectionAliases) returns (Status) {};
 }
 
@@ -114,9 +114,9 @@ message IncomingOrder {
   string CollectionAlias = 1;
   string StatusId =2;
   string FilePath = 3;
-  string InfoFilePath = 4;
-  Object Object = 5;
-
+  string FileName = 4;
+  string InfoFilePath = 5;
+  Object Object = 6;
 }
 
 message Collection {
