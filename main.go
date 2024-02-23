@@ -24,7 +24,6 @@ import (
 	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
 	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
-	//dlzaManagerClient "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager/pkg/ingest/client"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -46,15 +45,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//clerkIngestClient, clerkIngestCloser, err := dlzaManagerClient.NewClient(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	//defer clerkIngestCloser.Close()
-
-	//////ClerkIngest gRPC connection
-	connectionClerkIngest, err := grpc.Dial(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//////ClerkStorageHandler gRPC connection
+	connectionClerkStorageHandler, err := grpc.Dial(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer connectionClerkIngest.Close()
+	defer connectionClerkStorageHandler.Close()
 
 	//////ClerkHandler gRPC connection
 	connectionClerkHandler, err := grpc.Dial(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -63,13 +59,13 @@ func main() {
 	}
 	defer connectionClerkHandler.Close()
 
-	clerkIngestServiceClient := pb.NewClerkIngestServiceClient(connectionClerkIngest)
+	clerkStorageHandlerServiceClient := pb.NewClerkStorageHandlerServiceClient(connectionClerkStorageHandler)
 
 	clerkHandlerServiceClient := pb.NewClerkHandlerServiceClient(connectionClerkHandler)
 
 	tenantController := controller.NewTenantController(clerkHandlerServiceClient)
 	storageLocationController := controller.NewStorageLocationController(clerkHandlerServiceClient)
-	storagePartitionController := controller.NewStoragePartitionController(clerkIngestServiceClient)
+	storagePartitionController := controller.NewStoragePartitionController(clerkStorageHandlerServiceClient)
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
 	statusController := controller.NewStatusController(clerkHandlerServiceClient)
 	routes := router.NewRouter(tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
@@ -83,6 +79,20 @@ func main() {
 	if logFile != nil {
 		defer logFile.Close()
 	}
+	/*
+		server := &http.Server{
+			Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
+			Handler: routes,
+		}
+		go func() {
+			err = server.ListenAndServe()
+
+			if err != nil {
+				log.Fatalf("error: %s", err.Error())
+			}
+		}()
+
+	*/
 
 	// logger, logStash, logFile := ubLogger.CreateUbMultiLogger(
 	// 	cfg.Logging.StashHost,

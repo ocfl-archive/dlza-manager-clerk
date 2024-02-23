@@ -11,8 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewCollectionController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) Controller {
-	return &CollectionController{ClientClerkHandler: clientClerkIngestHandler}
+func NewCollectionController(clientClerkHandler pb.ClerkHandlerServiceClient) Controller {
+	return &CollectionController{ClientClerkHandler: clientClerkHandler}
 }
 
 type CollectionController struct {

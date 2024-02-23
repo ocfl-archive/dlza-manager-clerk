@@ -7,17 +7,16 @@ import (
 )
 
 type Service struct {
-	ServiceName string         `yaml:"service_name" toml:"ServiceName"`
-	Host        string         `yaml:"host" toml:"Host"`
-	Port        int            `yaml:"port" toml:"Port"`
-	Database    DatabaseConfig `yaml:"database" toml:"Database"`
+	ServiceName string `yaml:"service_name" toml:"ServiceName"`
+	Host        string `yaml:"host" toml:"Host"`
+	Port        int    `yaml:"port" toml:"Port"`
 }
 
 type Config struct {
-	GraphQLConfig models.GraphQLConfig `yaml:"graphql_config" toml:"GraphQLConfig"`
-	Handler       Service              `yaml:"handler" toml:"Handler"`
-	Ingester      Service              `yaml:"ingester" toml:"Ingester"`
-	Clerk         Service              `yaml:"clerk" toml:"Clerk"`
+	GraphQLConfig  models.GraphQLConfig `yaml:"graphql_config" toml:"GraphQLConfig"`
+	Handler        Service              `yaml:"handler" toml:"Handler"`
+	StorageHandler Service              `yaml:"storage-handler" toml:"StorageHandler"`
+	Clerk          Service              `yaml:"clerk" toml:"Clerk"`
 }
 
 // GetConfig creates a new config from a given environment

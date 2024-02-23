@@ -19,7 +19,7 @@ clientId="graphql-demo"
 [Handler]
 Host="localhost"
 Port=9082
-[Ingester]
+[StorageHandler]
 Host="localhost"
 Port=9083
 [Clerk]
