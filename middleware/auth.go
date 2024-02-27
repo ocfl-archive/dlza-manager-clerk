@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -25,39 +27,90 @@ func GenerateStateOauth() string {
 	return state
 }
 
-func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.IDTokenVerifier, oauth2Config oauth2.Config, keycloak models.Keycloak, domain string) gin.HandlerFunc {
-
+func VerifyToken(ctx context.Context, keycloak models.Keycloak, verifier *oidc.IDTokenVerifier, oauth2Config oauth2.Config, domain string) gin.HandlerFunc {
+	fmt.Println("VerifyToken")
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
-		rawAccessToken, errT := c.Cookie("access_token")
-		if errT != nil {
+
+		if session.Get("access_token") == nil {
 			refreshedToken, err := RefreshToken(c, ctx, oauth2Config)
 			if err != nil {
-				c.Error(errors.Errorf("RefreshToken not possible VerifyToken Authorization header missing %d, err : %s", http.StatusUnauthorized, err))
+				c.Error(errors.Errorf("VerifyToken : RefreshToken not possible %d, err : %s", http.StatusUnauthorized, err))
 				urlPath := c.Request.URL.Path
 				session.Set("url_path", urlPath)
 				session.Save()
-				c.Redirect(http.StatusFound, "/auth/login")
+				// c.Redirect(http.StatusFound, "/auth/login")
 				// c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
 				c.Abort()
 				return
 			} else {
 				if refreshedToken != nil {
-					c.SetCookie("access_token", refreshedToken.AccessToken, int(time.Until(refreshedToken.Expiry).Seconds()), "/", domain, false, true)
+					// c.SetCookie("access_token", refreshedToken.AccessToken, int(time.Until(refreshedToken.Expiry).Seconds()), "/", domain, false, true)
+					session.Set("access_token", refreshedToken.AccessToken)
 					session.Set("refresh_token", refreshedToken.RefreshToken)
 				}
 			}
-
 		}
+		// rawAccessToken, errT := c.Cookie("access_token")
+		// if errT != nil {
+		// 	refreshedToken, err := RefreshToken(c, ctx, oauth2Config)
+		// 	if err != nil {
+		// 		c.Error(errors.Errorf("RefreshToken not possible VerifyToken Authorization header missing %d, err : %s", http.StatusUnauthorized, err))
+		// 		urlPath := c.Request.URL.Path
+		// 		session.Set("url_path", urlPath)
+		// 		session.Save()
+		// 		c.Redirect(http.StatusFound, "/auth/login")
+		// 		// c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
+		// 		c.Abort()
+		// 		return
+		// 	} else {
+		// 		if refreshedToken != nil {
+		// 			c.SetCookie("access_token", refreshedToken.AccessToken, int(time.Until(refreshedToken.Expiry).Seconds()), "/", domain, false, true)
+		// 			session.Set("refresh_token", refreshedToken.RefreshToken)
+		// 		}
+		// 	}
 
+		// }
+		if session.Get("expiry_token") == nil {
+			c.Error(errors.Errorf("expiry_token not set in session %d", http.StatusUnauthorized))
+			c.Abort()
+			return
+		} else {
+
+			expiryToken, err := time.Parse(time.RFC3339, session.Get("expiry_token").(string))
+			if time.Until(expiryToken) < 0 {
+				refreshedToken, err := RefreshToken(c, ctx, oauth2Config)
+				if err != nil {
+					c.Error(errors.Errorf("VerifyToken : RefreshToken not possible %d, err : %s", http.StatusUnauthorized, err))
+					urlPath := c.Request.URL.Path
+					session.Set("url_path", urlPath)
+					session.Save()
+					// c.Redirect(http.StatusFound, "/auth/login")
+					// c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
+					c.Abort()
+					return
+				} else {
+					if refreshedToken != nil {
+						// c.SetCookie("access_token", refreshedToken.AccessToken, int(time.Until(refreshedToken.Expiry).Seconds()), "/", domain, false, true)
+						session.Set("access_token", refreshedToken.AccessToken)
+						session.Set("refresh_token", refreshedToken.RefreshToken)
+					}
+				}
+			}
+			if err != nil {
+				c.Error(errors.Errorf("expiry_token err %d, err %s", http.StatusUnauthorized, err))
+				c.Abort()
+				return
+			}
+		}
+		rawAccessToken := session.Get("access_token").(string)
 		if rawAccessToken == "" {
 			c.Error(errors.Errorf("VerifyToken Authorization header missing %d", http.StatusUnauthorized))
 
 			urlPath := c.Request.URL.Path
 			session.Set("url_path", urlPath)
 			session.Save()
-			c.Redirect(http.StatusFound, "/auth/login")
-			// c.Redirect(http.StatusFound, "/auth/login?url="+urlPath)
+			// c.Redirect(http.StatusFound, "/auth/login")
 			c.Abort()
 			return
 		}
@@ -79,6 +132,7 @@ func VerifyToken(ctx context.Context, keycloack models.Keycloak, verifier *oidc.
 		}
 
 		session.Set("username", userClaim.PreferredUsername)
+		session.Set("userClaim", userClaim)
 		session.Save()
 		c.Set("userClaim", userClaim)
 		c.Set(constants.KEYCLOAK_GROUPS_CTX, userClaim.Groups)
@@ -96,11 +150,328 @@ func RefreshToken(c *gin.Context, ctx context.Context, oauth2Config oauth2.Confi
 		return nil, errors.Errorf("RefreshToken, no refresh_token in session")
 	}
 
+	fmt.Println("RefreshToken in : ", refreshToken)
 	ts := oauth2Config.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshToken.(string)})
 	tok, err := ts.Token()
 
+	fmt.Println("tok err", err)
 	if err != nil {
 		return nil, err
 	}
 	return tok, err
+}
+
+func GinContextToContextMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := context.WithValue(c.Request.Context(), "GinContextKey", c)
+
+		c.Set("GinContextKey", c)
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	}
+}
+
+// ctx := context.WithValue(c, constants.Needed, "Needed to attach context")
+// c.Set("keycloak_group", userClaim.Groups)
+// c.Set("tenant_list", userClaim.TenantList)
+// h.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
+
+func GinContextFromContext(ctx context.Context) (*gin.Context, error) {
+	ginContext := ctx.Value("GinContextKey")
+	if ginContext == nil {
+		err := fmt.Errorf("could not retrieve gin.Context")
+		return nil, err
+	}
+
+	gc, ok := ginContext.(*gin.Context)
+	if !ok {
+		err := fmt.Errorf("gin.Context has wrong type")
+		return nil, err
+	}
+	return gc, nil
+}
+
+func GetAuthCodeURL(c *gin.Context) (string, error) {
+	session := sessions.Default(c)
+	// Keycloak configuration
+	// ctx := context.Background()
+	// provider, err := oidc.NewProvider(ctx, keycloak.Addr+keycloak.Realm)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	state := GenerateStateOauth()
+	// c.SetCookie("state", state, 60, "/", srv.domain, true, true)
+	session.Set("state", state)
+	nonce := GenerateStateOauth()
+	// c.SetCookie("nonce", nonce, 60, "/", srv.domain, true, true)
+	session.Set("nonce", nonce)
+	session.Save()
+	// oauth2Config := oauth2.Config{
+	// 	ClientID:     keycloak.ClientId,
+	// 	ClientSecret: keycloak.ClientSecret,
+	// 	RedirectURL:  keycloak.Callback + "auth/callback",
+	// 	// Discovery returns the OAuth2 endpoints.
+	// 	Endpoint: provider.Endpoint(),
+	// 	// "openid" is a required scope for OpenID Connect flows.
+	// 	Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
+	// }
+	var keycloak models.Keycloak
+	if c.Value("keycloak") != nil {
+		keycloak = c.Value("keycloak").(models.Keycloak)
+	} else {
+		fmt.Println("could't retrieve keycloak informations")
+		return "", errors.New("could't retrieve keycloak informations")
+	}
+
+	oauth2Config := GetOauth2Config(keycloak)
+	return oauth2Config.AuthCodeURL(state, oidc.Nonce(nonce)), nil
+}
+
+func Callback(ctx context.Context, c *gin.Context, code string) error {
+	fmt.Println("/auth/callback")
+	session := sessions.Default(c)
+	// state, err := c.Cookie("state")
+	// state := session.Get("state").(string)
+	// if err != nil {
+	// 	c.Error(errors.Errorf("state not found:"+err.Error(), http.StatusBadRequest))
+	// 	// c.Redirect(http.StatusFound, "/auth/login")
+	// 	return
+	// }
+	if session.Get("state") == nil {
+		c.Error(errors.Errorf("state did not match : %d", http.StatusBadRequest))
+		return errors.New("state did no match")
+	}
+	var keycloak models.Keycloak
+	if ctx.Value("keycloak") != nil {
+		keycloak = ctx.Value("keycloak").(models.Keycloak)
+	} else {
+		return errors.New("could't retrieve keycloak informations")
+	}
+	fmt.Println("login keycloak", keycloak)
+	oauth2Config := GetOauth2Config(keycloak)
+	oauth2Token, err := oauth2Config.Exchange(ctx, code)
+	if err != nil {
+		fmt.Println("Failed to exchange token:")
+		c.Error(errors.Errorf("Failed to exchange token:"+err.Error(), http.StatusInternalServerError))
+		return err
+	}
+	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
+	if !ok {
+		c.Error(errors.Errorf("No id_token field in oauth2 token:", http.StatusInternalServerError))
+		fmt.Println("Failed oauth2Token.Extra")
+		return errors.New("No id_token field in oauth2 token")
+	}
+	verifier := GetVerifier(keycloak)
+	idToken, err := verifier.Verify(ctx, rawIDToken)
+	if err != nil {
+		fmt.Println("Failed  verifier.Verify")
+		c.Error(errors.Errorf("callback Failed to verify ID Token:"+err.Error(), http.StatusInternalServerError))
+		return err
+	}
+
+	// nonce, err := c.Cookie("nonce")
+	// if err != nil {
+	// 	c.Error(errors.Errorf("nonce not found:"+err.Error(), http.StatusBadRequest))
+	// 	// c.Redirect(http.StatusFound, "/auth/login")
+	// 	return
+	// }
+	nonce := session.Get("nonce").(string)
+	if idToken.Nonce != nonce {
+		// c.Redirect(http.StatusFound, "/auth/login")
+		c.Error(errors.Errorf("nonce did not match.", http.StatusBadRequest))
+		return errors.New("nonce did not match.")
+	}
+	resp := struct {
+		OAuth2Token   *oauth2.Token
+		IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
+	}{oauth2Token, new(json.RawMessage)}
+
+	if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
+		fmt.Println("Failed  idToken.Claims")
+		c.Error(errors.Errorf(err.Error(), http.StatusInternalServerError))
+		return err
+	}
+
+	// c.SetCookie("access_token", resp.OAuth2Token.AccessToken, int(time.Until(resp.OAuth2Token.Expiry).Seconds()), "/", srv.domain, false, true)
+	session.Set("access_token", resp.OAuth2Token.AccessToken)
+	session.Set("refresh_token", resp.OAuth2Token.RefreshToken)
+	//get token info then user info ?
+	var userClaim models.KeyCloakToken
+
+	_, err = jwt.ParseWithClaims(resp.OAuth2Token.AccessToken, &userClaim, nil)
+	if err != nil && err.Error() != "no Keyfunc was provided." {
+		return err
+	}
+
+	session.Set("userClaim", userClaim)
+	session.Set("keycloak_group", userClaim.Groups)
+	session.Set("tenant_list", userClaim.TenantList)
+	expiryToken := resp.OAuth2Token.Expiry.Format(time.RFC3339)
+	session.Set("expiry_token", expiryToken)
+	err = session.Save()
+	if err != nil {
+		c.Error(errors.Errorf("callback Failed to set session token:"+err.Error(), http.StatusInternalServerError))
+		return err
+	}
+	return nil
+}
+
+func GetOauth2Config(keycloak models.Keycloak) oauth2.Config {
+
+	// Keycloak configuration
+	provider := GetProvider(keycloak)
+
+	return oauth2.Config{
+		ClientID:     keycloak.ClientId,
+		ClientSecret: keycloak.ClientSecret,
+		RedirectURL:  keycloak.Callback + "auth/callback",
+		// Discovery returns the OAuth2 endpoints.
+		Endpoint: provider.Endpoint(),
+		// "openid" is a required scope for OpenID Connect flows.
+		Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
+	}
+
+}
+
+func GetProvider(keycloak models.Keycloak) *oidc.Provider {
+
+	// Keycloak configuration
+	ctx := context.Background()
+	provider, err := oidc.NewProvider(ctx, keycloak.Addr+keycloak.Realm)
+	if err != nil {
+		panic(err)
+	}
+
+	return provider
+
+}
+
+func GetOidcConfig(keycloak models.Keycloak) *oidc.Config {
+
+	return &oidc.Config{
+		ClientID: keycloak.ClientId,
+	}
+}
+
+func GetVerifier(keycloak models.Keycloak) *oidc.IDTokenVerifier {
+	provider := GetProvider(keycloak)
+	return provider.Verifier(GetOidcConfig(keycloak))
+}
+
+func ResetSession(c *gin.Context) error {
+	session := sessions.Default(c)
+	// session.Set("access_token", nil)
+	// session.Set("refresh_token", nil)
+	// session.Set("expiry_token", nil)
+	session.Clear()
+	err := session.Save()
+	return err
+}
+
+func GetUser(c *gin.Context) (*models.KeyCloakToken, error) {
+	session := sessions.Default(c)
+	var userClaim models.KeyCloakToken
+
+	if session.Get("userClaim") == nil {
+
+		return nil, errors.New("no user found")
+	}
+	userClaim = session.Get("userClaim").(models.KeyCloakToken)
+	return &userClaim, nil
+}
+
+func GraphqlVerifyToken(ctx context.Context) error {
+	fmt.Println("GraphqlVerifyToken")
+	c, err := GinContextFromContext(ctx)
+	if err != nil {
+		fmt.Println("gc err", err)
+		return err
+	}
+	var keycloak models.Keycloak
+	if ctx.Value("keycloak") != nil {
+		keycloak = ctx.Value("keycloak").(models.Keycloak)
+	} else {
+		fmt.Println("could't retrieve keycloak informations")
+		return errors.New("could't retrieve keycloak informations")
+	}
+
+	session := sessions.Default(c)
+	oauth2Config := GetOauth2Config(keycloak)
+	if session.Get("access_token") == nil {
+		refreshedToken, err := RefreshToken(c, ctx, oauth2Config)
+		if err != nil {
+
+			return err
+		} else {
+			if refreshedToken != nil {
+				session.Set("access_token", refreshedToken.AccessToken)
+				session.Set("refresh_token", refreshedToken.RefreshToken)
+			}
+		}
+	}
+
+	if session.Get("expiry_token") == nil {
+		return errors.New("expiry_token not set in session")
+	} else {
+
+		expiryToken, err := time.Parse(time.RFC3339, session.Get("expiry_token").(string))
+		if err != nil {
+			return err
+		}
+		if time.Until(expiryToken) < 0 {
+			refreshedToken, err := RefreshToken(c, ctx, oauth2Config)
+			if err != nil {
+				return err
+			} else {
+				if refreshedToken != nil {
+					session.Set("access_token", refreshedToken.AccessToken)
+					session.Set("refresh_token", refreshedToken.RefreshToken)
+				}
+			}
+		}
+
+	}
+	rawAccessToken := session.Get("access_token").(string)
+	if rawAccessToken == "" {
+		return errors.New("access_token not set in session")
+	}
+	verifier := GetVerifier(keycloak)
+	_, err = verifier.Verify(context.Background(), rawAccessToken)
+	if err != nil {
+		return err
+	}
+
+	//get token info then user info ?
+	var userClaim models.KeyCloakToken
+
+	_, err = jwt.ParseWithClaims(rawAccessToken, &userClaim, nil)
+	if err != nil && err.Error() != "no Keyfunc was provided." {
+		return err
+	}
+
+	session.Set("username", userClaim.PreferredUsername)
+	session.Set("userClaim", userClaim)
+	session.Set("keycloak_group", userClaim.Groups)
+	session.Set("tenant_list", userClaim.TenantList)
+	session.Save()
+	return nil
+}
+
+func TenantGroups(ctx context.Context) ([]string, []string, error) {
+	var keyCloakGroup []string
+	var tenantList []string
+	c, err := GinContextFromContext(ctx)
+	if err != nil {
+		fmt.Println("GinContextFromContext err", err)
+		return nil, nil, err
+	}
+	session := sessions.Default(c)
+	if session.Get("keycloak_group") != nil {
+		keyCloakGroup = session.Get("keycloak_group").([]string)
+	}
+	if session.Get("tenant_list") != nil {
+		tenantList = session.Get("tenant_list").([]string)
+	}
+
+	return keyCloakGroup, tenantList, nil
 }

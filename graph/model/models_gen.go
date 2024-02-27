@@ -455,6 +455,11 @@ type TenantListOptions struct {
 	Search        *string        `json:"search,omitempty"`
 }
 
+type User struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
 type CollectionSortKey string
 
 const (

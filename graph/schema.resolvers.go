@@ -6,9 +6,12 @@ package graph
 
 import (
 	"context"
+	"fmt"
+
 	"emperror.dev/errors"
 
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/middleware"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/service"
 )
 
@@ -28,6 +31,31 @@ func (r *collectionResolver) Files(ctx context.Context, obj *model.Collection, o
 		return nil, errors.Wrapf(err, "Could not GetFilesForCollection: %v", err)
 	}
 	return files, nil
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, code string) (bool, error) {
+	gc, err := middleware.GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	err = middleware.Callback(ctx, gc, code)
+	if err != nil {
+		fmt.Println("login Callback", err)
+		return false, err
+	}
+	return true, nil
+}
+
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
+	gc, err := middleware.GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	middleware.ResetSession(gc)
+	return true, nil
 }
 
 // ObjectInstances is the resolver for the objectInstances field.
@@ -57,8 +85,41 @@ func (r *objectInstanceResolver) ObjectInstanceChecks(ctx context.Context, obj *
 	return objectInstanceChecks, nil
 }
 
+// Auth is the resolver for the auth field.
+func (r *queryResolver) Auth(ctx context.Context) (string, error) {
+	gc, err := middleware.GinContextFromContext(ctx)
+	if err != nil {
+		fmt.Println("gc err", err)
+		return "", err
+	}
+
+	return middleware.GetAuthCodeURL(gc)
+}
+
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
+	//TODO do something to retrieve username and user email from gincontexts
+	gc, err := middleware.GinContextFromContext(ctx)
+	if err != nil {
+		fmt.Println("gc err", err)
+		return nil, err
+	}
+
+	userClaim, err := middleware.GetUser(gc)
+	if err != nil {
+		return nil, err
+	}
+	user := model.User{Username: userClaim.PreferredUsername,
+		Email: userClaim.Email}
+	return &user, nil
+}
+
 // Tenants is the resolver for the tenants field.
 func (r *queryResolver) Tenants(ctx context.Context, options *model.TenantListOptions) (*model.TenantList, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		fmt.Println("errM", errM)
+		return nil, fmt.Errorf("Access denied")
+	}
 	tenants, err := service.GetTenants(ctx, r.ClientClerkHandler, options, r.AllowedTenants)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not FindAllTenants: %v", err)
@@ -258,6 +319,9 @@ func (r *tenantResolver) StorageLocations(ctx context.Context, obj *model.Tenant
 // Collection returns CollectionResolver implementation.
 func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
 
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
 // Object returns ObjectResolver implementation.
 func (r *Resolver) Object() ObjectResolver { return &objectResolver{r} }
 
@@ -277,6 +341,7 @@ func (r *Resolver) StoragePartition() StoragePartitionResolver { return &storage
 func (r *Resolver) Tenant() TenantResolver { return &tenantResolver{r} }
 
 type collectionResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
 type objectResolver struct{ *Resolver }
 type objectInstanceResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
