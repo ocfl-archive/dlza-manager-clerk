@@ -106,10 +106,10 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
 	router.Use(middleware.GinContextToContextMiddleware())
-	router.GET("/logout", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, claims.EndSessionURL+"?user.id_token_hint="+srv.keycloak.ClientId+"&post_logout_redirect_uri="+srv.keycloak.Callback+"login")
+	// router.GET("/logout", func(c *gin.Context) {
+	// 	c.Redirect(http.StatusFound, claims.EndSessionURL+"?user.id_token_hint="+srv.keycloak.ClientId+"&post_logout_redirect_uri="+srv.keycloak.Callback+"login")
 
-	})
+	// })
 	router.GET("/auth/login", func(c *gin.Context) {
 		session := sessions.Default(c)
 		state := middleware.GenerateStateOauth()
