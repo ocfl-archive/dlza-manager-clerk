@@ -2,7 +2,7 @@ package controller
 
 import (
 	"context"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/proto"
 	"net/http"
 	"time"
 

@@ -4,29 +4,28 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"embed"
+	"emperror.dev/emperror"
+	"emperror.dev/errors"
 	"encoding/pem"
 	"flag"
 	"fmt"
+	"gitlab.switch.ch/ub-unibas/dlza/dlza-manager/client"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/certs"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/web"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
+	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
+	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"io/fs"
 	"log"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
-
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/certs"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/web"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
-	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
-	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var configParam = flag.String("config", "", "config file in toml format, no need for filetype for this param")
@@ -46,22 +45,18 @@ func main() {
 	}
 
 	//////ClerkStorageHandler gRPC connection
-	connectionClerkStorageHandler, err := grpc.Dial(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clerkStorageHandlerServiceClient, connectionClerkStorageHandler, err := client.NewStorageHandlerClient(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer connectionClerkStorageHandler.Close()
 
 	//////ClerkHandler gRPC connection
-	connectionClerkHandler, err := grpc.Dial(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clerkHandlerServiceClient, connectionClerkHandler, err := client.NewHandlerClient(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer connectionClerkHandler.Close()
-
-	clerkStorageHandlerServiceClient := pb.NewClerkStorageHandlerServiceClient(connectionClerkStorageHandler)
-
-	clerkHandlerServiceClient := pb.NewClerkHandlerServiceClient(connectionClerkHandler)
 
 	tenantController := controller.NewTenantController(clerkHandlerServiceClient)
 	storageLocationController := controller.NewStorageLocationController(clerkHandlerServiceClient)
@@ -79,20 +74,6 @@ func main() {
 	if logFile != nil {
 		defer logFile.Close()
 	}
-	/*
-		server := &http.Server{
-			Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
-			Handler: routes,
-		}
-		go func() {
-			err = server.ListenAndServe()
-
-			if err != nil {
-				log.Fatalf("error: %s", err.Error())
-			}
-		}()
-
-	*/
 
 	// logger, logStash, logFile := ubLogger.CreateUbMultiLogger(
 	// 	cfg.Logging.StashHost,
