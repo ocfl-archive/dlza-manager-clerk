@@ -9,7 +9,6 @@ import (
 	"encoding/pem"
 	"flag"
 	"fmt"
-	"gitlab.switch.ch/ub-unibas/dlza/dlza-manager/client"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/certs"
@@ -17,6 +16,8 @@ import (
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
 	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
+	handlerClient "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/client"
+	storageHandlerClient "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler/client"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -45,14 +46,14 @@ func main() {
 	}
 
 	//////ClerkStorageHandler gRPC connection
-	clerkStorageHandlerServiceClient, connectionClerkStorageHandler, err := client.NewStorageHandlerClient(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clerkStorageHandlerServiceClient, connectionClerkStorageHandler, err := storageHandlerClient.NewStorageHandlerClient(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer connectionClerkStorageHandler.Close()
 
 	//////ClerkHandler gRPC connection
-	clerkHandlerServiceClient, connectionClerkHandler, err := client.NewHandlerClient(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clerkHandlerServiceClient, connectionClerkHandler, err := handlerClient.NewHandlerClient(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

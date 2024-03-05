@@ -2,9 +2,9 @@ package controller
 
 import (
 	"context"
-	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/proto"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/proto"
 	"net/http"
 	"time"
 

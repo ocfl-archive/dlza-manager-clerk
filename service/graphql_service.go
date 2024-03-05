@@ -7,8 +7,8 @@ import (
 
 	"slices"
 
-	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/proto"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
+	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/proto"
 
 	"emperror.dev/errors"
 )

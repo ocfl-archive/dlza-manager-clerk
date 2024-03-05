@@ -1,6 +1,6 @@
 package graph
 
-import pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/proto"
+import pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/proto"
 
 // This file will not be regenerated automatically.
 //
