@@ -361,10 +361,15 @@ input PronomIdListOptions {
 type User {
   username: String! 
   email: String!
+  id:String!
+}
+
+type Auth {
+  authCodeUrl: String!
 }
 type Query {
-  auth: String!
-  user: User! 
+  auth: Auth!
+  user: User
   tenants(options: TenantListOptions): TenantList!
   tenant(id: ID!): Tenant
 
@@ -394,6 +399,6 @@ type Query {
 }
 
 type Mutation {
-  login(code: String!): Boolean!
+  login(code: String!): User!
   logout: Boolean! 
 }

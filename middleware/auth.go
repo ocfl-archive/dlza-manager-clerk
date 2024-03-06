@@ -7,13 +7,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"emperror.dev/errors"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/coreos/go-oidc"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/constants"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
 	"golang.org/x/oauth2"
@@ -150,11 +153,9 @@ func RefreshToken(c *gin.Context, ctx context.Context, oauth2Config oauth2.Confi
 		return nil, errors.Errorf("RefreshToken, no refresh_token in session")
 	}
 
-	fmt.Println("RefreshToken in : ", refreshToken)
 	ts := oauth2Config.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshToken.(string)})
 	tok, err := ts.Token()
 
-	fmt.Println("tok err", err)
 	if err != nil {
 		return nil, err
 	}
@@ -193,33 +194,17 @@ func GinContextFromContext(ctx context.Context) (*gin.Context, error) {
 
 func GetAuthCodeURL(c *gin.Context) (string, error) {
 	session := sessions.Default(c)
-	// Keycloak configuration
-	// ctx := context.Background()
-	// provider, err := oidc.NewProvider(ctx, keycloak.Addr+keycloak.Realm)
-	// if err != nil {
-	// 	panic(err)
-	// }
+
 	state := GenerateStateOauth()
-	// c.SetCookie("state", state, 60, "/", srv.domain, true, true)
 	session.Set("state", state)
 	nonce := GenerateStateOauth()
-	// c.SetCookie("nonce", nonce, 60, "/", srv.domain, true, true)
 	session.Set("nonce", nonce)
 	session.Save()
-	// oauth2Config := oauth2.Config{
-	// 	ClientID:     keycloak.ClientId,
-	// 	ClientSecret: keycloak.ClientSecret,
-	// 	RedirectURL:  keycloak.Callback + "auth/callback",
-	// 	// Discovery returns the OAuth2 endpoints.
-	// 	Endpoint: provider.Endpoint(),
-	// 	// "openid" is a required scope for OpenID Connect flows.
-	// 	Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
-	// }
+
 	var keycloak models.Keycloak
 	if c.Value("keycloak") != nil {
 		keycloak = c.Value("keycloak").(models.Keycloak)
 	} else {
-		fmt.Println("could't retrieve keycloak informations")
 		return "", errors.New("could't retrieve keycloak informations")
 	}
 
@@ -230,13 +215,6 @@ func GetAuthCodeURL(c *gin.Context) (string, error) {
 func Callback(ctx context.Context, c *gin.Context, code string) error {
 	fmt.Println("/auth/callback")
 	session := sessions.Default(c)
-	// state, err := c.Cookie("state")
-	// state := session.Get("state").(string)
-	// if err != nil {
-	// 	c.Error(errors.Errorf("state not found:"+err.Error(), http.StatusBadRequest))
-	// 	// c.Redirect(http.StatusFound, "/auth/login")
-	// 	return
-	// }
 	if session.Get("state") == nil {
 		c.Error(errors.Errorf("state did not match : %d", http.StatusBadRequest))
 		return errors.New("state did no match")
@@ -247,38 +225,24 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 	} else {
 		return errors.New("could't retrieve keycloak informations")
 	}
-	fmt.Println("login keycloak", keycloak)
+
 	oauth2Config := GetOauth2Config(keycloak)
 	oauth2Token, err := oauth2Config.Exchange(ctx, code)
 	if err != nil {
-		fmt.Println("Failed to exchange token:")
-		c.Error(errors.Errorf("Failed to exchange token:"+err.Error(), http.StatusInternalServerError))
 		return err
 	}
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
-		c.Error(errors.Errorf("No id_token field in oauth2 token:", http.StatusInternalServerError))
-		fmt.Println("Failed oauth2Token.Extra")
 		return errors.New("No id_token field in oauth2 token")
 	}
 	verifier := GetVerifier(keycloak)
 	idToken, err := verifier.Verify(ctx, rawIDToken)
 	if err != nil {
-		fmt.Println("Failed  verifier.Verify")
-		c.Error(errors.Errorf("callback Failed to verify ID Token:"+err.Error(), http.StatusInternalServerError))
 		return err
 	}
 
-	// nonce, err := c.Cookie("nonce")
-	// if err != nil {
-	// 	c.Error(errors.Errorf("nonce not found:"+err.Error(), http.StatusBadRequest))
-	// 	// c.Redirect(http.StatusFound, "/auth/login")
-	// 	return
-	// }
 	nonce := session.Get("nonce").(string)
 	if idToken.Nonce != nonce {
-		// c.Redirect(http.StatusFound, "/auth/login")
-		c.Error(errors.Errorf("nonce did not match.", http.StatusBadRequest))
 		return errors.New("nonce did not match.")
 	}
 	resp := struct {
@@ -287,15 +251,12 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 	}{oauth2Token, new(json.RawMessage)}
 
 	if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
-		fmt.Println("Failed  idToken.Claims")
-		c.Error(errors.Errorf(err.Error(), http.StatusInternalServerError))
 		return err
 	}
 
-	// c.SetCookie("access_token", resp.OAuth2Token.AccessToken, int(time.Until(resp.OAuth2Token.Expiry).Seconds()), "/", srv.domain, false, true)
 	session.Set("access_token", resp.OAuth2Token.AccessToken)
 	session.Set("refresh_token", resp.OAuth2Token.RefreshToken)
-	//get token info then user info ?
+
 	var userClaim models.KeyCloakToken
 
 	_, err = jwt.ParseWithClaims(resp.OAuth2Token.AccessToken, &userClaim, nil)
@@ -310,7 +271,6 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 	session.Set("expiry_token", expiryToken)
 	err = session.Save()
 	if err != nil {
-		c.Error(errors.Errorf("callback Failed to set session token:"+err.Error(), http.StatusInternalServerError))
 		return err
 	}
 	return nil
@@ -381,33 +341,31 @@ func GetUser(c *gin.Context) (*models.KeyCloakToken, error) {
 }
 
 func GraphqlVerifyToken(ctx context.Context) error {
-	fmt.Println("GraphqlVerifyToken")
 	c, err := GinContextFromContext(ctx)
 	if err != nil {
-		fmt.Println("gc err", err)
 		return err
 	}
 	var keycloak models.Keycloak
 	if ctx.Value("keycloak") != nil {
 		keycloak = ctx.Value("keycloak").(models.Keycloak)
 	} else {
-		fmt.Println("could't retrieve keycloak informations")
 		return errors.New("could't retrieve keycloak informations")
 	}
 
 	session := sessions.Default(c)
 	oauth2Config := GetOauth2Config(keycloak)
 	if session.Get("access_token") == nil {
-		refreshedToken, err := RefreshToken(c, ctx, oauth2Config)
-		if err != nil {
+		// refreshedToken, err := RefreshToken(c, ctx, oauth2Config)
+		// if err != nil {
 
-			return err
-		} else {
-			if refreshedToken != nil {
-				session.Set("access_token", refreshedToken.AccessToken)
-				session.Set("refresh_token", refreshedToken.RefreshToken)
-			}
-		}
+		// 	return err
+		// } else {
+		// 	if refreshedToken != nil {
+		// 		session.Set("access_token", refreshedToken.AccessToken)
+		// 		session.Set("refresh_token", refreshedToken.RefreshToken)
+		// 	}
+		// }
+		return errors.New("Access denied : no access token")
 	}
 
 	if session.Get("expiry_token") == nil {
@@ -462,7 +420,6 @@ func TenantGroups(ctx context.Context) ([]string, []string, error) {
 	var tenantList []string
 	c, err := GinContextFromContext(ctx)
 	if err != nil {
-		fmt.Println("GinContextFromContext err", err)
 		return nil, nil, err
 	}
 	session := sessions.Default(c)
@@ -474,4 +431,21 @@ func TenantGroups(ctx context.Context) ([]string, []string, error) {
 	}
 
 	return keyCloakGroup, tenantList, nil
+}
+
+func GraphqlErrorWrapper(err error, ctx context.Context, httpStatus int) *gqlerror.Error {
+
+	if strings.Contains(err.Error(), "You are not allowed to retrieve datas") {
+		httpStatus = http.StatusForbidden
+	} else if strings.Contains(err.Error(), "You could not retrieve more than 1000") {
+		httpStatus = http.StatusBadRequest
+	}
+	return &gqlerror.Error{
+		Err:     err,
+		Path:    graphql.GetPath(ctx),
+		Message: err.Error(),
+		Extensions: map[string]interface{}{
+			"code": httpStatus,
+		},
+	}
 }

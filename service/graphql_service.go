@@ -27,7 +27,7 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 	}
 
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -168,7 +168,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -333,7 +333,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -493,7 +493,7 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -571,7 +571,7 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -685,7 +685,7 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -754,7 +754,7 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -822,7 +822,7 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -980,7 +980,7 @@ func GetTenantById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServic
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -1120,7 +1120,7 @@ func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.Cler
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}
@@ -1185,7 +1185,7 @@ func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 		return nil, err
 	}
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
-		return nil, errors.New("You are not allowed to retrive datas")
+		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
 		allowedTenants = tenantList
 	}

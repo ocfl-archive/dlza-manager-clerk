@@ -7,6 +7,13 @@
 ## Description
 TO DO
 
+## Prerequisite
+
+### Graphql Schema generation : 
+```
+go run github.com/99designs/gqlgen generate
+```
+
 ## Usage
 ### Launch local
 - launch with config.yml file at root directory 

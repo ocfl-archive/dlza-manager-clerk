@@ -71,7 +71,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	}
 
 	// // Keycloak configuration
-	ctx := context.Background()
+	// ctx := context.Background()
 
 	provider := middleware.GetProvider(srv.keycloak)
 	var claims struct {
@@ -85,10 +85,10 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		return nil, err
 	}
 
-	oidcConfig := &oidc.Config{
-		ClientID: srv.keycloak.ClientId,
-	}
-	verifier := provider.Verifier(oidcConfig)
+	// oidcConfig := &oidc.Config{
+	// 	ClientID: srv.keycloak.ClientId,
+	// }
+	// verifier := provider.Verifier(oidcConfig)
 
 	var tlsConfig = &tls.Config{
 		Certificates: []tls.Certificate{srv.cert},
@@ -106,10 +106,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
 	router.Use(middleware.GinContextToContextMiddleware())
-	// router.GET("/logout", func(c *gin.Context) {
-	// 	c.Redirect(http.StatusFound, claims.EndSessionURL+"?user.id_token_hint="+srv.keycloak.ClientId+"&post_logout_redirect_uri="+srv.keycloak.Callback+"login")
 
-	// })
 	router.GET("/auth/login", func(c *gin.Context) {
 		session := sessions.Default(c)
 		state := middleware.GenerateStateOauth()
@@ -151,12 +148,12 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	// 	ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
 	// })
 	// .Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.domain))
-	schema := router.Group("/schema").Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.domain))
-	{
-		schema.GET("", func(ctx *gin.Context) {
-			ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
-		})
-	}
+	// schema := router.Group("/schema").Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.domain))
+	// {
+	// 	schema.GET("", func(ctx *gin.Context) {
+	// 		ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
+	// 	})
+	// }
 	srv.server = http.Server{
 		Addr:      srv.addr,
 		Handler:   router,
