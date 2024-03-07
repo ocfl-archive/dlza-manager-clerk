@@ -232,6 +232,7 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 		fmt.Println("oauth2Config.Exchange", err)
 		fmt.Println(" code ", code)
 		fmt.Println("ctx ", ctx)
+		fmt.Println("gincontext ", c)
 		fmt.Println("oauth2Config.RedirectURL ", oauth2Config.RedirectURL)
 		fmt.Println("keycloak ", keycloak)
 		return err

@@ -130,12 +130,12 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		}
 		c.JSON(http.StatusFound, output)
 	})
-	router.GET("/auth/callback", func(c *gin.Context) {
-		output := map[string]any{
-			"code": c.Request.URL.Query().Get("code"),
-		}
-		c.JSON(http.StatusFound, output)
-	})
+	// router.GET("/auth/callback", func(c *gin.Context) {
+	// 	output := map[string]any{
+	// 		"code": c.Request.URL.Query().Get("code"),
+	// 	}
+	// 	c.JSON(http.StatusFound, output)
+	// })
 
 	graphql := router.Group("/graphql")
 	{
