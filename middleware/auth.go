@@ -229,6 +229,11 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 	oauth2Config := GetOauth2Config(keycloak)
 	oauth2Token, err := oauth2Config.Exchange(ctx, code)
 	if err != nil {
+		fmt.Println("oauth2Config.Exchange", err)
+		fmt.Println(" code ", code)
+		fmt.Println("ctx ", ctx)
+		fmt.Println("oauth2Config.RedirectURL ", oauth2Config.RedirectURL)
+		fmt.Println("keycloak ", keycloak)
 		return err
 	}
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
