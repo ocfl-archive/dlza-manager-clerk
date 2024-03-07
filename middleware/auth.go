@@ -216,8 +216,8 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 	fmt.Println("/auth/callback")
 	session := sessions.Default(c)
 	if session.Get("state") == nil {
-		c.Error(errors.Errorf("state did not match : %d", http.StatusBadRequest))
-		return errors.New("state did no match")
+		c.Error(errors.Errorf("state is empty : %d", http.StatusBadRequest))
+		return errors.New("state is empty")
 	}
 	var keycloak models.Keycloak
 	if ctx.Value("keycloak") != nil {
@@ -238,6 +238,9 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 	verifier := GetVerifier(keycloak)
 	idToken, err := verifier.Verify(ctx, rawIDToken)
 	if err != nil {
+		fmt.Println("verifier error", err)
+		fmt.Println(" keycloak.Callback ", keycloak.Callback)
+		fmt.Println("oauth2Config.RedirectURL ", oauth2Config.RedirectURL)
 		return err
 	}
 
