@@ -399,6 +399,9 @@ func GraphqlVerifyToken(ctx context.Context) error {
 	verifier := GetVerifier(keycloak)
 	_, err = verifier.Verify(context.Background(), rawAccessToken)
 	if err != nil {
+		fmt.Println("GraphqlVerifyToken verifier error", err)
+		fmt.Println(" keycloak.Callback ", keycloak.Callback)
+		fmt.Println("oauth2Config.RedirectURL ", oauth2Config.RedirectURL)
 		return err
 	}
 

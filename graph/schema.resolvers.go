@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"errors"
@@ -37,15 +38,18 @@ func (r *collectionResolver) Files(ctx context.Context, obj *model.Collection, o
 func (r *mutationResolver) Login(ctx context.Context, code string) (*model.User, error) {
 	gc, err := middleware.GinContextFromContext(ctx)
 	if err != nil {
+		fmt.Println("gc err", err, "\n", ctx)
 		return nil, middleware.GraphqlErrorWrapper(err, ctx, http.StatusInternalServerError)
 	}
 
 	err = middleware.Callback(ctx, gc, code)
 	if err != nil {
+		fmt.Println("Callback err", err, "\n", ctx)
 		return nil, middleware.GraphqlErrorWrapper(err, ctx, http.StatusInternalServerError)
 	}
 	userClaim, err := middleware.GetUser(gc)
 	if err != nil {
+		fmt.Println("GetUser err", err, "\n", ctx)
 		middleware.GraphqlErrorWrapper(err, ctx, http.StatusUnauthorized)
 	}
 	user := model.User{
