@@ -98,7 +98,8 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	router := srv.router
 
 	store := memstore.NewStore([]byte("secretToBeChangedWithKubernetesSecret"))
-	store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteLaxMode, HttpOnly: true})
+	// store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteLaxMode, HttpOnly: true})
+	store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteNoneMode, HttpOnly: true})
 	gob.Register(models.KeyCloakToken{})
 	router.Use(sessions.Sessions("mysession", store))
 	router.NoRoute(func(c *gin.Context) {
