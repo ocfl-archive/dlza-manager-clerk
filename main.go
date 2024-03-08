@@ -46,14 +46,14 @@ func main() {
 	}
 
 	//////ClerkStorageHandler gRPC connection
-	clerkStorageHandlerServiceClient, connectionClerkStorageHandler, err := storageHandlerClient.NewStorageHandlerClient(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clerkStorageHandlerServiceClient, connectionClerkStorageHandler, err := storageHandlerClient.NewStorageHandlerClerkClient(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer connectionClerkStorageHandler.Close()
 
 	//////ClerkHandler gRPC connection
-	clerkHandlerServiceClient, connectionClerkHandler, err := handlerClient.NewHandlerClient(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clerkHandlerServiceClient, connectionClerkHandler, err := handlerClient.NewClerkHandlerClient(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
