@@ -2,21 +2,23 @@ package controller
 
 import (
 	"context"
+
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/proto"
+	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func NewCollectionController(clientClerkHandler pb.ClerkHandlerServiceClient) Controller {
+func NewCollectionController(clientClerkHandler pbHandler.ClerkHandlerServiceClient) Controller {
 	return &CollectionController{ClientClerkHandler: clientClerkHandler}
 }
 
 type CollectionController struct {
-	ClientClerkHandler pb.ClerkHandlerServiceClient
+	ClientClerkHandler pbHandler.ClerkHandlerServiceClient
 }
 
 func (col *CollectionController) Path() string {

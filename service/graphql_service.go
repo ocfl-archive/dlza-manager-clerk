@@ -2,13 +2,14 @@ package service
 
 import (
 	"context"
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
 	"regexp"
 	"strings"
 
 	"slices"
 
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/proto"
+	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 
 	"emperror.dev/errors"
 )
@@ -18,7 +19,7 @@ const (
 	sortDirectionAscending  string = "ASC"
 )
 
-func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.TenantListOptions, allowedTenants []string) (*model.TenantList, error) {
+func GetTenants(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.TenantListOptions, allowedTenants []string) (*model.TenantList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -75,7 +76,7 @@ func GetTenants(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceCl
 	return &model.TenantList{Items: tenants, TotalItems: int(tenantsPb.TotalItems)}, nil
 }
 
-func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Tenant, options *model.StorageLocationListOptions) (*model.StorageLocationList, error) {
+func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Tenant, options *model.StorageLocationListOptions) (*model.StorageLocationList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -120,7 +121,7 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pb.Cle
 	return &model.StorageLocationList{Items: storageLocations, TotalItems: int(storageLocationsPb.TotalItems)}, nil
 }
 
-func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Tenant, options *model.CollectionListOptions) (*model.CollectionList, error) {
+func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Tenant, options *model.CollectionListOptions) (*model.CollectionList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -162,7 +163,7 @@ func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pb.ClerkHan
 	return &model.CollectionList{Items: collections, TotalItems: int(collectionsPb.TotalItems)}, nil
 }
 
-func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.CollectionListOptions, allowedTenants []string) (*model.CollectionList, error) {
+func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.CollectionListOptions, allowedTenants []string) (*model.CollectionList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -232,7 +233,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkH
 	return &model.CollectionList{Items: collections, TotalItems: int(collectionsPb.TotalItems)}, nil
 }
 
-func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection, options *model.ObjectListOptions) (*model.ObjectList, error) {
+func GetObjectsForCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Collection, options *model.ObjectListOptions) (*model.ObjectList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -277,7 +278,7 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pb.ClerkHan
 	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
 }
 
-func GetFilesForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Collection, options *model.FileListOptions) (*model.FileList, error) {
+func GetFilesForCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Collection, options *model.FileListOptions) (*model.FileList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -330,7 +331,7 @@ func GetFilesForCollection(ctx context.Context, clientClerkHandler pb.ClerkHandl
 	return &model.FileList{Items: files, TotalItems: int(filesPb.TotalItems)}, nil
 }
 
-func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.ObjectListOptions, allowedTenants []string) (*model.ObjectList, error) {
+func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.ObjectListOptions, allowedTenants []string) (*model.ObjectList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -403,7 +404,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkH
 	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
 }
 
-func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
+func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -448,7 +449,7 @@ func GetObjectInstancesForObject(ctx context.Context, clientClerkHandler pb.Cler
 	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: int(objectInstancesPb.TotalItems)}, nil
 }
 
-func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.Object, options *model.FileListOptions) (*model.FileList, error) {
+func GetFilesForObject(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Object, options *model.FileListOptions) (*model.FileList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -493,7 +494,7 @@ func GetFilesForObject(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 	return &model.FileList{Items: files, TotalItems: int(filesPb.TotalItems)}, nil
 }
 
-func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.ObjectInstanceListOptions, allowedTenants []string) (*model.ObjectInstanceList, error) {
+func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.ObjectInstanceListOptions, allowedTenants []string) (*model.ObjectInstanceList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -574,7 +575,7 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pb.Cl
 	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: int(objectInstancesPb.TotalItems)}, nil
 }
 
-func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.FileListOptions, allowedTenants []string) (*model.FileList, error) {
+func GetFilesForObjectId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.FileListOptions, allowedTenants []string) (*model.FileList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -646,7 +647,7 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pb.ClerkHandler
 	return &model.FileList{Items: files, TotalItems: int(filesPb.TotalItems)}, nil
 }
 
-func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.ObjectInstance, options *model.ObjectInstanceCheckListOptions) (*model.ObjectInstanceCheckList, error) {
+func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.ObjectInstance, options *model.ObjectInstanceCheckListOptions) (*model.ObjectInstanceCheckList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -691,7 +692,7 @@ func GetObjectInstanceChecksForObjectInstance(ctx context.Context, clientClerkHa
 	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: int(objectInstanceChecksPb.TotalItems)}, nil
 }
 
-func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.ObjectInstanceCheckListOptions, allowedTenants []string) (*model.ObjectInstanceCheckList, error) {
+func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.ObjectInstanceCheckListOptions, allowedTenants []string) (*model.ObjectInstanceCheckList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -763,7 +764,7 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: int(objectInstanceChecksPb.TotalItems)}, nil
 }
 
-func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.StorageLocationListOptions, allowedTenants []string) (*model.StorageLocationList, error) {
+func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.StorageLocationListOptions, allowedTenants []string) (*model.StorageLocationList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -835,7 +836,7 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pb.C
 	return &model.StorageLocationList{Items: storageLocations, TotalItems: int(storageLocationsPb.TotalItems)}, nil
 }
 
-func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.StoragePartitionListOptions, allowedTenants []string) (*model.StoragePartitionList, error) {
+func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.StoragePartitionListOptions, allowedTenants []string) (*model.StoragePartitionList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -907,7 +908,7 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 	return &model.StoragePartitionList{Items: storagePartitions, TotalItems: int(storagePartitionsPb.TotalItems)}, nil
 }
 
-func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.StorageLocation, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error) {
+func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.StorageLocation, options *model.StoragePartitionListOptions) (*model.StoragePartitionList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -952,7 +953,7 @@ func GetStoragePartitionsForLocation(ctx context.Context, clientClerkHandler pb.
 	return &model.StoragePartitionList{Items: storagePartitions, TotalItems: int(storagePartitionsPb.TotalItems)}, nil
 }
 
-func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, obj *model.StoragePartition, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
+func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.StoragePartition, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -997,7 +998,7 @@ func GetObjectInstancesForStoragePartition(ctx context.Context, clientClerkHandl
 	return &model.ObjectInstanceList{Items: objectInstances, TotalItems: int(objectInstancesPb.TotalItems)}, nil
 }
 
-func GetTenantById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string, allowedTenants []string) (*model.Tenant, error) {
+func GetTenantById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string, allowedTenants []string) (*model.Tenant, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -1027,7 +1028,7 @@ func GetTenantById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServic
 	return tenant, err
 }
 
-func GetCollectionById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string) (*model.Collection, error) {
+func GetCollectionById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.Collection, error) {
 	collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
@@ -1041,7 +1042,7 @@ func GetCollectionById(ctx context.Context, clientClerkHandler pb.ClerkHandlerSe
 	return collection, err
 }
 
-func GetObjectById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string) (*model.Object, error) {
+func GetObjectById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.Object, error) {
 	objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
@@ -1056,7 +1057,7 @@ func GetObjectById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServic
 	return object, err
 }
 
-func GetObjectInstanceById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string) (*model.ObjectInstance, error) {
+func GetObjectInstanceById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.ObjectInstance, error) {
 	objectInstancePb, err := clientClerkHandler.GetObjectInstanceById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstanceById: %v", err)
@@ -1071,7 +1072,7 @@ func GetObjectInstanceById(ctx context.Context, clientClerkHandler pb.ClerkHandl
 	return objectInstance, err
 }
 
-func GetObjectInstanceCheckById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string) (*model.ObjectInstanceCheck, error) {
+func GetObjectInstanceCheckById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.ObjectInstanceCheck, error) {
 	objectInstanceCheckPb, err := clientClerkHandler.GetObjectInstanceCheckById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectInstanceCheckById: %v", err)
@@ -1086,7 +1087,7 @@ func GetObjectInstanceCheckById(ctx context.Context, clientClerkHandler pb.Clerk
 	return objectInstanceCheck, err
 }
 
-func GetFileById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string) (*model.File, error) {
+func GetFileById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.File, error) {
 	filePb, err := clientClerkHandler.GetFileById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetFileById: %v", err)
@@ -1101,7 +1102,7 @@ func GetFileById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceC
 	return file, err
 }
 
-func GetStorageLocationById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string) (*model.StorageLocation, error) {
+func GetStorageLocationById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.StorageLocation, error) {
 	storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
@@ -1116,7 +1117,7 @@ func GetStorageLocationById(ctx context.Context, clientClerkHandler pb.ClerkHand
 	return storageLocation, err
 }
 
-func GetStoragePartitionById(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, id string) (*model.StoragePartition, error) {
+func GetStoragePartitionById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.StoragePartition, error) {
 	storagePartitionPb, err := clientClerkHandler.GetStoragePartitionById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionById: %v", err)
@@ -1133,7 +1134,7 @@ func GetStoragePartitionById(ctx context.Context, clientClerkHandler pb.ClerkHan
 
 //Statistic
 
-func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.MimeTypeListOptions, allowedTenants []string) (*model.MimeTypeList, error) {
+func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.MimeTypeListOptions, allowedTenants []string) (*model.MimeTypeList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
@@ -1194,7 +1195,7 @@ func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pb.Cler
 	return &model.MimeTypeList{Items: mimeTypes, TotalItems: int(mimeTypesPb.TotalItems)}, nil
 }
 
-func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pb.ClerkHandlerServiceClient, options *model.PronomIDListOptions, allowedTenants []string) (*model.PronomIDList, error) {
+func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.PronomIDListOptions, allowedTenants []string) (*model.PronomIDList, error) {
 	var keyCloakGroup []string
 	var tenantList []string
 	if ctx.Value("keycloak_group") != nil {
