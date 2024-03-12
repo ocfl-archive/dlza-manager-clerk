@@ -27,4 +27,5 @@ storage-handler:
   port : 9083  #modify if needed 
 clerk: 
   host : localhost
-  port : 9086  #modify if needed 
+  port : 9086  #modify if needed
+jwt-key: ""

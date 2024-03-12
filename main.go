@@ -40,10 +40,7 @@ var schemaFS embed.FS
 func main() {
 
 	flag.Parse()
-	conf, err := config.GetConfig(*configParam)
-	if err != nil {
-		log.Fatal(err)
-	}
+	conf := config.GetConfig(*configParam)
 
 	//////ClerkStorageHandler gRPC connection
 	connectionClerkStorageHandler, err := grpc.Dial(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -68,7 +65,7 @@ func main() {
 	storagePartitionController := controller.NewStoragePartitionController(clerkStorageHandlerServiceClient)
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
 	statusController := controller.NewStatusController(clerkHandlerServiceClient)
-	routes := router.NewRouter(tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
+	routes := router.NewRouter(conf.Jwt, tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
@@ -79,20 +76,6 @@ func main() {
 	if logFile != nil {
 		defer logFile.Close()
 	}
-	/*
-		server := &http.Server{
-			Addr:    conf.Clerk.Host + ":" + strconv.Itoa(conf.Clerk.Port),
-			Handler: routes,
-		}
-		go func() {
-			err = server.ListenAndServe()
-
-			if err != nil {
-				log.Fatalf("error: %s", err.Error())
-			}
-		}()
-
-	*/
 
 	// logger, logStash, logFile := ubLogger.CreateUbMultiLogger(
 	// 	cfg.Logging.StashHost,
