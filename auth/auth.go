@@ -5,17 +5,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"net/http"
-	"os"
 	"strings"
 )
 
-func tokenValid(c *gin.Context) error {
+func tokenValid(c *gin.Context, key string) error {
 	tokenString := extractToken(c)
 	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("JWT_KEY")), nil
+		return []byte(key), nil
 	})
 	if err != nil {
 		return err
@@ -32,9 +31,9 @@ func extractToken(c *gin.Context) string {
 	return ""
 }
 
-func JwtAuthMiddleware() gin.HandlerFunc {
+func JwtAuthMiddleware(key string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := tokenValid(c)
+		err := tokenValid(c, key)
 		if err != nil {
 			c.String(http.StatusUnauthorized, "Unauthorized")
 			c.Abort()
