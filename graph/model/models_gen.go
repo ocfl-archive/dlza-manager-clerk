@@ -460,9 +460,10 @@ type TenantListOptions struct {
 }
 
 type User struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	ID       string `json:"id"`
+	Username string    `json:"username"`
+	Email    string    `json:"email"`
+	ID       string    `json:"id"`
+	Tenants  []*Tenant `json:"tenants"`
 }
 
 type CollectionSortKey string

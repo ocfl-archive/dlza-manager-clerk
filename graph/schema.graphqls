@@ -362,6 +362,7 @@ type User {
   username: String! 
   email: String!
   id:String!
+  tenants: [Tenant!]!
 }
 
 type Auth {

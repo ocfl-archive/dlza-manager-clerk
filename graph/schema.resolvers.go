@@ -6,10 +6,9 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
-
-	"errors"
 
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/middleware"
@@ -386,6 +385,18 @@ func (r *tenantResolver) StorageLocations(ctx context.Context, obj *model.Tenant
 	return storageLocations, nil
 }
 
+// Tenants is the resolver for the tenants field.
+func (r *userResolver) Tenants(ctx context.Context, obj *model.User) ([]*model.Tenant, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
+	tenants, err := service.GetTenants(ctx, r.ClientClerkHandler, nil, r.AllowedTenants)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not FindAllTenants: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return tenants.Items, err
+}
+
 // Collection returns CollectionResolver implementation.
 func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
 
@@ -410,6 +421,9 @@ func (r *Resolver) StoragePartition() StoragePartitionResolver { return &storage
 // Tenant returns TenantResolver implementation.
 func (r *Resolver) Tenant() TenantResolver { return &tenantResolver{r} }
 
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
 type collectionResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type objectResolver struct{ *Resolver }
@@ -418,3 +432,4 @@ type queryResolver struct{ *Resolver }
 type storageLocationResolver struct{ *Resolver }
 type storagePartitionResolver struct{ *Resolver }
 type tenantResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
