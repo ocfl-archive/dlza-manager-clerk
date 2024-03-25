@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/configor"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
 	"log"
+	"os"
 )
 
 type Service struct {
@@ -17,16 +18,21 @@ type Config struct {
 	Handler        Service              `yaml:"handler" toml:"Handler"`
 	StorageHandler Service              `yaml:"storage-handler" toml:"StorageHandler"`
 	Clerk          Service              `yaml:"clerk" toml:"Clerk"`
+	Jwt            string               `yaml:"jwt-key" toml:"JwtKey"`
 }
 
 // GetConfig creates a new config from a given environment
-func GetConfig(configFile string) (config Config, err error) {
+func GetConfig(configFile string) Config {
+	conf := Config{}
 	if configFile == "" {
 		configFile = "config.yml"
 	}
-	err = configor.Load(&config, configFile)
+	err := configor.Load(&conf, configFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return
+	if conf.Jwt == "" {
+		conf.Jwt = os.Getenv("JWT_KEY")
+	}
+	return conf
 }
