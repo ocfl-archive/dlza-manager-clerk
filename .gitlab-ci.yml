@@ -40,3 +40,10 @@ build-develop-image:
     - develop
     - dev_png
     - keycloak_backend
+
+build-prod-image:
+  extends: .build-image
+  variables:
+    IMAGE_TAG: "$CI_REGISTRY_IMAGE:prod"
+  only:             
+    - prod
