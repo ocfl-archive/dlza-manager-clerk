@@ -6,9 +6,11 @@ import (
 	"crypto/x509"
 	"embed"
 	"encoding/gob"
-	"fmt"
 	"io/fs"
 	"net/http"
+	"os"
+	"path"
+	"strings"
 
 	"emperror.dev/errors"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -102,10 +104,11 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteNoneMode, HttpOnly: true})
 	gob.Register(models.KeyCloakToken{})
 	router.Use(sessions.Sessions("mysession", store))
-	router.NoRoute(func(c *gin.Context) {
-		fmt.Printf("%s doesn't exists, redirect on / ", c.Request.URL.Path)
-		c.Redirect(http.StatusMovedPermanently, "/")
-	})
+	// router.NoRoute(func(c *gin.Context) {
+	// 	fmt.Println("test")
+	// 	fmt.Printf("%s doesn't exists, redirect on / ", c.Request.URL.Path)
+	// 	c.Redirect(http.StatusMovedPermanently, "/")
+	// })
 	router.Use(middleware.GinContextToContextMiddleware())
 
 	router.GET("/auth/login", func(c *gin.Context) {
@@ -140,9 +143,29 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	graphql := router.Group("/graphql")
 	{
 		graphql.POST("", srv.graphqlHandler(srv.ClientClerkHandler))
+		graphql.OPTIONS("", srv.graphqlHandler(srv.ClientClerkHandler))
 	}
 
 	router.Use(static.Serve("/", static.EmbedFolder(UiFS, "dlza-frontend/build")))
+
+	router.Use(func(ctx *gin.Context) {
+
+		fsys, _ := fs.Sub(UiFS, "dlza-frontend/build")
+		if ctx.Request.URL.Path != "/" {
+			fullPath := "dlza-frontend/build" + strings.TrimPrefix(path.Clean(ctx.Request.URL.Path), "/")
+			_, err := os.Stat(fullPath)
+			if err != nil {
+				if !os.IsNotExist(err) {
+					panic(err)
+				}
+				// Requested file does not exist so we return the default (resolves to index.html)
+				ctx.Request.URL.Path = "/"
+			}
+		}
+		path := ctx.Request.URL.Path
+
+		ctx.FileFromFS(path, http.FS(fsys))
+	})
 
 	router.GET("/playground", playgroundHandler())
 	// router.GET("/schema", func(ctx *gin.Context) {
@@ -193,9 +216,17 @@ func playgroundHandler() gin.HandlerFunc {
 func (srv *Server) graphqlHandler(clientClerkHandler pb.ClerkHandlerServiceClient) gin.HandlerFunc {
 	// NewExecutableSchema and Config are in the generated.go file
 	// Resolver is in the resolver.go file
+
 	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{ClientClerkHandler: clientClerkHandler}}))
 	return func(c *gin.Context) {
-
+		// fmt.Println("test before")
+		// c.Header("Access-Control-Allow-Origin", "https://localhost:9087")
+		// // c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
+		// // c.Header("Access-Control-Allow-Origin", "http://localhost:4173")
+		// c.Header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS")
+		// c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		// c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		// fmt.Println("test after")
 		ctx := context.WithValue(c, constants.Needed, "Needed to attach context")
 		c.Set("keycloak", srv.keycloak)
 		h.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
