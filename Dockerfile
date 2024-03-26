@@ -58,11 +58,13 @@ RUN go mod download
 
 # RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
 RUN npm i -g vite
-RUN git clone -b dev_png git@gitlab.switch.ch:ub-unibas/dlza/dlza-frontend.git
+RUN git clone -b develop git@gitlab.switch.ch:ub-unibas/dlza/dlza-frontend.git
 ## to override hardcode in frontend that targets "ub-dlza-test" namespace
-RUN sed -i "s|dlza-manager.ub-dlza-test.k8s-001.unibas.ch|dlza-manager.ub-dlza-stage.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
+# RUN sed -i "s|dlza-manager.ub-dlza-test.k8s-001.unibas.ch|dlza-manager.ub-dlza-stage.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
 # RUN sed -i "s|env.PUBLIC_BACKEND_URL|dlza-manager.ub-dlza-prod.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
-RUN cd dlza-frontend  && npm install && npm run build
+RUN cd dlza-frontend  
+RUN echo "PUBLIC_BACKEND_URL=https://dlza-manager.ub-dlza-stage.k8s-001.unibas.ch/graphql" >> .env
+RUN npm install && npm run build
 # RUN npm run build dlza-frontend
 # RUN cd ..
 RUN go build 
