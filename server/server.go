@@ -23,7 +23,7 @@ import (
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/middleware"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"golang.org/x/net/http2"
 	"golang.org/x/oauth2"

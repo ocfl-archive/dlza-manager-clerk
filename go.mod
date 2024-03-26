@@ -17,12 +17,14 @@ require (
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
 	github.com/vektah/gqlparser/v2 v2.5.11
+	gitlab.switch.ch/ub-unibas/dlza/dlza-manager v0.0.1
+	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler v0.0.2
+	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler v0.0.2
 	gitlab.switch.ch/ub-unibas/go-ublogger v0.0.0-20240221112852-57b8fc6da630
 	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81
 	golang.org/x/net v0.22.0
 	golang.org/x/oauth2 v0.18.0
 	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.33.0
 )
 
 require (
@@ -79,6 +81,7 @@ require (
 	golang.org/x/tools v0.19.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

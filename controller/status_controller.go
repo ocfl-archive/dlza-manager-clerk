@@ -2,13 +2,14 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 	"net/http"
 )
 
 type StatusController struct {
-	ClientClerkHandlerService pb.ClerkHandlerServiceClient
+	ClientClerkHandlerService pbHandler.ClerkHandlerServiceClient
 }
 
 func (s *StatusController) InitRoutes(statusRouter *gin.RouterGroup) {
@@ -21,7 +22,7 @@ func (s *StatusController) Path() string {
 	return "/status"
 }
 
-func NewStatusController(clientClerkHandlerService pb.ClerkHandlerServiceClient) Controller {
+func NewStatusController(clientClerkHandlerService pbHandler.ClerkHandlerServiceClient) Controller {
 	return &StatusController{ClientClerkHandlerService: clientClerkHandlerService}
 }
 

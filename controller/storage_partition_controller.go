@@ -2,7 +2,8 @@ package controller
 
 import (
 	"context"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
+	pbStorageHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler/storagehandlerproto"
 	"net/http"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 )
 
 type StoragePartitionController struct {
-	ClientClerkStorageHandlerService pb.ClerkStorageHandlerServiceClient
+	ClientClerkStorageHandlerService pbStorageHandler.ClerkStorageHandlerServiceClient
 }
 
 func (s *StoragePartitionController) InitRoutes(storagePartitionRouter *gin.RouterGroup) {
@@ -21,7 +22,7 @@ func (s *StoragePartitionController) Path() string {
 	return "/storage-partition"
 }
 
-func NewStoragePartitionController(clientClerkStorageHandlerService pb.ClerkStorageHandlerServiceClient) Controller {
+func NewStoragePartitionController(clientClerkStorageHandlerService pbStorageHandler.ClerkStorageHandlerServiceClient) Controller {
 	return &StoragePartitionController{ClientClerkStorageHandlerService: clientClerkStorageHandlerService}
 }
 

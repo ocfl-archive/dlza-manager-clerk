@@ -2,9 +2,11 @@ package controller
 
 import (
 	"context"
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
+
 	"net/http"
 	"time"
 
@@ -12,7 +14,7 @@ import (
 )
 
 type StorageLocationController struct {
-	ClientClerkHandler pb.ClerkHandlerServiceClient
+	ClientClerkHandler pbHandler.ClerkHandlerServiceClient
 }
 
 func (s *StorageLocationController) InitRoutes(storageLocationRouter *gin.RouterGroup) {
@@ -25,7 +27,7 @@ func (s *StorageLocationController) Path() string {
 	return "/storage-location"
 }
 
-func NewStorageLocationController(clientClerkHandler pb.ClerkHandlerServiceClient) Controller {
+func NewStorageLocationController(clientClerkHandler pbHandler.ClerkHandlerServiceClient) Controller {
 	return &StorageLocationController{ClientClerkHandler: clientClerkHandler}
 }
 
