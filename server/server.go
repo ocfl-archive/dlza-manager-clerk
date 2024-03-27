@@ -24,7 +24,7 @@ import (
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/middleware"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"golang.org/x/net/http2"
 )
@@ -110,7 +110,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	// 	c.Redirect(http.StatusMovedPermanently, "/")
 	// })
 	router.Use(middleware.GinContextToContextMiddleware())
-
+	router.GET("/playground", playgroundHandler())
 	router.GET("/auth/login", func(c *gin.Context) {
 		session := sessions.Default(c)
 		state := middleware.GenerateStateOauth()
@@ -171,7 +171,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 
 	})
 
-	router.GET("/playground", playgroundHandler())
+	// router.GET("/playground", playgroundHandler())
 	// router.GET("/schema", func(ctx *gin.Context) {
 	// 	ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
 	// })

@@ -1,43 +1,38 @@
 package config
 
 import (
-	"log"
-
 	"github.com/jinzhu/configor"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	"log"
+	"os"
 )
 
 type Service struct {
-	ServiceName string         `yaml:"service_name" toml:"ServiceName"`
-	Host        string         `yaml:"host" toml:"Host"`
-	Port        int            `yaml:"port" toml:"Port"`
-	Database    DatabaseConfig `yaml:"database" toml:"Database"`
+	ServiceName string `yaml:"service_name" toml:"ServiceName"`
+	Host        string `yaml:"host" toml:"Host"`
+	Port        int    `yaml:"port" toml:"Port"`
 }
 
 type Config struct {
-	GraphQLConfig models.GraphQLConfig `yaml:"graphql_config" toml:"GraphQLConfig"`
-	Handler       Service              `yaml:"handler" toml:"Handler"`
-	Ingester      Service              `yaml:"ingester" toml:"Ingester"`
-	Clerk         Service              `yaml:"clerk" toml:"Clerk"`
+	GraphQLConfig  models.GraphQLConfig `yaml:"graphql_config" toml:"GraphQLConfig"`
+	Handler        Service              `yaml:"handler" toml:"Handler"`
+	StorageHandler Service              `yaml:"storage-handler" toml:"StorageHandler"`
+	Clerk          Service              `yaml:"clerk" toml:"Clerk"`
+	Jwt            string               `yaml:"jwt-key" toml:"JwtKey"`
 }
 
 // GetConfig creates a new config from a given environment
-func GetConfig(configFile string, fileType string) (config Config, err error) {
+func GetConfig(configFile string) Config {
+	conf := Config{}
 	if configFile == "" {
-		defaultConfig := "config.yml"
-		if fileType == "toml" {
-			defaultConfig = "config.toml"
-		}
-		err = configor.Load(&config, defaultConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		err = configor.Load(&config, configFile)
-		if err != nil {
-			log.Fatal(err)
-		}
+		configFile = "config.yml"
 	}
-
-	return
+	err := configor.Load(&conf, configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if conf.Jwt == "" {
+		conf.Jwt = os.Getenv("JWT_KEY")
+	}
+	return conf
 }

@@ -2,21 +2,35 @@ package controller
 
 import (
 	"context"
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-type TenantController struct {
-	ClientClerkIngestHandler pb.ClerkHandlerServiceClient
+func NewTenantController(clientClerkHandler pbHandler.ClerkHandlerServiceClient) Controller {
+	return &TenantController{ClientClerkHandler: clientClerkHandler}
 }
 
-func NewTenantController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) *TenantController {
-	return &TenantController{ClientClerkIngestHandler: clientClerkIngestHandler}
+type TenantController struct {
+	ClientClerkHandler pbHandler.ClerkHandlerServiceClient
+}
+
+func (t *TenantController) Path() string {
+	return "/tenant"
+}
+
+func (t *TenantController) InitRoutes(tenantRouter *gin.RouterGroup) {
+
+	tenantRouter.GET("", t.FindAllTenants)
+	tenantRouter.GET("/:id", t.FindTenantById)
+	tenantRouter.POST("", t.SaveTenant)
+	tenantRouter.PATCH("", t.UpdateTenant)
+	tenantRouter.DELETE("/:id", t.DeleteTenant)
 }
 
 // SaveTenant godoc
@@ -39,7 +53,7 @@ func (t *TenantController) SaveTenant(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
-	_, err = t.ClientClerkIngestHandler.SaveTenant(cont, &tenant)
+	_, err = t.ClientClerkHandler.SaveTenant(cont, &tenant)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -68,7 +82,7 @@ func (t *TenantController) UpdateTenant(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"message": "request failed"})
 		return
 	}
-	_, err = t.ClientClerkIngestHandler.UpdateTenant(cont, &tenant)
+	_, err = t.ClientClerkHandler.UpdateTenant(cont, &tenant)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -93,7 +107,7 @@ func (t *TenantController) DeleteTenant(ctx *gin.Context) {
 	defer cancel()
 	id := ctx.Param("id")
 
-	_, err := t.ClientClerkIngestHandler.DeleteTenant(cont, &pb.Id{Id: id})
+	_, err := t.ClientClerkHandler.DeleteTenant(cont, &pb.Id{Id: id})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -116,7 +130,7 @@ func (t *TenantController) FindTenantById(ctx *gin.Context) {
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
 	id := ctx.Param("id")
-	tenant, err := t.ClientClerkIngestHandler.FindTenantById(cont, &pb.Id{Id: id})
+	tenant, err := t.ClientClerkHandler.FindTenantById(cont, &pb.Id{Id: id})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -138,7 +152,7 @@ func (t *TenantController) FindAllTenants(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
-	tenants, err := t.ClientClerkIngestHandler.FindAllTenants(cont, &pb.NoParam{})
+	tenants, err := t.ClientClerkHandler.FindAllTenants(cont, &pb.NoParam{})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

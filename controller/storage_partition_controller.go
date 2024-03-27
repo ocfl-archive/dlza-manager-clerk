@@ -2,7 +2,8 @@ package controller
 
 import (
 	"context"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
+	pbStorageHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler/storagehandlerproto"
 	"net/http"
 	"time"
 
@@ -10,11 +11,19 @@ import (
 )
 
 type StoragePartitionController struct {
-	ClientClerkIngestService pb.ClerkIngestServiceClient
+	ClientClerkStorageHandlerService pbStorageHandler.ClerkStorageHandlerServiceClient
 }
 
-func NewStoragePartitionController(clientClerkIngestService pb.ClerkIngestServiceClient) *StoragePartitionController {
-	return &StoragePartitionController{ClientClerkIngestService: clientClerkIngestService}
+func (s *StoragePartitionController) InitRoutes(storagePartitionRouter *gin.RouterGroup) {
+	storagePartitionRouter.POST("", s.CreateStoragePartition)
+}
+
+func (s *StoragePartitionController) Path() string {
+	return "/storage-partition"
+}
+
+func NewStoragePartitionController(clientClerkStorageHandlerService pbStorageHandler.ClerkStorageHandlerServiceClient) Controller {
+	return &StoragePartitionController{ClientClerkStorageHandlerService: clientClerkStorageHandlerService}
 }
 
 // CreateStoragePartition godoc
@@ -37,7 +46,7 @@ func (s *StoragePartitionController) CreateStoragePartition(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
-	_, err = s.ClientClerkIngestService.CreateStoragePartition(cont, &storagePartition)
+	_, err = s.ClientClerkStorageHandlerService.CreateStoragePartition(cont, &storagePartition)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return

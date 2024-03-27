@@ -4,35 +4,32 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"embed"
+	"emperror.dev/emperror"
+	"emperror.dev/errors"
 	"encoding/pem"
 	"flag"
 	"fmt"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/certs"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/web"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
+	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
+	handlerClient "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/client"
+	storageHandlerClient "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler/client"
+	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"io/fs"
 	"log"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
-
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/config"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/certs"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/data/web"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/router"
-	graphqlServer "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/server"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/service"
-
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
-	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var configParam = flag.String("config", "", "config file in toml format, no need for filetype for this param")
-var filetype = flag.String("filetype", "", "config file format, default is .yml")
 
 //go:embed all:dlza-frontend/build
 var uiFS embed.FS
@@ -43,33 +40,28 @@ var schemaFS embed.FS
 func main() {
 
 	flag.Parse()
-	conf, err := config.GetConfig(*configParam, *filetype)
-	if err != nil {
-		log.Fatal(err)
-	}
+	conf := config.GetConfig(*configParam)
 
-	connectionClerkIngest, err := grpc.Dial(conf.Ingester.Host+":"+strconv.Itoa(conf.Ingester.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//////ClerkStorageHandler gRPC connection
+	clerkStorageHandlerServiceClient, connectionClerkStorageHandler, err := storageHandlerClient.NewStorageHandlerClerkClient(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+	defer connectionClerkStorageHandler.Close()
 
 	//////ClerkHandler gRPC connection
-	connectionClerkHandler, err := grpc.Dial(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clerkHandlerServiceClient, connectionClerkHandler, err := handlerClient.NewClerkHandlerClient(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+	defer connectionClerkHandler.Close()
 
-	clerkIngestServiceClient := pb.NewClerkIngestServiceClient(connectionClerkIngest)
-	orderService := service.NewOrderService(clerkIngestServiceClient)
-
-	clerkHandlerServiceClient := pb.NewClerkHandlerServiceClient(connectionClerkHandler)
-
-	orderController := controller.NewOrderController(orderService)
 	tenantController := controller.NewTenantController(clerkHandlerServiceClient)
 	storageLocationController := controller.NewStorageLocationController(clerkHandlerServiceClient)
-	storagePartitionController := controller.NewStoragePartitionController(clerkIngestServiceClient)
+	storagePartitionController := controller.NewStoragePartitionController(clerkStorageHandlerServiceClient)
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
-	routes := router.NewRouter(orderController, tenantController, storageLocationController, collectionController, storagePartitionController)
+	statusController := controller.NewStatusController(clerkHandlerServiceClient)
+	routes := router.NewRouter(conf.Jwt, tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
@@ -175,13 +167,12 @@ func main() {
 	if err != nil {
 		emperror.Panic(errors.Wrap(err, "cannot start server"))
 	}
+	defer cancel()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 	fmt.Println("press ctrl+c to stop server")
 	s := <-done
 	fmt.Println("got signal:", s)
-
-	cancel()
 
 }

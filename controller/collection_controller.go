@@ -2,21 +2,34 @@ package controller
 
 import (
 	"context"
+
+	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
 	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/proto"
+	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-type CollectionController struct {
-	ClientClerkHandler pb.ClerkHandlerServiceClient
+func NewCollectionController(clientClerkHandler pbHandler.ClerkHandlerServiceClient) Controller {
+	return &CollectionController{ClientClerkHandler: clientClerkHandler}
 }
 
-func NewCollectionController(clientClerkIngestHandler pb.ClerkHandlerServiceClient) *CollectionController {
-	return &CollectionController{ClientClerkHandler: clientClerkIngestHandler}
+type CollectionController struct {
+	ClientClerkHandler pbHandler.ClerkHandlerServiceClient
+}
+
+func (col *CollectionController) Path() string {
+	return "/collection"
+}
+
+func (col *CollectionController) InitRoutes(collectionRouter *gin.RouterGroup) {
+	collectionRouter.GET("/:id", col.GetCollectionsByTenantId)
+	collectionRouter.POST("", col.CreateCollection)
+	collectionRouter.PATCH("", col.UpdateCollection)
+	collectionRouter.DELETE("/:id", col.DeleteCollectionById)
 }
 
 // CreateCollection godoc
@@ -124,3 +137,5 @@ func (col *CollectionController) GetCollectionsByTenantId(ctx *gin.Context) {
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusOK, collections.Collections)
 }
+
+var _ Controller = (*CollectionController)(nil)
