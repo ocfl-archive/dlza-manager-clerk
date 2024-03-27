@@ -110,7 +110,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	// 	c.Redirect(http.StatusMovedPermanently, "/")
 	// })
 	router.Use(middleware.GinContextToContextMiddleware())
-	router.GET("/playground", playgroundHandler())
+
 	router.GET("/auth/login", func(c *gin.Context) {
 		session := sessions.Default(c)
 		state := middleware.GenerateStateOauth()
@@ -149,24 +149,29 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	router.Use(static.Serve("/", static.EmbedFolder(UiFS, "dlza-frontend/build")))
 
 	router.Use(func(ctx *gin.Context) {
-
-		fsys, _ := fs.Sub(UiFS, "dlza-frontend/build")
-		if ctx.Request.URL.Path != "/" {
-			fullPath := "dlza-frontend/build" + strings.TrimPrefix(path.Clean(ctx.Request.URL.Path), "/")
-			_, err := os.Stat(fullPath)
-			if err != nil {
-				if !os.IsNotExist(err) {
-					panic(err)
+		if ctx.Request.URL.Path == "/playground" {
+			ctx.Next()
+		} else {
+			fsys, _ := fs.Sub(UiFS, "dlza-frontend/build")
+			if ctx.Request.URL.Path != "/" {
+				fullPath := "dlza-frontend/build" + strings.TrimPrefix(path.Clean(ctx.Request.URL.Path), "/")
+				_, err := os.Stat(fullPath)
+				if err != nil {
+					if !os.IsNotExist(err) {
+						panic(err)
+					}
+					// Requested file does not exist so we return the default (resolves to index.html)
+					ctx.Request.URL.Path = "/"
 				}
-				// Requested file does not exist so we return the default (resolves to index.html)
-				ctx.Request.URL.Path = "/"
 			}
-		}
-		path := ctx.Request.URL.Path
+			path := ctx.Request.URL.Path
 
-		ctx.FileFromFS(path, http.FS(fsys))
+			ctx.FileFromFS(path, http.FS(fsys))
+		}
+
 	})
 
+	router.GET("/playground", playgroundHandler())
 	// router.GET("/schema", func(ctx *gin.Context) {
 	// 	ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
 	// })
