@@ -110,7 +110,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	// 	c.Redirect(http.StatusMovedPermanently, "/")
 	// })
 	router.Use(middleware.GinContextToContextMiddleware())
-
+	router.GET("/playground", playgroundHandler())
 	router.GET("/auth/login", func(c *gin.Context) {
 		session := sessions.Default(c)
 		state := middleware.GenerateStateOauth()
@@ -167,7 +167,6 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		ctx.FileFromFS(path, http.FS(fsys))
 	})
 
-	router.GET("/playground", playgroundHandler())
 	// router.GET("/schema", func(ctx *gin.Context) {
 	// 	ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
 	// })
