@@ -19,6 +19,10 @@ type PaginatedList interface {
 	GetTotalItems() int
 }
 
+type Auth struct {
+	AuthCodeURL string `json:"authCodeUrl"`
+}
+
 type Collection struct {
 	ID               string      `json:"id"`
 	Alias            string      `json:"alias"`
@@ -453,6 +457,13 @@ type TenantListOptions struct {
 	SortDirection *SortDirection `json:"sortDirection,omitempty"`
 	SortKey       *TenantSortKey `json:"sortKey,omitempty"`
 	Search        *string        `json:"search,omitempty"`
+}
+
+type User struct {
+	Username string    `json:"username"`
+	Email    string    `json:"email"`
+	ID       string    `json:"id"`
+	Tenants  []*Tenant `json:"tenants"`
 }
 
 type CollectionSortKey string

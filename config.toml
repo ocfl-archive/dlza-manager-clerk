@@ -1,6 +1,7 @@
 [GraphQLConfig]
 addr = "localhost:4443"
 extaddr = "https://localhost:4443"
+domain = "localhost"
 
 [GraphQLConfig.logging]
 namespace="graphql-ui-template"

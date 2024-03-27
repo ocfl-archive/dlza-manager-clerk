@@ -5,20 +5,21 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"embed"
-	"encoding/json"
+	"encoding/gob"
 	"io/fs"
 	"net/http"
-	"slices"
+	"os"
+	"path"
 	"strings"
-	"time"
 
 	"emperror.dev/errors"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/coreos/go-oidc"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/memstore"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/constants"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph"
 	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/middleware"
@@ -26,7 +27,6 @@ import (
 	pb "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
 	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"golang.org/x/net/http2"
-	"golang.org/x/oauth2"
 )
 
 func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger *ubLogger.Logger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, router *gin.Engine, domain string) (*Server, error) {
@@ -72,54 +72,47 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		rootCAs.AddCert(ca)
 	}
 
-	// Keycloak configuration
-	ctx := context.Background()
-	provider, err := oidc.NewProvider(ctx, srv.keycloak.Addr+srv.keycloak.Realm)
-	if err != nil {
-		panic(err)
-	}
+	// // Keycloak configuration
+	// ctx := context.Background()
+
+	provider := middleware.GetProvider(srv.keycloak)
 	var claims struct {
 		EndSessionURL string `json:"end_session_endpoint"`
 	}
-	err = provider.Claims(&claims)
+
+	oauth2Config := middleware.GetOauth2Config(srv.keycloak)
+
+	err := provider.Claims(&claims)
 	if err != nil {
 		return nil, err
 	}
 
-	oauth2Config := oauth2.Config{
-		ClientID:     srv.keycloak.ClientId,
-		ClientSecret: srv.keycloak.ClientSecret,
-		RedirectURL:  srv.keycloak.Callback + "auth/callback",
-		// Discovery returns the OAuth2 endpoints.
-		Endpoint: provider.Endpoint(),
-		// "openid" is a required scope for OpenID Connect flows.
-		Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
-	}
-
-	oidcConfig := &oidc.Config{
-		ClientID: srv.keycloak.ClientId,
-	}
-	verifier := provider.Verifier(oidcConfig)
+	// oidcConfig := &oidc.Config{
+	// 	ClientID: srv.keycloak.ClientId,
+	// }
+	// verifier := provider.Verifier(oidcConfig)
 
 	var tlsConfig = &tls.Config{
 		Certificates: []tls.Certificate{srv.cert},
 		RootCAs:      rootCAs,
 	}
-	// var keycloakConfig = ginkeycloak.KeycloakConfig{
-	// 	Url:   srv.keycloak.Addr,
-	// 	Realm: srv.keycloak.Realm,
-	// }
 
-	// router := gin.Default()
 	router := srv.router
-	store := cookie.NewStore([]byte("secretToBeChangedWithKubernetesSecret"))
+
+	store := memstore.NewStore([]byte("secretToBeChangedWithKubernetesSecret"))
+	// store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteLaxMode, HttpOnly: true})
+	store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteNoneMode, HttpOnly: true})
+	gob.Register(models.KeyCloakToken{})
 	router.Use(sessions.Sessions("mysession", store))
-
-	router.GET("/logout", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, claims.EndSessionURL+"?user.id_token_hint="+srv.keycloak.ClientId+"&post_logout_redirect_uri="+srv.keycloak.Callback+"login")
-
-	})
+	// router.NoRoute(func(c *gin.Context) {
+	// 	fmt.Println("test")
+	// 	fmt.Printf("%s doesn't exists, redirect on / ", c.Request.URL.Path)
+	// 	c.Redirect(http.StatusMovedPermanently, "/")
+	// })
+	router.Use(middleware.GinContextToContextMiddleware())
+	router.GET("/playground", playgroundHandler())
 	router.GET("/auth/login", func(c *gin.Context) {
+		session := sessions.Default(c)
 		state := middleware.GenerateStateOauth()
 		if err != nil {
 			c.Error(errors.Errorf("Internal error:"+err.Error(), http.StatusInternalServerError))
@@ -131,87 +124,64 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 			return
 		}
 
-		c.SetCookie("state", state, 60, "/", srv.domain, false, true)
-		c.SetCookie("nonce", nonce, 60, "/", srv.domain, false, true)
-		c.Redirect(http.StatusFound, oauth2Config.AuthCodeURL(state, oidc.Nonce(nonce)))
-	})
-	router.GET("/auth/callback", func(c *gin.Context) {
-		session := sessions.Default(c)
-		state, err := c.Cookie("state")
-		if err != nil {
-			c.Error(errors.Errorf("state not found:"+err.Error(), http.StatusBadRequest))
-			c.Redirect(http.StatusFound, "/auth/login")
-			return
-		}
-		if c.Request.URL.Query().Get("state") != state {
-			c.Error(errors.Errorf("state did not match : ", http.StatusBadRequest))
-			return
-		}
-
-		oauth2Token, err := oauth2Config.Exchange(ctx, c.Request.URL.Query().Get("code"))
-		if err != nil {
-			c.Error(errors.Errorf("Failed to exchange token:"+err.Error(), http.StatusInternalServerError))
-			c.Redirect(http.StatusFound, "/auth/login")
-			return
-		}
-		rawIDToken, ok := oauth2Token.Extra("id_token").(string)
-		if !ok {
-			c.Error(errors.Errorf("No id_token field in oauth2 token:", http.StatusInternalServerError))
-			c.Redirect(http.StatusFound, "/auth/login")
-			return
-		}
-		idToken, err := verifier.Verify(ctx, rawIDToken)
-		if err != nil {
-			c.Error(errors.Errorf("callback Failed to verify ID Token:"+err.Error(), http.StatusInternalServerError))
-			c.Redirect(http.StatusFound, "/auth/login")
-			return
-		}
-
-		nonce, err := c.Cookie("nonce")
-		if err != nil {
-			c.Error(errors.Errorf("nonce not found:"+err.Error(), http.StatusBadRequest))
-			c.Redirect(http.StatusFound, "/auth/login")
-			return
-		}
-		if idToken.Nonce != nonce {
-			c.Redirect(http.StatusFound, "/auth/login")
-			c.Error(errors.Errorf("nonce did not match.", http.StatusBadRequest))
-			return
-		}
-		resp := struct {
-			OAuth2Token   *oauth2.Token
-			IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
-		}{oauth2Token, new(json.RawMessage)}
-
-		if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
-			c.Error(errors.Errorf(err.Error(), http.StatusInternalServerError))
-			return
-		}
-
-		c.SetCookie("access_token", resp.OAuth2Token.AccessToken, int(time.Until(resp.OAuth2Token.Expiry).Seconds()), "/", srv.domain, false, true)
-		session.Set("refresh_token", resp.OAuth2Token.RefreshToken)
+		session.Set("state", state)
+		session.Set("nonce", nonce)
 		session.Save()
 
-		c.Redirect(http.StatusFound, "/")
+		output := map[string]any{
+			"auth_code_url": oauth2Config.AuthCodeURL(state, oidc.Nonce(nonce)),
+		}
+		c.JSON(http.StatusFound, output)
 	})
-	graphql := router.Group("/graphql").Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak, srv.domain))
+	// router.GET("/auth/callback", func(c *gin.Context) {
+	// 	output := map[string]any{
+	// 		"code": c.Request.URL.Query().Get("code"),
+	// 	}
+	// 	c.JSON(http.StatusFound, output)
+	// })
+
+	graphql := router.Group("/graphql")
 	{
 		graphql.POST("", srv.graphqlHandler(srv.ClientClerkHandler))
+		graphql.OPTIONS("", srv.graphqlHandler(srv.ClientClerkHandler))
 	}
 
-	router.Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak, srv.domain)).Use(func(ctx *gin.Context) {
+	router.Use(static.Serve("/", static.EmbedFolder(UiFS, "dlza-frontend/build")))
+
+	router.Use(func(ctx *gin.Context) {
+		// if ctx.Request.URL.Path == "/playground" {
+		// 	ctx.Next()
+		// } else {
 		fsys, _ := fs.Sub(UiFS, "dlza-frontend/build")
-		path := ctx.Request.URL.Path
-		if slices.Contains([]string{"/collections", "/tenants", "/objects", "/files"}, path) {
-			ctx.Redirect(http.StatusMovedPermanently, "/")
+		if ctx.Request.URL.Path != "/" {
+			fullPath := "dlza-frontend/build" + strings.TrimPrefix(path.Clean(ctx.Request.URL.Path), "/")
+			_, err := os.Stat(fullPath)
+			if err != nil {
+				if !os.IsNotExist(err) {
+					panic(err)
+				}
+				// Requested file does not exist so we return the default (resolves to index.html)
+				ctx.Request.URL.Path = "/"
+			}
 		}
+		path := ctx.Request.URL.Path
+
 		ctx.FileFromFS(path, http.FS(fsys))
+		// }
+
 	})
 
-	router.GET("/schema", func(ctx *gin.Context) {
-		ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
-	}).Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.keycloak, srv.domain))
-
+	// router.GET("/playground", playgroundHandler())
+	// router.GET("/schema", func(ctx *gin.Context) {
+	// 	ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
+	// })
+	// .Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.domain))
+	// schema := router.Group("/schema").Use(middleware.VerifyToken(ctx, srv.keycloak, verifier, oauth2Config, srv.domain))
+	// {
+	// 	schema.GET("", func(ctx *gin.Context) {
+	// 		ctx.FileFromFS("graph/schema.graphqls", http.FS(SchemaFS))
+	// 	})
+	// }
 	srv.server = http.Server{
 		Addr:      srv.addr,
 		Handler:   router,
@@ -237,45 +207,32 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	}, nil
 }
 
+// Defining the Playground handler
+func playgroundHandler() gin.HandlerFunc {
+	h := playground.Handler("GraphQL", "/graphql")
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
 // Defining the Graphql handler
 func (srv *Server) graphqlHandler(clientClerkHandler pb.ClerkHandlerServiceClient) gin.HandlerFunc {
 	// NewExecutableSchema and Config are in the generated.go file
 	// Resolver is in the resolver.go file
+
 	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{ClientClerkHandler: clientClerkHandler}}))
 	return func(c *gin.Context) {
-		rawAccessToken, errT := c.Cookie("access_token")
-		if errT != nil {
-			c.Writer.WriteHeader(400)
-			return
-		}
-
-		parts := strings.Split(rawAccessToken, " ")
-
-		var userClaim models.KeyCloakToken
-		provider, err := oidc.NewProvider(c, srv.keycloak.Addr+srv.keycloak.Realm)
-		if err != nil {
-			panic(err)
-		}
-
-		oidcConfig := &oidc.Config{
-			ClientID: srv.keycloak.ClientId,
-		}
-
-		verifier := provider.Verifier(oidcConfig)
-
-		_, err = verifier.Verify(c, parts[0])
-		if err != nil {
-			c.Error(errors.Errorf("Failed to verify ID Token: "+err.Error(), http.StatusInternalServerError))
-			return
-		}
-
-		_, err = jwt.ParseWithClaims(parts[0], &userClaim, nil)
-		if err != nil && err.Error() != "no Keyfunc was provided." {
-			c.Writer.WriteHeader(400)
-		}
+		// fmt.Println("test before")
+		// c.Header("Access-Control-Allow-Origin", "https://localhost:9087")
+		// // c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
+		// // c.Header("Access-Control-Allow-Origin", "http://localhost:4173")
+		// c.Header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS")
+		// c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		// c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		// fmt.Println("test after")
 		ctx := context.WithValue(c, constants.Needed, "Needed to attach context")
-		c.Set("keycloak_group", userClaim.Groups)
-		c.Set("tenant_list", userClaim.TenantList)
+		c.Set("keycloak", srv.keycloak)
 		h.ServeHTTP(c.Writer, c.Request.WithContext(ctx))
 	}
 }

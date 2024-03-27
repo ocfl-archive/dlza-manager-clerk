@@ -9,6 +9,7 @@ require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/gin-contrib/sessions v0.0.5
+	github.com/gin-contrib/static v1.1.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.0
@@ -64,6 +65,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pquerna/cachecontrol v0.2.0 // indirect
+	github.com/quasoft/memstore v0.0.0-20191010062613-2bce066d2b0b // indirect
 	github.com/rs/zerolog v1.32.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.2.0 // indirect

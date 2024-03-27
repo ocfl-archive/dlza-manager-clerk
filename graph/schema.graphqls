@@ -358,7 +358,19 @@ input PronomIdListOptions {
   sortKey: PronomIdSortKey
 }
 
+type User {
+  username: String! 
+  email: String!
+  id:String!
+  tenants: [Tenant!]!
+}
+
+type Auth {
+  authCodeUrl: String!
+}
 type Query {
+  auth: Auth!
+  user: User
   tenants(options: TenantListOptions): TenantList!
   tenant(id: ID!): Tenant
 
@@ -385,4 +397,9 @@ type Query {
 
   mimeTypes(options: MimeTypeListOptions): MimeTypeList!
   pronomIds(options: PronomIdListOptions): PronomIdList!
+}
+
+type Mutation {
+  login(code: String!): User!
+  logout: Boolean! 
 }
