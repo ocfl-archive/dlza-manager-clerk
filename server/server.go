@@ -15,7 +15,6 @@ import (
 	"emperror.dev/errors"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/coreos/go-oidc"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-contrib/static"
@@ -80,7 +79,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		EndSessionURL string `json:"end_session_endpoint"`
 	}
 
-	oauth2Config := middleware.GetOauth2Config(srv.keycloak)
+	// oauth2Config := middleware.GetOauth2Config(srv.keycloak)
 
 	err := provider.Claims(&claims)
 	if err != nil {
@@ -111,28 +110,28 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	// })
 	router.Use(middleware.GinContextToContextMiddleware())
 	router.GET("/playground", playgroundHandler())
-	router.GET("/auth/login", func(c *gin.Context) {
-		session := sessions.Default(c)
-		state := middleware.GenerateStateOauth()
-		if err != nil {
-			c.Error(errors.Errorf("Internal error:"+err.Error(), http.StatusInternalServerError))
-			return
-		}
-		nonce := middleware.GenerateStateOauth()
-		if err != nil {
-			c.Error(errors.Errorf("Invalid or malformed token:"+err.Error(), http.StatusInternalServerError))
-			return
-		}
+	// router.GET("/auth/login", func(c *gin.Context) {
+	// 	session := sessions.Default(c)
+	// 	state := middleware.GenerateStateOauth()
+	// 	if err != nil {
+	// 		c.Error(errors.Errorf("Internal error:"+err.Error(), http.StatusInternalServerError))
+	// 		return
+	// 	}
+	// 	nonce := middleware.GenerateStateOauth()
+	// 	if err != nil {
+	// 		c.Error(errors.Errorf("Invalid or malformed token:"+err.Error(), http.StatusInternalServerError))
+	// 		return
+	// 	}
 
-		session.Set("state", state)
-		session.Set("nonce", nonce)
-		session.Save()
+	// 	session.Set("state", state)
+	// 	session.Set("nonce", nonce)
+	// 	session.Save()
 
-		output := map[string]any{
-			"auth_code_url": oauth2Config.AuthCodeURL(state, oidc.Nonce(nonce)),
-		}
-		c.JSON(http.StatusFound, output)
-	})
+	// 	output := map[string]any{
+	// 		"auth_code_url": oauth2Config.AuthCodeURL(state, oidc.Nonce(nonce)),
+	// 	}
+	// 	c.JSON(http.StatusFound, output)
+	// })
 	// router.GET("/auth/callback", func(c *gin.Context) {
 	// 	output := map[string]any{
 	// 		"code": c.Request.URL.Query().Get("code"),
