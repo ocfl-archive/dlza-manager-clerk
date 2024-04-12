@@ -191,7 +191,8 @@ enum FileSortKey {
   checksum,
   mimeType,
   pronom,
-  name
+  name,
+  size
 }
 
 type Tenant implements Node {
