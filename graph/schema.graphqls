@@ -173,6 +173,7 @@ enum ObjectSortKey {
   keywords,
   identifiers,
   alternativeTitles,
+  size,
   totalFileSize,
   totalFileCount
 }
