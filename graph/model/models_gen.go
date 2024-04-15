@@ -151,6 +151,9 @@ type MimeTypeListOptions struct {
 	SortKey       *MimeTypeSortKey `json:"sortKey,omitempty"`
 }
 
+type Mutation struct {
+}
+
 type Object struct {
 	ID                string              `json:"id"`
 	Signature         string              `json:"signature"`
@@ -324,6 +327,9 @@ type PronomIDListOptions struct {
 	Take          *int             `json:"take,omitempty"`
 	SortDirection *SortDirection   `json:"sortDirection,omitempty"`
 	SortKey       *PronomIDSortKey `json:"sortKey,omitempty"`
+}
+
+type Query struct {
 }
 
 type StorageLocation struct {
@@ -529,6 +535,7 @@ const (
 	FileSortKeyMimeType FileSortKey = "mimeType"
 	FileSortKeyPronom   FileSortKey = "pronom"
 	FileSortKeyName     FileSortKey = "name"
+	FileSortKeySize     FileSortKey = "size"
 )
 
 var AllFileSortKey = []FileSortKey{
@@ -537,11 +544,12 @@ var AllFileSortKey = []FileSortKey{
 	FileSortKeyMimeType,
 	FileSortKeyPronom,
 	FileSortKeyName,
+	FileSortKeySize,
 }
 
 func (e FileSortKey) IsValid() bool {
 	switch e {
-	case FileSortKeyID, FileSortKeyChecksum, FileSortKeyMimeType, FileSortKeyPronom, FileSortKeyName:
+	case FileSortKeyID, FileSortKeyChecksum, FileSortKeyMimeType, FileSortKeyPronom, FileSortKeyName, FileSortKeySize:
 		return true
 	}
 	return false
@@ -709,6 +717,7 @@ const (
 	ObjectSortKeyKeywords          ObjectSortKey = "keywords"
 	ObjectSortKeyIdentifiers       ObjectSortKey = "identifiers"
 	ObjectSortKeyAlternativeTitles ObjectSortKey = "alternativeTitles"
+	ObjectSortKeySize              ObjectSortKey = "size"
 	ObjectSortKeyTotalFileSize     ObjectSortKey = "totalFileSize"
 	ObjectSortKeyTotalFileCount    ObjectSortKey = "totalFileCount"
 )
@@ -725,13 +734,14 @@ var AllObjectSortKey = []ObjectSortKey{
 	ObjectSortKeyKeywords,
 	ObjectSortKeyIdentifiers,
 	ObjectSortKeyAlternativeTitles,
+	ObjectSortKeySize,
 	ObjectSortKeyTotalFileSize,
 	ObjectSortKeyTotalFileCount,
 }
 
 func (e ObjectSortKey) IsValid() bool {
 	switch e {
-	case ObjectSortKeyID, ObjectSortKeySignature, ObjectSortKeyTitle, ObjectSortKeyDescription, ObjectSortKeyIngestWorkflow, ObjectSortKeyUser, ObjectSortKeyAddress, ObjectSortKeyChecksum, ObjectSortKeyKeywords, ObjectSortKeyIdentifiers, ObjectSortKeyAlternativeTitles, ObjectSortKeyTotalFileSize, ObjectSortKeyTotalFileCount:
+	case ObjectSortKeyID, ObjectSortKeySignature, ObjectSortKeyTitle, ObjectSortKeyDescription, ObjectSortKeyIngestWorkflow, ObjectSortKeyUser, ObjectSortKeyAddress, ObjectSortKeyChecksum, ObjectSortKeyKeywords, ObjectSortKeyIdentifiers, ObjectSortKeyAlternativeTitles, ObjectSortKeySize, ObjectSortKeyTotalFileSize, ObjectSortKeyTotalFileCount:
 		return true
 	}
 	return false

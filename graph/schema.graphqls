@@ -173,6 +173,7 @@ enum ObjectSortKey {
   keywords,
   identifiers,
   alternativeTitles,
+  size,
   totalFileSize,
   totalFileCount
 }
@@ -191,7 +192,8 @@ enum FileSortKey {
   checksum,
   mimeType,
   pronom,
-  name
+  name,
+  size
 }
 
 type Tenant implements Node {

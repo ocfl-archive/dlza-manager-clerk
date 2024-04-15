@@ -11600,8 +11600,6 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11609,8 +11607,6 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 			}
 			it.TenantID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11618,8 +11614,6 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11627,8 +11621,6 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -11636,8 +11628,6 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOCollectionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionSortKey(ctx, v)
 			if err != nil {
@@ -11645,8 +11635,6 @@ func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Cont
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -11674,8 +11662,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11683,8 +11669,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			}
 			it.TenantID = data
 		case "objectId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objectId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11692,8 +11676,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			}
 			it.ObjectID = data
 		case "collectionId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11701,8 +11683,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			}
 			it.CollectionID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11710,8 +11690,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11719,8 +11697,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -11728,8 +11704,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOFileSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐFileSortKey(ctx, v)
 			if err != nil {
@@ -11737,8 +11711,6 @@ func (ec *executionContext) unmarshalInputFileListOptions(ctx context.Context, o
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -11766,8 +11738,6 @@ func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Contex
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11775,8 +11745,6 @@ func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Contex
 			}
 			it.TenantID = data
 		case "collectionId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11784,8 +11752,6 @@ func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Contex
 			}
 			it.CollectionID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11793,8 +11759,6 @@ func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Contex
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11802,8 +11766,6 @@ func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Contex
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -11811,8 +11773,6 @@ func (ec *executionContext) unmarshalInputMimeTypeListOptions(ctx context.Contex
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOMimeTypeSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐMimeTypeSortKey(ctx, v)
 			if err != nil {
@@ -11840,8 +11800,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11849,8 +11807,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			}
 			it.TenantID = data
 		case "objectInstanceId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objectInstanceId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11858,8 +11814,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			}
 			it.ObjectInstanceID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11867,8 +11821,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11876,8 +11828,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -11885,8 +11835,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOObjectInstanceCheckSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceCheckSortKey(ctx, v)
 			if err != nil {
@@ -11894,8 +11842,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceCheckListOptions(ctx con
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -11923,8 +11869,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11932,8 +11876,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			}
 			it.TenantID = data
 		case "ObjectId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ObjectId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -11941,8 +11883,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			}
 			it.ObjectID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11950,8 +11890,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -11959,8 +11897,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -11968,8 +11904,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOObjectInstanceSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectInstanceSortKey(ctx, v)
 			if err != nil {
@@ -11977,8 +11911,6 @@ func (ec *executionContext) unmarshalInputObjectInstanceListOptions(ctx context.
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -12006,8 +11938,6 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12015,8 +11945,6 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			}
 			it.TenantID = data
 		case "collectionId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12024,8 +11952,6 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			}
 			it.CollectionID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12033,8 +11959,6 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12042,8 +11966,6 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -12051,8 +11973,6 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOObjectSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐObjectSortKey(ctx, v)
 			if err != nil {
@@ -12060,8 +11980,6 @@ func (ec *executionContext) unmarshalInputObjectListOptions(ctx context.Context,
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -12089,8 +12007,6 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12098,8 +12014,6 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 			}
 			it.TenantID = data
 		case "collectionId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12107,8 +12021,6 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 			}
 			it.CollectionID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12116,8 +12028,6 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12125,8 +12035,6 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -12134,8 +12042,6 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOPronomIdSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐPronomIDSortKey(ctx, v)
 			if err != nil {
@@ -12163,8 +12069,6 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12172,8 +12076,6 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			}
 			it.TenantID = data
 		case "collectionId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12181,8 +12083,6 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			}
 			it.CollectionID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12190,8 +12090,6 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12199,8 +12097,6 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -12208,8 +12104,6 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOStorageLocationSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationSortKey(ctx, v)
 			if err != nil {
@@ -12217,8 +12111,6 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -12246,8 +12138,6 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 		}
 		switch k {
 		case "tenantId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12255,8 +12145,6 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			}
 			it.TenantID = data
 		case "storageLocationId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("storageLocationId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -12264,8 +12152,6 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			}
 			it.StorageLocationID = data
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12273,8 +12159,6 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12282,8 +12166,6 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -12291,8 +12173,6 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOStoragePartitionSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionSortKey(ctx, v)
 			if err != nil {
@@ -12300,8 +12180,6 @@ func (ec *executionContext) unmarshalInputStoragePartitionListOptions(ctx contex
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -12329,8 +12207,6 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 		}
 		switch k {
 		case "skip":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12338,8 +12214,6 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 			}
 			it.Skip = data
 		case "take":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("take"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -12347,8 +12221,6 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 			}
 			it.Take = data
 		case "sortDirection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortDirection"))
 			data, err := ec.unmarshalOSortDirection2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐSortDirection(ctx, v)
 			if err != nil {
@@ -12356,8 +12228,6 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 			}
 			it.SortDirection = data
 		case "sortKey":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortKey"))
 			data, err := ec.unmarshalOTenantSortKey2ᚖgitlabᚗswitchᚗchᚋubᚑunibasᚋdlzaᚋmicroservicesᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantSortKey(ctx, v)
 			if err != nil {
@@ -12365,8 +12235,6 @@ func (ec *executionContext) unmarshalInputTenantListOptions(ctx context.Context,
 			}
 			it.SortKey = data
 		case "search":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
