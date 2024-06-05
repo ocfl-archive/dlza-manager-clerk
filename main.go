@@ -61,7 +61,8 @@ func main() {
 	storagePartitionController := controller.NewStoragePartitionController(clerkStorageHandlerServiceClient)
 	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
 	statusController := controller.NewStatusController(clerkHandlerServiceClient)
-	routes := router.NewRouter(conf.Jwt, tenantController, storageLocationController, collectionController, storagePartitionController, statusController)
+	objectInstanceController := controller.NewObjectInstanceController(clerkHandlerServiceClient)
+	routes := router.NewRouter(conf.Jwt, tenantController, storageLocationController, collectionController, storagePartitionController, statusController, objectInstanceController)
 
 	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
 		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
