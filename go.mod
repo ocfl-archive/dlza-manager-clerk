@@ -5,7 +5,7 @@ go 1.22.3
 require (
 	emperror.dev/emperror v0.33.0
 	emperror.dev/errors v0.8.1
-	github.com/99designs/gqlgen v0.17.47
+	github.com/99designs/gqlgen v0.17.49
 	github.com/BurntSushi/toml v1.4.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/gin-contrib/sessions v1.0.1
@@ -17,12 +17,12 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
-	github.com/vektah/gqlparser/v2 v2.5.12
+	github.com/vektah/gqlparser/v2 v2.5.16
 	gitlab.switch.ch/ub-unibas/dlza/dlza-manager v0.0.2
-	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler v0.0.6
+	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler v0.0.7
 	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler v0.0.5
-	gitlab.switch.ch/ub-unibas/go-ublogger v0.0.0-20240529135102-38bc77a4bfdf
-	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8
+	gitlab.switch.ch/ub-unibas/go-ublogger v0.0.0-20240612084645-ba4f8357c0d4
+	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.21.0
 	google.golang.org/grpc v1.64.0
@@ -31,7 +31,7 @@ require (
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
-	github.com/bytedance/sonic v1.11.8 // indirect
+	github.com/bytedance/sonic v1.11.9 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
@@ -44,17 +44,17 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.21.0 // indirect
+	github.com/go-playground/validator/v10 v10.22.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/context v1.1.2 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gorilla/sessions v1.2.2 // indirect
-	github.com/gorilla/websocket v1.5.1 // indirect
+	github.com/gorilla/sessions v1.3.0 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -82,8 +82,8 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240617180043-68d350f18fd4 // indirect
+	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
