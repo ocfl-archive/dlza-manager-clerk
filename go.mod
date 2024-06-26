@@ -19,7 +19,7 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/vektah/gqlparser/v2 v2.5.16
 	gitlab.switch.ch/ub-unibas/dlza/dlza-manager v0.0.2
-	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler v0.0.7
+	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler v0.0.8
 	gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler v0.0.5
 	gitlab.switch.ch/ub-unibas/go-ublogger v0.0.0-20240612084645-ba4f8357c0d4
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8

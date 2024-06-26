@@ -13,6 +13,8 @@ type ObjectController struct {
 
 func (o *ObjectController) InitRoutes(StorageInfoRouter *gin.RouterGroup) {
 	StorageInfoRouter.GET("/:checksum", o.GetObjectsByChecksum)
+	StorageInfoRouter.GET("/resulting-quality/:id", o.GetResultingQualityForObject)
+	StorageInfoRouter.GET("/needed-quality/:id", o.GetNeededQualityForObject)
 }
 
 func (o *ObjectController) Path() string {
@@ -41,4 +43,44 @@ func (o *ObjectController) GetObjectsByChecksum(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, objects)
+}
+
+// GetResultingQualityForObject godoc
+// @Summary		Getting resulting quality by object id
+// @Description	Getting resulting quality by object id
+// @Security 	ApiKeyAuth
+// @ID 			resulting-quality-by-object-id
+// @Produce		json
+// @Success		200
+// @Failure 	400
+// @Router		/object/resulting-quality/{id} [get]
+func (o *ObjectController) GetResultingQualityForObject(ctx *gin.Context) {
+
+	checksum := ctx.Param("id")
+	quality, err := o.ClientClerkHandlerService.GetResultingQualityForObject(ctx, &pb.Id{Id: checksum})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "request failed"})
+		return
+	}
+	ctx.JSON(http.StatusOK, quality)
+}
+
+// GetNeededQualityForObject godoc
+// @Summary		Getting needed quality by object id
+// @Description	Getting needed quality by object id
+// @Security 	ApiKeyAuth
+// @ID 			resulting-needed-by-object-id
+// @Produce		json
+// @Success		200
+// @Failure 	400
+// @Router		/object/needed-quality/{id} [get]
+func (o *ObjectController) GetNeededQualityForObject(ctx *gin.Context) {
+
+	checksum := ctx.Param("id")
+	quality, err := o.ClientClerkHandlerService.GetNeededQualityForObject(ctx, &pb.Id{Id: checksum})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "request failed"})
+		return
+	}
+	ctx.JSON(http.StatusOK, quality)
 }
