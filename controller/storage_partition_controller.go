@@ -2,8 +2,8 @@ package controller
 
 import (
 	"context"
-	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
-	pbStorageHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-storage-handler/storagehandlerproto"
+	pbStorageHandler "github.com/ocfl-archive/dlza-manager-storage-handler/storagehandlerproto"
+	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
 	"net/http"
 	"time"
 

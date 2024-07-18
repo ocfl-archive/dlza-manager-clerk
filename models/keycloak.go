@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/golang-jwt/jwt/v4"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/constants"
+	"github.com/ocfl-archive/dlza-manager-clerk/constants"
 	"golang.org/x/exp/slices"
 )
 

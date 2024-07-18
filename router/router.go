@@ -2,10 +2,10 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ocfl-archive/dlza-manager-clerk/auth"
+	"github.com/ocfl-archive/dlza-manager-clerk/controller"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/auth"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller"
 )
 
 func NewRouter(key string, controllers ...controller.Controller) *gin.Engine {

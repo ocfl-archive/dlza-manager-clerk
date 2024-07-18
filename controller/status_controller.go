@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
+	"github.com/ocfl-archive/dlza-manager-clerk/models"
+	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
 	"net/http"
 )
 

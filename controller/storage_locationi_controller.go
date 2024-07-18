@@ -2,10 +2,10 @@ package controller
 
 import (
 	"context"
-	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
-	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
-	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
-	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
+	_ "github.com/ocfl-archive/dlza-manager-clerk/controller/docs"
+	_ "github.com/ocfl-archive/dlza-manager-clerk/models"
+	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
 
 	"net/http"
 	"time"

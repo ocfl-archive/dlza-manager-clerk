@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/middleware"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/service"
+	"github.com/ocfl-archive/dlza-manager-clerk/graph/model"
+	"github.com/ocfl-archive/dlza-manager-clerk/middleware"
+	"github.com/ocfl-archive/dlza-manager-clerk/service"
 )
 
 // Objects is the resolver for the objects field.

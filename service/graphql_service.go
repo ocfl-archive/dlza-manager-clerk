@@ -5,14 +5,14 @@ import (
 	"regexp"
 	"strings"
 
-	pb "gitlab.switch.ch/ub-unibas/dlza/dlza-manager/dlzamanagerproto"
+	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
 
 	"slices"
 
 	"emperror.dev/errors"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/graph/model"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/middleware"
-	pbHandler "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-handler/handlerproto"
+	"github.com/ocfl-archive/dlza-manager-clerk/graph/model"
+	"github.com/ocfl-archive/dlza-manager-clerk/middleware"
+	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
 )
 
 const (

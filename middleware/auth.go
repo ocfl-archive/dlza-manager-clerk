@@ -16,9 +16,9 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/ocfl-archive/dlza-manager-clerk/constants"
+	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	"github.com/vektah/gqlparser/v2/gqlerror"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/constants"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
 	"golang.org/x/oauth2"
 )
 

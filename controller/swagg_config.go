@@ -3,7 +3,7 @@
 package controller
 
 import (
-	_ "gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/controller/docs"
+	_ "github.com/ocfl-archive/dlza-manager-clerk/controller/docs"
 )
 
 // @title DLZA-archive API

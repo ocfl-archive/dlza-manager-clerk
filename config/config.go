@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/jinzhu/configor"
-	"gitlab.switch.ch/ub-unibas/dlza/microservices/dlza-manager-clerk/models"
+	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	"log"
 	"os"
 )
