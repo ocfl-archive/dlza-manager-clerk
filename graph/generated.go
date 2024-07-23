@@ -60,6 +60,7 @@ type ComplexityRoot struct {
 
 	Collection struct {
 		Alias            func(childComplexity int) int
+		AmountOfErrors   func(childComplexity int) int
 		Description      func(childComplexity int) int
 		Files            func(childComplexity int, options *model.FileListOptions) int
 		ID               func(childComplexity int) int
@@ -357,6 +358,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Collection.Alias(childComplexity), true
+
+	case "Collection.amountOfErrors":
+		if e.complexity.Collection.AmountOfErrors == nil {
+			break
+		}
+
+		return e.complexity.Collection.AmountOfErrors(childComplexity), true
 
 	case "Collection.description":
 		if e.complexity.Collection.Description == nil {
@@ -2830,6 +2838,50 @@ func (ec *executionContext) fieldContext_Collection_totalObjectCount(_ context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Collection_amountOfErrors(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_amountOfErrors(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AmountOfErrors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_amountOfErrors(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CollectionList_items(ctx context.Context, field graphql.CollectedField, obj *model.CollectionList) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CollectionList_items(ctx, field)
 	if err != nil {
@@ -2897,6 +2949,8 @@ func (ec *executionContext) fieldContext_CollectionList_items(_ context.Context,
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
 				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_Collection_amountOfErrors(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -4652,6 +4706,8 @@ func (ec *executionContext) fieldContext_Object_collection(_ context.Context, fi
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
 				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_Collection_amountOfErrors(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -6605,6 +6661,8 @@ func (ec *executionContext) fieldContext_Query_collection(ctx context.Context, f
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
 				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_Collection_amountOfErrors(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -12592,6 +12650,11 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 			}
 		case "totalObjectCount":
 			out.Values[i] = ec._Collection_totalObjectCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "amountOfErrors":
+			out.Values[i] = ec._Collection_amountOfErrors(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

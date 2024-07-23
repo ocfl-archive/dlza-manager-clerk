@@ -38,6 +38,7 @@ type Collection struct {
 	TotalFileSize    int         `json:"totalFileSize"`
 	TotalFileCount   int         `json:"totalFileCount"`
 	TotalObjectCount int         `json:"totalObjectCount"`
+	AmountOfErrors   int         `json:"amountOfErrors"`
 }
 
 func (Collection) IsNode()            {}

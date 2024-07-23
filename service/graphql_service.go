@@ -156,6 +156,11 @@ func GetCollectionsForTenant(ctx context.Context, clientClerkHandler pbHandler.C
 	collections := make([]*model.Collection, 0)
 	for _, collectionPb := range collectionsPb.Collections {
 		collection := collectionToGraphQlCollection(collectionPb)
+		amountOfErrors, err := clientClerkHandler.GetAmountOfErrorsByCollectionId(ctx, &pb.Id{Id: collection.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetAmountOfErrorsByCollectionId: %v", err)
+		}
+		collection.AmountOfErrors = int(amountOfErrors.Size)
 		collection.Tenant = obj
 		collections = append(collections, collection)
 	}
@@ -215,6 +220,10 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pbHandler
 	collections := make([]*model.Collection, 0)
 	for _, collectionPb := range collectionsPb.Collections {
 		collection := collectionToGraphQlCollection(collectionPb)
+		amountOfErrors, err := clientClerkHandler.GetAmountOfErrorsByCollectionId(ctx, &pb.Id{Id: collection.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetAmountOfErrorsByCollectionId: %v", err)
+		}
 		if tenantsMap[collection.TenantID] == nil {
 			tenantPb, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: collection.TenantID})
 			if err != nil {
@@ -222,6 +231,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pbHandler
 			}
 			tenantsMap[collection.TenantID] = tenantToGraphQlTenant(tenantPb)
 		}
+		collection.AmountOfErrors = int(amountOfErrors.Size)
 		collection.Tenant = tenantsMap[collection.TenantID]
 		collections = append(collections, collection)
 	}
@@ -1001,6 +1011,11 @@ func GetCollectionById(ctx context.Context, clientClerkHandler pbHandler.ClerkHa
 		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
 	}
 	collection := collectionToGraphQlCollection(collectionPb)
+	amountOfErrors, err := clientClerkHandler.GetAmountOfErrorsByCollectionId(ctx, &pb.Id{Id: collection.ID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetAmountOfErrorsByCollectionId: %v", err)
+	}
+	collection.AmountOfErrors = int(amountOfErrors.Size)
 	tenant, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: collection.TenantID})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)

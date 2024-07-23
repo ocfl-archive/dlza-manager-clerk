@@ -221,6 +221,7 @@ type Collection implements Node {
   totalFileSize: Int!
   totalFileCount: Int!
   totalObjectCount: Int!
+  amountOfErrors: Int!
 }
 type StorageLocation implements Node {
   id: ID!
