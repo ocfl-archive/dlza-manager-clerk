@@ -277,6 +277,11 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pbHandler.C
 	objects := make([]*model.Object, 0)
 	for _, objectPb := range objectsPb.Objects {
 		object := objectToGraphQlObject(objectPb)
+		status, err := clientClerkHandler.GetStatusForObjectId(ctx, &pb.Id{Id: object.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetStatusForObjectId: %v", err)
+		}
+		object.Status = int(status.Size)
 		object.Collection = obj
 		objects = append(objects, object)
 	}
@@ -392,6 +397,11 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 	objects := make([]*model.Object, 0)
 	for _, objectPb := range objectsPb.Objects {
 		object := objectToGraphQlObject(objectPb)
+		status, err := clientClerkHandler.GetStatusForObjectId(ctx, &pb.Id{Id: object.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetStatusForObjectId: %v", err)
+		}
+		object.Status = int(status.Size)
 		if collectionsMap[object.CollectionID] == nil {
 			collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: object.CollectionID})
 			if err != nil {
@@ -1030,6 +1040,11 @@ func GetObjectById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
 	}
 	object := objectToGraphQlObject(objectPb)
+	status, err := clientClerkHandler.GetStatusForObjectId(ctx, &pb.Id{Id: object.ID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStatusForObjectId: %v", err)
+	}
+	object.Status = int(status.Size)
 	collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: object.CollectionID})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)

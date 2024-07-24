@@ -276,6 +276,7 @@ type Object implements Node {
   files(options: FileListOptions): FileList!
   totalFileSize: Int!
   totalFileCount: Int!
+  status: Int!
 }
 type ObjectInstance implements Node {
   id: ID!

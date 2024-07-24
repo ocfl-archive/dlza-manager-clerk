@@ -178,6 +178,7 @@ type Object struct {
 	Files             *FileList           `json:"files"`
 	TotalFileSize     int                 `json:"totalFileSize"`
 	TotalFileCount    int                 `json:"totalFileCount"`
+	Status            int                 `json:"status"`
 }
 
 func (Object) IsNode()            {}

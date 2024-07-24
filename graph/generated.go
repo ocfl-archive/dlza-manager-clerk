@@ -134,6 +134,7 @@ type ComplexityRoot struct {
 		Sets              func(childComplexity int) int
 		Signature         func(childComplexity int) int
 		Size              func(childComplexity int) int
+		Status            func(childComplexity int) int
 		Title             func(childComplexity int) int
 		TotalFileCount    func(childComplexity int) int
 		TotalFileSize     func(childComplexity int) int
@@ -754,6 +755,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Object.Size(childComplexity), true
+
+	case "Object.status":
+		if e.complexity.Object.Status == nil {
+			break
+		}
+
+		return e.complexity.Object.Status(childComplexity), true
 
 	case "Object.title":
 		if e.complexity.Object.Title == nil {
@@ -3525,6 +3533,8 @@ func (ec *executionContext) fieldContext_File_object(_ context.Context, field gr
 				return ec.fieldContext_Object_totalFileSize(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Object_totalFileCount(ctx, field)
+			case "status":
+				return ec.fieldContext_Object_status(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -4969,6 +4979,50 @@ func (ec *executionContext) fieldContext_Object_totalFileCount(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Object_status(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ObjectInstance_id(ctx context.Context, field graphql.CollectedField, obj *model.ObjectInstance) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ObjectInstance_id(ctx, field)
 	if err != nil {
@@ -5426,6 +5480,8 @@ func (ec *executionContext) fieldContext_ObjectInstance_object(_ context.Context
 				return ec.fieldContext_Object_totalFileSize(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Object_totalFileCount(ctx, field)
+			case "status":
+				return ec.fieldContext_Object_status(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -6075,6 +6131,8 @@ func (ec *executionContext) fieldContext_ObjectList_items(_ context.Context, fie
 				return ec.fieldContext_Object_totalFileSize(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Object_totalFileCount(ctx, field)
+			case "status":
+				return ec.fieldContext_Object_status(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -6822,6 +6880,8 @@ func (ec *executionContext) fieldContext_Query_object(ctx context.Context, field
 				return ec.fieldContext_Object_totalFileSize(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Object_totalFileCount(ctx, field)
+			case "status":
+				return ec.fieldContext_Object_status(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
 		},
@@ -13182,6 +13242,11 @@ func (ec *executionContext) _Object(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "totalFileCount":
 			out.Values[i] = ec._Object_totalFileCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "status":
+			out.Values[i] = ec._Object_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
