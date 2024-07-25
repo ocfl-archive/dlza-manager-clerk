@@ -70,6 +70,12 @@ func GetTenants(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerSe
 	tenants := make([]*model.Tenant, 0)
 	for _, tenantPb := range tenantsPb.Tenants {
 		tenant := tenantToGraphQlTenant(tenantPb)
+		amountAndSize, err := clientClerkHandler.GetAmountOfObjectsAndTotalSizeByTenantId(ctx, &pb.Id{Id: tenant.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsAndTotalSizeByTenantId: %v", err)
+		}
+		tenant.TotalAmountOfObjects = int(amountAndSize.Amount)
+		tenant.TotalSize = int(amountAndSize.Size)
 		tenants = append(tenants, tenant)
 	}
 	return &model.TenantList{Items: tenants, TotalItems: int(tenantsPb.TotalItems)}, nil
@@ -114,6 +120,16 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pbHand
 	storageLocations := make([]*model.StorageLocation, 0)
 	for _, storageLocationPb := range storageLocationsPb.StorageLocations {
 		storageLocation := storageLocationToGraphQlStorageLocation(storageLocationPb)
+		amountOfObjects, err := clientClerkHandler.GetAmountOfObjectsForStorageLocationId(ctx, &pb.Id{Id: storageLocation.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsForStorageLocationId: %v", err)
+		}
+		amountOfErrors, err := clientClerkHandler.GetAmountOfErrorsForStorageLocationId(ctx, &pb.Id{Id: storageLocation.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetAmountOfErrorsForStorageLocationId: %v", err)
+		}
+		storageLocation.AmountOfErrors = int(amountOfErrors.Size)
+		storageLocation.AmountOfObjects = int(amountOfObjects.Size)
 		storageLocation.Tenant = obj
 		storageLocations = append(storageLocations, storageLocation)
 	}
@@ -818,6 +834,16 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pbHa
 	storageLocations := make([]*model.StorageLocation, 0)
 	for _, storageLocationPb := range storageLocationsPb.StorageLocations {
 		storageLocation := storageLocationToGraphQlStorageLocation(storageLocationPb)
+		amountOfObjects, err := clientClerkHandler.GetAmountOfObjectsForStorageLocationId(ctx, &pb.Id{Id: storageLocation.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsForStorageLocationId: %v", err)
+		}
+		amountOfErrors, err := clientClerkHandler.GetAmountOfErrorsForStorageLocationId(ctx, &pb.Id{Id: storageLocation.ID})
+		if err != nil {
+			return nil, errors.Wrapf(err, "Could not GetAmountOfErrorsForStorageLocationId: %v", err)
+		}
+		storageLocation.AmountOfErrors = int(amountOfErrors.Size)
+		storageLocation.AmountOfObjects = int(amountOfObjects.Size)
 		if tenantsMap[storageLocation.TenantID] == nil {
 			tenantPb, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: storageLocation.TenantID})
 			if err != nil {
@@ -1012,6 +1038,12 @@ func GetTenantById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
 	}
 	tenant := tenantToGraphQlTenant(tenantPb)
+	amountAndSize, err := clientClerkHandler.GetAmountOfObjectsAndTotalSizeByTenantId(ctx, &pb.Id{Id: tenant.ID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsAndTotalSizeByTenantId: %v", err)
+	}
+	tenant.TotalAmountOfObjects = int(amountAndSize.Amount)
+	tenant.TotalSize = int(amountAndSize.Size)
 	return tenant, err
 }
 
@@ -1105,6 +1137,16 @@ func GetStorageLocationById(ctx context.Context, clientClerkHandler pbHandler.Cl
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
 	}
 	storageLocation := storageLocationToGraphQlStorageLocation(storageLocationPb)
+	amountOfObjects, err := clientClerkHandler.GetAmountOfObjectsForStorageLocationId(ctx, &pb.Id{Id: storageLocation.ID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsForStorageLocationId: %v", err)
+	}
+	amountOfErrors, err := clientClerkHandler.GetAmountOfErrorsForStorageLocationId(ctx, &pb.Id{Id: storageLocation.ID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetAmountOfErrorsForStorageLocationId: %v", err)
+	}
+	storageLocation.AmountOfErrors = int(amountOfErrors.Size)
+	storageLocation.AmountOfObjects = int(amountOfObjects.Size)
 	tenantPb, err := clientClerkHandler.FindTenantById(ctx, &pb.Id{Id: storageLocation.TenantID})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)

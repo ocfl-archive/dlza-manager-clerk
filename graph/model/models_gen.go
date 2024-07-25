@@ -351,6 +351,8 @@ type StorageLocation struct {
 	TotalFilesSize      int                   `json:"totalFilesSize"`
 	TotalExistingVolume int                   `json:"totalExistingVolume"`
 	StoragePartitions   *StoragePartitionList `json:"storagePartitions"`
+	AmountOfErrors      int                   `json:"amountOfErrors"`
+	AmountOfObjects     int                   `json:"amountOfObjects"`
 }
 
 func (StorageLocation) IsNode()            {}
@@ -429,13 +431,15 @@ type StoragePartitionListOptions struct {
 }
 
 type Tenant struct {
-	ID               string               `json:"id"`
-	Name             string               `json:"name"`
-	Alias            string               `json:"alias"`
-	Person           string               `json:"person"`
-	Email            string               `json:"email"`
-	Collections      *CollectionList      `json:"collections"`
-	StorageLocations *StorageLocationList `json:"storageLocations"`
+	ID                   string               `json:"id"`
+	Name                 string               `json:"name"`
+	Alias                string               `json:"alias"`
+	Person               string               `json:"person"`
+	Email                string               `json:"email"`
+	TotalSize            int                  `json:"totalSize"`
+	TotalAmountOfObjects int                  `json:"totalAmountOfObjects"`
+	Collections          *CollectionList      `json:"collections"`
+	StorageLocations     *StorageLocationList `json:"storageLocations"`
 }
 
 func (Tenant) IsNode()            {}

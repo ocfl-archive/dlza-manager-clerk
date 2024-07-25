@@ -202,6 +202,8 @@ type Tenant implements Node {
   alias: String!
   person: String!
   email: String!
+  totalSize: Int!
+  totalAmountOfObjects: Int!
   collections(options: CollectionListOptions): CollectionList!
   storageLocations(options: StorageLocationListOptions): StorageLocationList!
 }
@@ -240,6 +242,8 @@ type StorageLocation implements Node {
   totalFilesSize: Int!
   totalExistingVolume: Int!
   storagePartitions(options: StoragePartitionListOptions): StoragePartitionList!
+  amountOfErrors: Int!
+  amountOfObjects: Int!
 }
 type StoragePartition implements Node {
   id: ID!

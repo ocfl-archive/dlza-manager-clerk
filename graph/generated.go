@@ -213,6 +213,8 @@ type ComplexityRoot struct {
 
 	StorageLocation struct {
 		Alias               func(childComplexity int) int
+		AmountOfErrors      func(childComplexity int) int
+		AmountOfObjects     func(childComplexity int) int
 		Connection          func(childComplexity int) int
 		FillFirst           func(childComplexity int) int
 		ID                  func(childComplexity int) int
@@ -254,13 +256,15 @@ type ComplexityRoot struct {
 	}
 
 	Tenant struct {
-		Alias            func(childComplexity int) int
-		Collections      func(childComplexity int, options *model.CollectionListOptions) int
-		Email            func(childComplexity int) int
-		ID               func(childComplexity int) int
-		Name             func(childComplexity int) int
-		Person           func(childComplexity int) int
-		StorageLocations func(childComplexity int, options *model.StorageLocationListOptions) int
+		Alias                func(childComplexity int) int
+		Collections          func(childComplexity int, options *model.CollectionListOptions) int
+		Email                func(childComplexity int) int
+		ID                   func(childComplexity int) int
+		Name                 func(childComplexity int) int
+		Person               func(childComplexity int) int
+		StorageLocations     func(childComplexity int, options *model.StorageLocationListOptions) int
+		TotalAmountOfObjects func(childComplexity int) int
+		TotalSize            func(childComplexity int) int
 	}
 
 	TenantList struct {
@@ -1215,6 +1219,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.StorageLocation.Alias(childComplexity), true
 
+	case "StorageLocation.amountOfErrors":
+		if e.complexity.StorageLocation.AmountOfErrors == nil {
+			break
+		}
+
+		return e.complexity.StorageLocation.AmountOfErrors(childComplexity), true
+
+	case "StorageLocation.amountOfObjects":
+		if e.complexity.StorageLocation.AmountOfObjects == nil {
+			break
+		}
+
+		return e.complexity.StorageLocation.AmountOfObjects(childComplexity), true
+
 	case "StorageLocation.connection":
 		if e.complexity.StorageLocation.Connection == nil {
 			break
@@ -1486,6 +1504,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tenant.StorageLocations(childComplexity, args["options"].(*model.StorageLocationListOptions)), true
+
+	case "Tenant.totalAmountOfObjects":
+		if e.complexity.Tenant.TotalAmountOfObjects == nil {
+			break
+		}
+
+		return e.complexity.Tenant.TotalAmountOfObjects(childComplexity), true
+
+	case "Tenant.totalSize":
+		if e.complexity.Tenant.TotalSize == nil {
+			break
+		}
+
+		return e.complexity.Tenant.TotalSize(childComplexity), true
 
 	case "TenantList.items":
 		if e.complexity.TenantList.Items == nil {
@@ -2581,6 +2613,10 @@ func (ec *executionContext) fieldContext_Collection_tenant(_ context.Context, fi
 				return ec.fieldContext_Tenant_person(ctx, field)
 			case "email":
 				return ec.fieldContext_Tenant_email(ctx, field)
+			case "totalSize":
+				return ec.fieldContext_Tenant_totalSize(ctx, field)
+			case "totalAmountOfObjects":
+				return ec.fieldContext_Tenant_totalAmountOfObjects(ctx, field)
 			case "collections":
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
@@ -6572,6 +6608,10 @@ func (ec *executionContext) fieldContext_Query_tenant(ctx context.Context, field
 				return ec.fieldContext_Tenant_person(ctx, field)
 			case "email":
 				return ec.fieldContext_Tenant_email(ctx, field)
+			case "totalSize":
+				return ec.fieldContext_Tenant_totalSize(ctx, field)
+			case "totalAmountOfObjects":
+				return ec.fieldContext_Tenant_totalAmountOfObjects(ctx, field)
 			case "collections":
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
@@ -7428,6 +7468,10 @@ func (ec *executionContext) fieldContext_Query_storageLocation(ctx context.Conte
 				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
 			case "storagePartitions":
 				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_StorageLocation_amountOfErrors(ctx, field)
+			case "amountOfObjects":
+				return ec.fieldContext_StorageLocation_amountOfObjects(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type StorageLocation", field.Name)
 		},
@@ -8365,6 +8409,10 @@ func (ec *executionContext) fieldContext_StorageLocation_tenant(_ context.Contex
 				return ec.fieldContext_Tenant_person(ctx, field)
 			case "email":
 				return ec.fieldContext_Tenant_email(ctx, field)
+			case "totalSize":
+				return ec.fieldContext_Tenant_totalSize(ctx, field)
+			case "totalAmountOfObjects":
+				return ec.fieldContext_Tenant_totalAmountOfObjects(ctx, field)
 			case "collections":
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
@@ -8569,6 +8617,94 @@ func (ec *executionContext) fieldContext_StorageLocation_storagePartitions(ctx c
 	return fc, nil
 }
 
+func (ec *executionContext) _StorageLocation_amountOfErrors(ctx context.Context, field graphql.CollectedField, obj *model.StorageLocation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_StorageLocation_amountOfErrors(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AmountOfErrors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_StorageLocation_amountOfErrors(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "StorageLocation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _StorageLocation_amountOfObjects(ctx context.Context, field graphql.CollectedField, obj *model.StorageLocation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_StorageLocation_amountOfObjects(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AmountOfObjects, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_StorageLocation_amountOfObjects(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "StorageLocation",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _StorageLocationList_items(ctx context.Context, field graphql.CollectedField, obj *model.StorageLocationList) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_StorageLocationList_items(ctx, field)
 	if err != nil {
@@ -8640,6 +8776,10 @@ func (ec *executionContext) fieldContext_StorageLocationList_items(_ context.Con
 				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
 			case "storagePartitions":
 				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_StorageLocation_amountOfErrors(ctx, field)
+			case "amountOfObjects":
+				return ec.fieldContext_StorageLocation_amountOfObjects(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type StorageLocation", field.Name)
 		},
@@ -9114,6 +9254,10 @@ func (ec *executionContext) fieldContext_StoragePartition_storageLocation(_ cont
 				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
 			case "storagePartitions":
 				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_StorageLocation_amountOfErrors(ctx, field)
+			case "amountOfObjects":
+				return ec.fieldContext_StorageLocation_amountOfObjects(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type StorageLocation", field.Name)
 		},
@@ -9512,6 +9656,94 @@ func (ec *executionContext) fieldContext_Tenant_email(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Tenant_totalSize(ctx context.Context, field graphql.CollectedField, obj *model.Tenant) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tenant_totalSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tenant_totalSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tenant",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tenant_totalAmountOfObjects(ctx context.Context, field graphql.CollectedField, obj *model.Tenant) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tenant_totalAmountOfObjects(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalAmountOfObjects, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tenant_totalAmountOfObjects(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tenant",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Tenant_collections(ctx context.Context, field graphql.CollectedField, obj *model.Tenant) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Tenant_collections(ctx, field)
 	if err != nil {
@@ -9683,6 +9915,10 @@ func (ec *executionContext) fieldContext_TenantList_items(_ context.Context, fie
 				return ec.fieldContext_Tenant_person(ctx, field)
 			case "email":
 				return ec.fieldContext_Tenant_email(ctx, field)
+			case "totalSize":
+				return ec.fieldContext_Tenant_totalSize(ctx, field)
+			case "totalAmountOfObjects":
+				return ec.fieldContext_Tenant_totalAmountOfObjects(ctx, field)
 			case "collections":
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
@@ -9919,6 +10155,10 @@ func (ec *executionContext) fieldContext_User_tenants(_ context.Context, field g
 				return ec.fieldContext_Tenant_person(ctx, field)
 			case "email":
 				return ec.fieldContext_Tenant_email(ctx, field)
+			case "totalSize":
+				return ec.fieldContext_Tenant_totalSize(ctx, field)
+			case "totalAmountOfObjects":
+				return ec.fieldContext_Tenant_totalAmountOfObjects(ctx, field)
 			case "collections":
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
@@ -14257,6 +14497,16 @@ func (ec *executionContext) _StorageLocation(ctx context.Context, sel ast.Select
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "amountOfErrors":
+			out.Values[i] = ec._StorageLocation_amountOfErrors(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "amountOfObjects":
+			out.Values[i] = ec._StorageLocation_amountOfObjects(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14516,6 +14766,16 @@ func (ec *executionContext) _Tenant(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "email":
 			out.Values[i] = ec._Tenant_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "totalSize":
+			out.Values[i] = ec._Tenant_totalSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "totalAmountOfObjects":
+			out.Values[i] = ec._Tenant_totalAmountOfObjects(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
