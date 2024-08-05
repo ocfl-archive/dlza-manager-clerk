@@ -779,7 +779,7 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 	return &model.ObjectInstanceCheckList{Items: objectInstanceChecks, TotalItems: int(objectInstanceChecksPb.TotalItems)}, nil
 }
 
-func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.StorageLocationListOptions, allowedTenants []string) (*model.StorageLocationList, error) {
+func GetStorageLocationsForTenantOrCollectionId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.StorageLocationListOptions, allowedTenants []string) (*model.StorageLocationList, error) {
 	keyCloakGroup, tenantList, err := middleware.TenantGroups(ctx)
 	if err != nil {
 		return nil, err
@@ -826,9 +826,16 @@ func GetStorageLocationsForTenantId(ctx context.Context, clientClerkHandler pbHa
 			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
-	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
+	var storageLocationsPb *pb.StorageLocations
+	if *options.TenantID != "" {
+		storageLocationsPb, err = clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
+	} else {
+		if *options.CollectionID != "" {
+			storageLocationsPb, err = clientClerkHandler.GetStorageLocationsByCollectionIdPaginated(ctx, &optionsPb)
+		}
+	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantIdPaginated: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetStorageLocationsForTenantOrCollectionId: %v", err)
 	}
 	tenantsMap := make(map[string]*model.Tenant)
 	storageLocations := make([]*model.StorageLocation, 0)
