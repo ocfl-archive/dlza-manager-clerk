@@ -121,10 +121,10 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
-github.com/ocfl-archive/dlza-manager v0.0.4 h1:EuOsExxX/0mInLCe7kZpp8OH0IBZ+nAWMoW0IB1dVN0=
-github.com/ocfl-archive/dlza-manager v0.0.4/go.mod h1:AiZNezoTzykvrolKinq4LxWAXwfeS8LbMncwHanKCfo=
-github.com/ocfl-archive/dlza-manager-handler v0.0.4 h1:5Oub1jiCQBwzQFNaPME6GlB1A/UjOYqI1dWnAcSVG7Y=
-github.com/ocfl-archive/dlza-manager-handler v0.0.4/go.mod h1:udLmTncBlbDxwf0xn68I1TxORcE1MLNjF9V7/mwxxzo=
+github.com/ocfl-archive/dlza-manager v0.0.5 h1:fMtdQNfWRy/aDIeBkKk3Nd7fNqRuyVUmx/SCUVPjrxI=
+github.com/ocfl-archive/dlza-manager v0.0.5/go.mod h1:AiZNezoTzykvrolKinq4LxWAXwfeS8LbMncwHanKCfo=
+github.com/ocfl-archive/dlza-manager-handler v0.0.5 h1:gDqlOS0gYw0VqsHo45bOSWA5kW2AKxWC+4vAHsg/jNg=
+github.com/ocfl-archive/dlza-manager-handler v0.0.5/go.mod h1:udLmTncBlbDxwf0xn68I1TxORcE1MLNjF9V7/mwxxzo=
 github.com/ocfl-archive/dlza-manager-storage-handler v0.0.4 h1:5Dx1rrD7r/p7ICSejJhLEsb/FuWketj/E89EzsIM0qU=
 github.com/ocfl-archive/dlza-manager-storage-handler v0.0.4/go.mod h1:94TA0BYMjYyfMKIJOHpVx8EF+4VAUu/yBT8tNiIqlwM=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=
