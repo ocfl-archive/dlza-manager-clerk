@@ -827,10 +827,10 @@ func GetStorageLocationsForTenantOrCollectionId(ctx context.Context, clientClerk
 		}
 	}
 	var storageLocationsPb *pb.StorageLocations
-	if *options.TenantID != "" {
+	if optionsPb.Id != "" {
 		storageLocationsPb, err = clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
 	} else {
-		if *options.CollectionID != "" {
+		if optionsPb.SecondId != "" {
 			storageLocationsPb, err = clientClerkHandler.GetStorageLocationsByCollectionIdPaginated(ctx, &optionsPb)
 		}
 	}
