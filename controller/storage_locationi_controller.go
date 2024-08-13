@@ -6,6 +6,7 @@ import (
 	_ "github.com/ocfl-archive/dlza-manager-clerk/models"
 	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
 	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
+	"strconv"
 
 	"net/http"
 	"time"
@@ -18,6 +19,7 @@ type StorageLocationController struct {
 }
 
 func (s *StorageLocationController) InitRoutes(storageLocationRouter *gin.RouterGroup) {
+	storageLocationRouter.GET("/collection/:alias/:size", s.GetStorageLocationsStatusForCollectionAlias)
 	storageLocationRouter.GET("/:id", s.GetStorageLocationsByTenantId)
 	storageLocationRouter.POST("", s.SaveStorageLocation)
 	storageLocationRouter.DELETE("/:id", s.DeleteStorageLocationById)
@@ -106,4 +108,30 @@ func (s *StorageLocationController) GetStorageLocationsByTenantId(ctx *gin.Conte
 	}
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(http.StatusOK, storageLocations.StorageLocations)
+}
+
+// GetStorageLocationsStatusForCollectionAlias godoc
+// @Summary		Get storageLocations status for collection alias
+// @Description	It will give a message if there is no possibility to archive data into some storage partition, otherwise it would deliver an empty string
+// @Security 	ApiKeyAuth
+// @ID 			get-storage-locations-status-for-collection-alias
+// @Param		alias string true "collection alias"
+// @Produce		json
+// @Success		200
+// @Failure 	400
+// @Router		/storage-location/collection/{alias}/{size} [get]
+func (s *StorageLocationController) GetStorageLocationsStatusForCollectionAlias(ctx *gin.Context) {
+	c := context.Background()
+	cont, cancel := context.WithTimeout(c, 10000*time.Second)
+	defer cancel()
+	alias := ctx.Param("alias")
+	size := ctx.Param("size")
+	sizeInt64, _ := strconv.ParseInt(size, 10, 64)
+	status, err := s.ClientClerkHandler.GetStorageLocationsStatusForCollectionAlias(cont, &pb.SizeAndId{Id: alias, Size: sizeInt64})
+	if err != nil {
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, status)
 }
