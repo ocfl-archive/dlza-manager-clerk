@@ -225,6 +225,18 @@ type Collection implements Node {
   totalObjectCount: Int!
   amountOfErrors: Int!
 }
+
+input CollectionInput {
+  id: ID!
+  alias: String!
+  description: String!
+  owner: String!
+  ownerMail: String!
+  name: String!
+  quality: Int!
+  tenantId: ID!
+}
+
 type StorageLocation implements Node {
   id: ID!
   alias: String!
@@ -245,6 +257,22 @@ type StorageLocation implements Node {
   amountOfErrors: Int!
   amountOfObjects: Int!
 }
+
+input StorageLocationInput {
+  id: ID!
+  alias: String!
+  type: String!
+  vault: String!
+  connection: String!
+  quality: Int!
+  price: Int!
+  securityCompliency: String!
+  fillFirst: Boolean!
+  ocflType: String!
+  tenantId: ID!
+  numberOfThreads: Int!
+}
+
 type StoragePartition implements Node {
   id: ID!
   alias: String!
@@ -257,6 +285,18 @@ type StoragePartition implements Node {
   storageLocation: StorageLocation!
   objectInstances(options: ObjectInstanceListOptions):ObjectInstanceList!
 }
+
+input StoragePartitionInput {
+  id: ID!
+  alias: String!
+  name: String!
+  maxSize: Int!
+  maxObjects: Int!
+  currentSize: Int!
+  currentObjects: Int!
+  storageLocationId: ID!
+}
+
 type Object implements Node {
   id: ID!
   signature: String!
@@ -409,5 +449,17 @@ type Query {
 
 type Mutation {
   login(code: String!): User!
-  logout: Boolean! 
+  logout: Boolean!
+
+  createCollection(input: CollectionInput): Collection!
+  updateCollection(input: CollectionInput): Collection!
+  deleteCollection(id: ID!): Collection!
+
+  createStorageLocation(input: StorageLocationInput): StorageLocation!
+  updateStorageLocation(input: StorageLocationInput): StorageLocation!
+  deleteStorageLocation(id: ID!): StorageLocation!
+
+  createStoragePartition(input: StoragePartitionInput): StoragePartition!
+  updateStoragePartition(input: StoragePartitionInput): StoragePartition!
+  deleteStoragePartition(id: ID!): StoragePartition!
 }

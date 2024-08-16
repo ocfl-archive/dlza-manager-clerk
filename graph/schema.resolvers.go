@@ -70,6 +70,87 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
+// CreateCollection is the resolver for the createCollection field.
+func (r *mutationResolver) CreateCollection(ctx context.Context, input *model.CollectionInput) (*model.Collection, error) {
+	collection, err := service.CreateCollection(ctx, r.ClientClerkHandler, input)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not CreateCollection: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return collection, nil
+}
+
+// UpdateCollection is the resolver for the updateCollection field.
+func (r *mutationResolver) UpdateCollection(ctx context.Context, input *model.CollectionInput) (*model.Collection, error) {
+	collection, err := service.UpdateCollection(ctx, r.ClientClerkHandler, input)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not UpdateCollection: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return collection, nil
+}
+
+// DeleteCollection is the resolver for the deleteCollection field.
+func (r *mutationResolver) DeleteCollection(ctx context.Context, id string) (*model.Collection, error) {
+	collection, err := service.DeleteCollection(ctx, r.ClientClerkHandler, id, r.AllowedTenants)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not DeleteCollection: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return collection, nil
+}
+
+// CreateStorageLocation is the resolver for the createStorageLocation field.
+func (r *mutationResolver) CreateStorageLocation(ctx context.Context, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	storageLocation, err := service.CreateStorageLocation(ctx, r.ClientClerkHandler, input)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not CreateStorageLocation: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return storageLocation, nil
+}
+
+// UpdateStorageLocation is the resolver for the updateStorageLocation field.
+func (r *mutationResolver) UpdateStorageLocation(ctx context.Context, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	storageLocation, err := service.UpdateStorageLocation(ctx, r.ClientClerkHandler, input)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not UpdateStorageLocation: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return storageLocation, nil
+}
+
+// DeleteStorageLocation is the resolver for the deleteStorageLocation field.
+func (r *mutationResolver) DeleteStorageLocation(ctx context.Context, id string) (*model.StorageLocation, error) {
+	storageLocation, err := service.DeleteStorageLocation(ctx, r.ClientClerkHandler, id)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not DeleteStorageLocation: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return storageLocation, nil
+}
+
+// CreateStoragePartition is the resolver for the createStoragePartition field.
+func (r *mutationResolver) CreateStoragePartition(ctx context.Context, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	storagePartition, err := service.CreateStoragePartition(ctx, r.ClientClerkHandler, input)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not CreateStoragePartition: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return storagePartition, nil
+}
+
+// UpdateStoragePartition is the resolver for the updateStoragePartition field.
+func (r *mutationResolver) UpdateStoragePartition(ctx context.Context, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	storagePartition, err := service.UpdateStoragePartition(ctx, r.ClientClerkHandler, input)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not UpdateStoragePartition: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return storagePartition, nil
+}
+
+// DeleteStoragePartition is the resolver for the deleteStoragePartition field.
+func (r *mutationResolver) DeleteStoragePartition(ctx context.Context, id string) (*model.StoragePartition, error) {
+	storagePartition, err := service.DeleteStoragePartition(ctx, r.ClientClerkHandler, id)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not DeleteStoragePartition: "+err.Error()), ctx, http.StatusInternalServerError)
+	}
+	return storagePartition, nil
+}
+
 // ObjectInstances is the resolver for the objectInstances field.
 func (r *objectResolver) ObjectInstances(ctx context.Context, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error) {
 	objectInstances, err := service.GetObjectInstancesForObject(ctx, r.ClientClerkHandler, obj, options)

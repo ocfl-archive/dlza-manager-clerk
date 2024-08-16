@@ -111,8 +111,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		Login  func(childComplexity int, code string) int
-		Logout func(childComplexity int) int
+		CreateCollection       func(childComplexity int, input *model.CollectionInput) int
+		CreateStorageLocation  func(childComplexity int, input *model.StorageLocationInput) int
+		CreateStoragePartition func(childComplexity int, input *model.StoragePartitionInput) int
+		DeleteCollection       func(childComplexity int, id string) int
+		DeleteStorageLocation  func(childComplexity int, id string) int
+		DeleteStoragePartition func(childComplexity int, id string) int
+		Login                  func(childComplexity int, code string) int
+		Logout                 func(childComplexity int) int
+		UpdateCollection       func(childComplexity int, input *model.CollectionInput) int
+		UpdateStorageLocation  func(childComplexity int, input *model.StorageLocationInput) int
+		UpdateStoragePartition func(childComplexity int, input *model.StoragePartitionInput) int
 	}
 
 	Object struct {
@@ -287,6 +296,15 @@ type CollectionResolver interface {
 type MutationResolver interface {
 	Login(ctx context.Context, code string) (*model.User, error)
 	Logout(ctx context.Context) (bool, error)
+	CreateCollection(ctx context.Context, input *model.CollectionInput) (*model.Collection, error)
+	UpdateCollection(ctx context.Context, input *model.CollectionInput) (*model.Collection, error)
+	DeleteCollection(ctx context.Context, id string) (*model.Collection, error)
+	CreateStorageLocation(ctx context.Context, input *model.StorageLocationInput) (*model.StorageLocation, error)
+	UpdateStorageLocation(ctx context.Context, input *model.StorageLocationInput) (*model.StorageLocation, error)
+	DeleteStorageLocation(ctx context.Context, id string) (*model.StorageLocation, error)
+	CreateStoragePartition(ctx context.Context, input *model.StoragePartitionInput) (*model.StoragePartition, error)
+	UpdateStoragePartition(ctx context.Context, input *model.StoragePartitionInput) (*model.StoragePartition, error)
+	DeleteStoragePartition(ctx context.Context, id string) (*model.StoragePartition, error)
 }
 type ObjectResolver interface {
 	ObjectInstances(ctx context.Context, obj *model.Object, options *model.ObjectInstanceListOptions) (*model.ObjectInstanceList, error)
@@ -605,6 +623,78 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MimeTypeList.TotalItems(childComplexity), true
 
+	case "Mutation.createCollection":
+		if e.complexity.Mutation.CreateCollection == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createCollection_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateCollection(childComplexity, args["input"].(*model.CollectionInput)), true
+
+	case "Mutation.createStorageLocation":
+		if e.complexity.Mutation.CreateStorageLocation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createStorageLocation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateStorageLocation(childComplexity, args["input"].(*model.StorageLocationInput)), true
+
+	case "Mutation.createStoragePartition":
+		if e.complexity.Mutation.CreateStoragePartition == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createStoragePartition_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateStoragePartition(childComplexity, args["input"].(*model.StoragePartitionInput)), true
+
+	case "Mutation.deleteCollection":
+		if e.complexity.Mutation.DeleteCollection == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteCollection_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteCollection(childComplexity, args["id"].(string)), true
+
+	case "Mutation.deleteStorageLocation":
+		if e.complexity.Mutation.DeleteStorageLocation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteStorageLocation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteStorageLocation(childComplexity, args["id"].(string)), true
+
+	case "Mutation.deleteStoragePartition":
+		if e.complexity.Mutation.DeleteStoragePartition == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteStoragePartition_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteStoragePartition(childComplexity, args["id"].(string)), true
+
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
 			break
@@ -623,6 +713,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Logout(childComplexity), true
+
+	case "Mutation.updateCollection":
+		if e.complexity.Mutation.UpdateCollection == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCollection_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCollection(childComplexity, args["input"].(*model.CollectionInput)), true
+
+	case "Mutation.updateStorageLocation":
+		if e.complexity.Mutation.UpdateStorageLocation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateStorageLocation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateStorageLocation(childComplexity, args["input"].(*model.StorageLocationInput)), true
+
+	case "Mutation.updateStoragePartition":
+		if e.complexity.Mutation.UpdateStoragePartition == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateStoragePartition_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateStoragePartition(childComplexity, args["input"].(*model.StoragePartitionInput)), true
 
 	case "Object.address":
 		if e.complexity.Object.Address == nil {
@@ -1569,6 +1695,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCollectionInput,
 		ec.unmarshalInputCollectionListOptions,
 		ec.unmarshalInputFileListOptions,
 		ec.unmarshalInputMimeTypeListOptions,
@@ -1576,7 +1703,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputObjectInstanceListOptions,
 		ec.unmarshalInputObjectListOptions,
 		ec.unmarshalInputPronomIdListOptions,
+		ec.unmarshalInputStorageLocationInput,
 		ec.unmarshalInputStorageLocationListOptions,
+		ec.unmarshalInputStoragePartitionInput,
 		ec.unmarshalInputStoragePartitionListOptions,
 		ec.unmarshalInputTenantListOptions,
 	)
@@ -1725,6 +1854,96 @@ func (ec *executionContext) field_Collection_objects_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createCollection_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CollectionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOCollectionInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createStorageLocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.StorageLocationInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOStorageLocationInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createStoragePartition_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.StoragePartitionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOStoragePartitionInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteCollection_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteStorageLocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteStoragePartition_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1737,6 +1956,51 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 		}
 	}
 	args["code"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateCollection_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CollectionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOCollectionInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateStorageLocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.StorageLocationInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOStorageLocationInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateStoragePartition_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.StoragePartitionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOStoragePartitionInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -3977,6 +4241,777 @@ func (ec *executionContext) fieldContext_Mutation_logout(_ context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createCollection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createCollection(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateCollection(rctx, fc.Args["input"].(*model.CollectionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Collection)
+	fc.Result = res
+	return ec.marshalNCollection2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Collection_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_Collection_alias(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "owner":
+				return ec.fieldContext_Collection_owner(ctx, field)
+			case "ownerMail":
+				return ec.fieldContext_Collection_ownerMail(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "quality":
+				return ec.fieldContext_Collection_quality(ctx, field)
+			case "tenantId":
+				return ec.fieldContext_Collection_tenantId(ctx, field)
+			case "tenant":
+				return ec.fieldContext_Collection_tenant(ctx, field)
+			case "objects":
+				return ec.fieldContext_Collection_objects(ctx, field)
+			case "files":
+				return ec.fieldContext_Collection_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Collection_totalFileCount(ctx, field)
+			case "totalObjectCount":
+				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_Collection_amountOfErrors(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createCollection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateCollection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateCollection(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateCollection(rctx, fc.Args["input"].(*model.CollectionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Collection)
+	fc.Result = res
+	return ec.marshalNCollection2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCollection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Collection_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_Collection_alias(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "owner":
+				return ec.fieldContext_Collection_owner(ctx, field)
+			case "ownerMail":
+				return ec.fieldContext_Collection_ownerMail(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "quality":
+				return ec.fieldContext_Collection_quality(ctx, field)
+			case "tenantId":
+				return ec.fieldContext_Collection_tenantId(ctx, field)
+			case "tenant":
+				return ec.fieldContext_Collection_tenant(ctx, field)
+			case "objects":
+				return ec.fieldContext_Collection_objects(ctx, field)
+			case "files":
+				return ec.fieldContext_Collection_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Collection_totalFileCount(ctx, field)
+			case "totalObjectCount":
+				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_Collection_amountOfErrors(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCollection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteCollection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteCollection(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteCollection(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Collection)
+	fc.Result = res
+	return ec.marshalNCollection2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteCollection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Collection_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_Collection_alias(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "owner":
+				return ec.fieldContext_Collection_owner(ctx, field)
+			case "ownerMail":
+				return ec.fieldContext_Collection_ownerMail(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "quality":
+				return ec.fieldContext_Collection_quality(ctx, field)
+			case "tenantId":
+				return ec.fieldContext_Collection_tenantId(ctx, field)
+			case "tenant":
+				return ec.fieldContext_Collection_tenant(ctx, field)
+			case "objects":
+				return ec.fieldContext_Collection_objects(ctx, field)
+			case "files":
+				return ec.fieldContext_Collection_files(ctx, field)
+			case "totalFileSize":
+				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalFileCount":
+				return ec.fieldContext_Collection_totalFileCount(ctx, field)
+			case "totalObjectCount":
+				return ec.fieldContext_Collection_totalObjectCount(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_Collection_amountOfErrors(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteCollection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createStorageLocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createStorageLocation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateStorageLocation(rctx, fc.Args["input"].(*model.StorageLocationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.StorageLocation)
+	fc.Result = res
+	return ec.marshalNStorageLocation2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createStorageLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_StorageLocation_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_StorageLocation_alias(ctx, field)
+			case "type":
+				return ec.fieldContext_StorageLocation_type(ctx, field)
+			case "vault":
+				return ec.fieldContext_StorageLocation_vault(ctx, field)
+			case "connection":
+				return ec.fieldContext_StorageLocation_connection(ctx, field)
+			case "quality":
+				return ec.fieldContext_StorageLocation_quality(ctx, field)
+			case "price":
+				return ec.fieldContext_StorageLocation_price(ctx, field)
+			case "securityCompliency":
+				return ec.fieldContext_StorageLocation_securityCompliency(ctx, field)
+			case "fillFirst":
+				return ec.fieldContext_StorageLocation_fillFirst(ctx, field)
+			case "ocflType":
+				return ec.fieldContext_StorageLocation_ocflType(ctx, field)
+			case "tenantId":
+				return ec.fieldContext_StorageLocation_tenantId(ctx, field)
+			case "tenant":
+				return ec.fieldContext_StorageLocation_tenant(ctx, field)
+			case "numberOfThreads":
+				return ec.fieldContext_StorageLocation_numberOfThreads(ctx, field)
+			case "totalFilesSize":
+				return ec.fieldContext_StorageLocation_totalFilesSize(ctx, field)
+			case "totalExistingVolume":
+				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
+			case "storagePartitions":
+				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_StorageLocation_amountOfErrors(ctx, field)
+			case "amountOfObjects":
+				return ec.fieldContext_StorageLocation_amountOfObjects(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type StorageLocation", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createStorageLocation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateStorageLocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateStorageLocation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateStorageLocation(rctx, fc.Args["input"].(*model.StorageLocationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.StorageLocation)
+	fc.Result = res
+	return ec.marshalNStorageLocation2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateStorageLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_StorageLocation_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_StorageLocation_alias(ctx, field)
+			case "type":
+				return ec.fieldContext_StorageLocation_type(ctx, field)
+			case "vault":
+				return ec.fieldContext_StorageLocation_vault(ctx, field)
+			case "connection":
+				return ec.fieldContext_StorageLocation_connection(ctx, field)
+			case "quality":
+				return ec.fieldContext_StorageLocation_quality(ctx, field)
+			case "price":
+				return ec.fieldContext_StorageLocation_price(ctx, field)
+			case "securityCompliency":
+				return ec.fieldContext_StorageLocation_securityCompliency(ctx, field)
+			case "fillFirst":
+				return ec.fieldContext_StorageLocation_fillFirst(ctx, field)
+			case "ocflType":
+				return ec.fieldContext_StorageLocation_ocflType(ctx, field)
+			case "tenantId":
+				return ec.fieldContext_StorageLocation_tenantId(ctx, field)
+			case "tenant":
+				return ec.fieldContext_StorageLocation_tenant(ctx, field)
+			case "numberOfThreads":
+				return ec.fieldContext_StorageLocation_numberOfThreads(ctx, field)
+			case "totalFilesSize":
+				return ec.fieldContext_StorageLocation_totalFilesSize(ctx, field)
+			case "totalExistingVolume":
+				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
+			case "storagePartitions":
+				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_StorageLocation_amountOfErrors(ctx, field)
+			case "amountOfObjects":
+				return ec.fieldContext_StorageLocation_amountOfObjects(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type StorageLocation", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateStorageLocation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteStorageLocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteStorageLocation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteStorageLocation(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.StorageLocation)
+	fc.Result = res
+	return ec.marshalNStorageLocation2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteStorageLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_StorageLocation_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_StorageLocation_alias(ctx, field)
+			case "type":
+				return ec.fieldContext_StorageLocation_type(ctx, field)
+			case "vault":
+				return ec.fieldContext_StorageLocation_vault(ctx, field)
+			case "connection":
+				return ec.fieldContext_StorageLocation_connection(ctx, field)
+			case "quality":
+				return ec.fieldContext_StorageLocation_quality(ctx, field)
+			case "price":
+				return ec.fieldContext_StorageLocation_price(ctx, field)
+			case "securityCompliency":
+				return ec.fieldContext_StorageLocation_securityCompliency(ctx, field)
+			case "fillFirst":
+				return ec.fieldContext_StorageLocation_fillFirst(ctx, field)
+			case "ocflType":
+				return ec.fieldContext_StorageLocation_ocflType(ctx, field)
+			case "tenantId":
+				return ec.fieldContext_StorageLocation_tenantId(ctx, field)
+			case "tenant":
+				return ec.fieldContext_StorageLocation_tenant(ctx, field)
+			case "numberOfThreads":
+				return ec.fieldContext_StorageLocation_numberOfThreads(ctx, field)
+			case "totalFilesSize":
+				return ec.fieldContext_StorageLocation_totalFilesSize(ctx, field)
+			case "totalExistingVolume":
+				return ec.fieldContext_StorageLocation_totalExistingVolume(ctx, field)
+			case "storagePartitions":
+				return ec.fieldContext_StorageLocation_storagePartitions(ctx, field)
+			case "amountOfErrors":
+				return ec.fieldContext_StorageLocation_amountOfErrors(ctx, field)
+			case "amountOfObjects":
+				return ec.fieldContext_StorageLocation_amountOfObjects(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type StorageLocation", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteStorageLocation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createStoragePartition(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createStoragePartition(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateStoragePartition(rctx, fc.Args["input"].(*model.StoragePartitionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.StoragePartition)
+	fc.Result = res
+	return ec.marshalNStoragePartition2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createStoragePartition(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_StoragePartition_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_StoragePartition_alias(ctx, field)
+			case "name":
+				return ec.fieldContext_StoragePartition_name(ctx, field)
+			case "maxSize":
+				return ec.fieldContext_StoragePartition_maxSize(ctx, field)
+			case "maxObjects":
+				return ec.fieldContext_StoragePartition_maxObjects(ctx, field)
+			case "currentSize":
+				return ec.fieldContext_StoragePartition_currentSize(ctx, field)
+			case "currentObjects":
+				return ec.fieldContext_StoragePartition_currentObjects(ctx, field)
+			case "storageLocationId":
+				return ec.fieldContext_StoragePartition_storageLocationId(ctx, field)
+			case "storageLocation":
+				return ec.fieldContext_StoragePartition_storageLocation(ctx, field)
+			case "objectInstances":
+				return ec.fieldContext_StoragePartition_objectInstances(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type StoragePartition", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createStoragePartition_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateStoragePartition(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateStoragePartition(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateStoragePartition(rctx, fc.Args["input"].(*model.StoragePartitionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.StoragePartition)
+	fc.Result = res
+	return ec.marshalNStoragePartition2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateStoragePartition(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_StoragePartition_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_StoragePartition_alias(ctx, field)
+			case "name":
+				return ec.fieldContext_StoragePartition_name(ctx, field)
+			case "maxSize":
+				return ec.fieldContext_StoragePartition_maxSize(ctx, field)
+			case "maxObjects":
+				return ec.fieldContext_StoragePartition_maxObjects(ctx, field)
+			case "currentSize":
+				return ec.fieldContext_StoragePartition_currentSize(ctx, field)
+			case "currentObjects":
+				return ec.fieldContext_StoragePartition_currentObjects(ctx, field)
+			case "storageLocationId":
+				return ec.fieldContext_StoragePartition_storageLocationId(ctx, field)
+			case "storageLocation":
+				return ec.fieldContext_StoragePartition_storageLocation(ctx, field)
+			case "objectInstances":
+				return ec.fieldContext_StoragePartition_objectInstances(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type StoragePartition", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateStoragePartition_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteStoragePartition(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteStoragePartition(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteStoragePartition(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.StoragePartition)
+	fc.Result = res
+	return ec.marshalNStoragePartition2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteStoragePartition(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_StoragePartition_id(ctx, field)
+			case "alias":
+				return ec.fieldContext_StoragePartition_alias(ctx, field)
+			case "name":
+				return ec.fieldContext_StoragePartition_name(ctx, field)
+			case "maxSize":
+				return ec.fieldContext_StoragePartition_maxSize(ctx, field)
+			case "maxObjects":
+				return ec.fieldContext_StoragePartition_maxObjects(ctx, field)
+			case "currentSize":
+				return ec.fieldContext_StoragePartition_currentSize(ctx, field)
+			case "currentObjects":
+				return ec.fieldContext_StoragePartition_currentObjects(ctx, field)
+			case "storageLocationId":
+				return ec.fieldContext_StoragePartition_storageLocationId(ctx, field)
+			case "storageLocation":
+				return ec.fieldContext_StoragePartition_storageLocation(ctx, field)
+			case "objectInstances":
+				return ec.fieldContext_StoragePartition_objectInstances(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type StoragePartition", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteStoragePartition_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11943,6 +12978,82 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCollectionInput(ctx context.Context, obj interface{}) (model.CollectionInput, error) {
+	var it model.CollectionInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "alias", "description", "owner", "ownerMail", "name", "quality", "tenantId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "alias":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alias"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Alias = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "owner":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Owner = data
+		case "ownerMail":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerMail"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerMail = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "quality":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quality"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quality = data
+		case "tenantId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCollectionListOptions(ctx context.Context, obj interface{}) (model.CollectionListOptions, error) {
 	var it model.CollectionListOptions
 	asMap := map[string]interface{}{}
@@ -12412,6 +13523,110 @@ func (ec *executionContext) unmarshalInputPronomIdListOptions(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputStorageLocationInput(ctx context.Context, obj interface{}) (model.StorageLocationInput, error) {
+	var it model.StorageLocationInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "alias", "type", "vault", "connection", "quality", "price", "securityCompliency", "fillFirst", "ocflType", "tenantId", "numberOfThreads"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "alias":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alias"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Alias = data
+		case "type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		case "vault":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vault"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Vault = data
+		case "connection":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connection"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connection = data
+		case "quality":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quality"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quality = data
+		case "price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Price = data
+		case "securityCompliency":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("securityCompliency"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SecurityCompliency = data
+		case "fillFirst":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fillFirst"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FillFirst = data
+		case "ocflType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ocflType"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OcflType = data
+		case "tenantId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
+		case "numberOfThreads":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("numberOfThreads"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NumberOfThreads = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context.Context, obj interface{}) (model.StorageLocationListOptions, error) {
 	var it model.StorageLocationListOptions
 	asMap := map[string]interface{}{}
@@ -12475,6 +13690,82 @@ func (ec *executionContext) unmarshalInputStorageLocationListOptions(ctx context
 				return it, err
 			}
 			it.Search = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputStoragePartitionInput(ctx context.Context, obj interface{}) (model.StoragePartitionInput, error) {
+	var it model.StoragePartitionInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "alias", "name", "maxSize", "maxObjects", "currentSize", "currentObjects", "storageLocationId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "alias":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alias"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Alias = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "maxSize":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxSize"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxSize = data
+		case "maxObjects":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxObjects"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxObjects = data
+		case "currentSize":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currentSize"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CurrentSize = data
+		case "currentObjects":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currentObjects"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CurrentObjects = data
+		case "storageLocationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("storageLocationId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StorageLocationID = data
 		}
 	}
 
@@ -13275,6 +14566,69 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "logout":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_logout(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createCollection":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createCollection(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateCollection":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCollection(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteCollection":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteCollection(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createStorageLocation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createStorageLocation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateStorageLocation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateStorageLocation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteStorageLocation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteStorageLocation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createStoragePartition":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createStoragePartition(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateStoragePartition":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateStoragePartition(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteStoragePartition":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteStoragePartition(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -15358,6 +16712,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCollection2githubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v model.Collection) graphql.Marshaler {
+	return ec._Collection(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNCollection2ᚕᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Collection) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -15864,6 +17222,10 @@ func (ec *executionContext) marshalNPronomIdList2ᚖgithubᚗcomᚋocflᚑarchiv
 	return ec._PronomIdList(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNStorageLocation2githubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocation(ctx context.Context, sel ast.SelectionSet, v model.StorageLocation) graphql.Marshaler {
+	return ec._StorageLocation(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNStorageLocation2ᚕᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.StorageLocation) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -15930,6 +17292,10 @@ func (ec *executionContext) marshalNStorageLocationList2ᚖgithubᚗcomᚋocfl�
 		return graphql.Null
 	}
 	return ec._StorageLocationList(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNStoragePartition2githubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartition(ctx context.Context, sel ast.SelectionSet, v model.StoragePartition) graphql.Marshaler {
+	return ec._StoragePartition(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNStoragePartition2ᚕᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.StoragePartition) graphql.Marshaler {
@@ -16415,6 +17781,14 @@ func (ec *executionContext) marshalOCollection2ᚖgithubᚗcomᚋocflᚑarchive�
 	return ec._Collection(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOCollectionInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionInput(ctx context.Context, v interface{}) (*model.CollectionInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCollectionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOCollectionListOptions2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐCollectionListOptions(ctx context.Context, v interface{}) (*model.CollectionListOptions, error) {
 	if v == nil {
 		return nil, nil
@@ -16666,6 +18040,14 @@ func (ec *executionContext) marshalOStorageLocation2ᚖgithubᚗcomᚋocflᚑarc
 	return ec._StorageLocation(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOStorageLocationInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationInput(ctx context.Context, v interface{}) (*model.StorageLocationInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputStorageLocationInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOStorageLocationListOptions2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStorageLocationListOptions(ctx context.Context, v interface{}) (*model.StorageLocationListOptions, error) {
 	if v == nil {
 		return nil, nil
@@ -16695,6 +18077,14 @@ func (ec *executionContext) marshalOStoragePartition2ᚖgithubᚗcomᚋocflᚑar
 		return graphql.Null
 	}
 	return ec._StoragePartition(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOStoragePartitionInput2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionInput(ctx context.Context, v interface{}) (*model.StoragePartitionInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputStoragePartitionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOStoragePartitionListOptions2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐStoragePartitionListOptions(ctx context.Context, v interface{}) (*model.StoragePartitionListOptions, error) {

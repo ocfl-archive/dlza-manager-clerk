@@ -1294,6 +1294,106 @@ func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 	return &model.PronomIDList{Items: pronoms, TotalItems: int(pronomsPb.TotalItems)}, nil
 }
 
+func CreateCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.CollectionInput) (*model.Collection, error) {
+	collectionPb := collectionInputToGrpcCollection(*input)
+	idPb, err := clientClerkHandler.CreateCollection(ctx, collectionPb)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not CreateCollection: %v", err)
+	}
+	collectionPb.Id = idPb.Id
+	collectionG := collectionToGraphQlCollection(collectionPb)
+	return collectionG, nil
+}
+
+func UpdateCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.CollectionInput) (*model.Collection, error) {
+	collectionPb := collectionInputToGrpcCollection(*input)
+	_, err := clientClerkHandler.UpdateCollection(ctx, collectionPb)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not UpdateCollection: %v", err)
+	}
+	collectionG := collectionToGraphQlCollection(collectionPb)
+	return collectionG, nil
+}
+
+func DeleteCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string, allowedTenants []string) (*model.Collection, error) {
+	collection, err := GetCollectionById(ctx, clientClerkHandler, id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+	}
+	_, err = clientClerkHandler.DeleteCollectionById(ctx, &pb.Id{Id: id})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not DeleteCollection: %v", err)
+	}
+	return collection, nil
+}
+
+func CreateStorageLocation(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	storageLocationPb := storageLocationInputToGrpcStorageLocation(input)
+	idPb, err := clientClerkHandler.SaveStorageLocation(ctx, storageLocationPb)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not CreateStorageLocation: %v", err)
+	}
+	storageLocationPb.Id = idPb.Id
+	storageLocationG := storageLocationToGraphQlStorageLocation(storageLocationPb)
+	return storageLocationG, nil
+}
+
+func UpdateStorageLocation(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	storageLocationPb := storageLocationInputToGrpcStorageLocation(input)
+	_, err := clientClerkHandler.UpdateStorageLocation(ctx, storageLocationPb)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not UpdateStorageLocation: %v", err)
+	}
+	storageLocationG := storageLocationToGraphQlStorageLocation(storageLocationPb)
+	return storageLocationG, nil
+}
+
+func DeleteStorageLocation(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.StorageLocation, error) {
+	storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: id})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
+	}
+	_, err = clientClerkHandler.DeleteStorageLocationById(ctx, &pb.Id{Id: id})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not DeleteStorageLocationById: %v", err)
+	}
+	storageLocationG := storageLocationToGraphQlStorageLocation(storageLocationPb)
+	return storageLocationG, nil
+}
+
+func CreateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	storagePartitionPb := storagePartitionInputToGrpcStoragePartition(input)
+	idPb, err := clientClerkHandler.CreateStoragePartition(ctx, storagePartitionPb)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not CreateStoragePartition: %v", err)
+	}
+	storagePartitionPb.Id = idPb.Id
+	storagePartitionG := storagePartitionToGraphQlStoragePartition(storagePartitionPb)
+	return storagePartitionG, nil
+}
+
+func UpdateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	storagePartitionPb := storagePartitionInputToGrpcStoragePartition(input)
+	_, err := clientClerkHandler.UpdateStoragePartition(ctx, storagePartitionPb)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not UpdateStoragePartition: %v", err)
+	}
+	storagePartitionG := storagePartitionToGraphQlStoragePartition(storagePartitionPb)
+	return storagePartitionG, nil
+}
+
+func DeleteStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.StoragePartition, error) {
+	storagePartition, err := GetStoragePartitionById(ctx, clientClerkHandler, id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStoragePartitionById: %v", err)
+	}
+	_, err = clientClerkHandler.DeleteStoragePartitionById(ctx, &pb.Id{Id: id})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not DeleteStoragePartitionById: %v", err)
+	}
+	return storagePartition, nil
+}
+
 func tenantToGraphQlTenant(tenantPb *pb.Tenant) *model.Tenant {
 	var tenant model.Tenant
 	tenant.ID = tenantPb.Id
@@ -1318,6 +1418,19 @@ func collectionToGraphQlCollection(collectionPb *pb.Collection) *model.Collectio
 	collection.TotalFileCount = int(collectionPb.TotalFileCount)
 	collection.TotalObjectCount = int(collectionPb.TotalObjectCount)
 	return &collection
+}
+
+func collectionInputToGrpcCollection(collection model.CollectionInput) *pb.Collection {
+	var collectionPb pb.Collection
+	collectionPb.Id = collection.ID
+	collectionPb.Alias = collection.Alias
+	collectionPb.Description = collection.Description
+	collectionPb.Owner = collection.Owner
+	collectionPb.Name = collection.Name
+	collectionPb.OwnerMail = collection.OwnerMail
+	collectionPb.Quality = int32(collection.Quality)
+	collectionPb.TenantId = collection.TenantID
+	return &collectionPb
 }
 
 func objectToGraphQlObject(objectPb *pb.Object) *model.Object {
@@ -1398,6 +1511,36 @@ func storageLocationToGraphQlStorageLocation(storageLocationPb *pb.StorageLocati
 	storageLocation.TotalExistingVolume = int(storageLocationPb.TotalExistingVolume)
 	storageLocation.TotalFilesSize = int(storageLocationPb.TotalFilesSize)
 	return &storageLocation
+}
+
+func storageLocationInputToGrpcStorageLocation(storageLocationInput *model.StorageLocationInput) *pb.StorageLocation {
+	var storageLocationPb pb.StorageLocation
+	storageLocationPb.Id = storageLocationInput.ID
+	storageLocationPb.Alias = storageLocationInput.Alias
+	storageLocationPb.Type = storageLocationInput.Type
+	storageLocationPb.Vault = storageLocationInput.Vault
+	storageLocationPb.Connection = storageLocationInput.Connection
+	storageLocationPb.Quality = int32(storageLocationInput.Quality)
+	storageLocationPb.Price = int32(storageLocationInput.Price)
+	storageLocationPb.SecurityCompliency = storageLocationInput.SecurityCompliency
+	storageLocationPb.FillFirst = storageLocationInput.FillFirst
+	storageLocationPb.OcflType = storageLocationInput.OcflType
+	storageLocationPb.NumberOfThreads = int32(storageLocationInput.NumberOfThreads)
+	storageLocationPb.TenantId = storageLocationInput.TenantID
+	return &storageLocationPb
+}
+
+func storagePartitionInputToGrpcStoragePartition(storagePartitionInput *model.StoragePartitionInput) *pb.StoragePartition {
+	var storagePartitionPb pb.StoragePartition
+	storagePartitionPb.Alias = storagePartitionInput.Alias
+	storagePartitionPb.Name = storagePartitionInput.Name
+	storagePartitionPb.MaxSize = int64(storagePartitionInput.MaxSize)
+	storagePartitionPb.MaxObjects = int64(storagePartitionInput.MaxObjects)
+	storagePartitionPb.CurrentSize = int64(storagePartitionInput.CurrentSize)
+	storagePartitionPb.CurrentObjects = int64(storagePartitionInput.CurrentObjects)
+	storagePartitionPb.Id = storagePartitionInput.ID
+	storagePartitionPb.StorageLocationId = storagePartitionInput.StorageLocationID
+	return &storagePartitionPb
 }
 
 func storagePartitionToGraphQlStoragePartition(storagePartitionPb *pb.StoragePartition) *model.StoragePartition {

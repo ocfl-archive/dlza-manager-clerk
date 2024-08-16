@@ -44,6 +44,17 @@ type Collection struct {
 func (Collection) IsNode()            {}
 func (this Collection) GetID() string { return this.ID }
 
+type CollectionInput struct {
+	ID          string `json:"id"`
+	Alias       string `json:"alias"`
+	Description string `json:"description"`
+	Owner       string `json:"owner"`
+	OwnerMail   string `json:"ownerMail"`
+	Name        string `json:"name"`
+	Quality     int    `json:"quality"`
+	TenantID    string `json:"tenantId"`
+}
+
 type CollectionList struct {
 	Items      []*Collection `json:"items"`
 	TotalItems int           `json:"totalItems"`
@@ -358,6 +369,21 @@ type StorageLocation struct {
 func (StorageLocation) IsNode()            {}
 func (this StorageLocation) GetID() string { return this.ID }
 
+type StorageLocationInput struct {
+	ID                 string `json:"id"`
+	Alias              string `json:"alias"`
+	Type               string `json:"type"`
+	Vault              string `json:"vault"`
+	Connection         string `json:"connection"`
+	Quality            int    `json:"quality"`
+	Price              int    `json:"price"`
+	SecurityCompliency string `json:"securityCompliency"`
+	FillFirst          bool   `json:"fillFirst"`
+	OcflType           string `json:"ocflType"`
+	TenantID           string `json:"tenantId"`
+	NumberOfThreads    int    `json:"numberOfThreads"`
+}
+
 type StorageLocationList struct {
 	Items      []*StorageLocation `json:"items"`
 	TotalItems int                `json:"totalItems"`
@@ -401,6 +427,17 @@ type StoragePartition struct {
 
 func (StoragePartition) IsNode()            {}
 func (this StoragePartition) GetID() string { return this.ID }
+
+type StoragePartitionInput struct {
+	ID                string `json:"id"`
+	Alias             string `json:"alias"`
+	Name              string `json:"name"`
+	MaxSize           int    `json:"maxSize"`
+	MaxObjects        int    `json:"maxObjects"`
+	CurrentSize       int    `json:"currentSize"`
+	CurrentObjects    int    `json:"currentObjects"`
+	StorageLocationID string `json:"storageLocationId"`
+}
 
 type StoragePartitionList struct {
 	Items      []*StoragePartition `json:"items"`
