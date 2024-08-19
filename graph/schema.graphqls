@@ -96,7 +96,7 @@ input ObjectListOptions {
   take: Int
   sortDirection: SortDirection
   sortKey: ObjectSortKey
-  #  id, signature, title, description, ingestWorkflow, user, address, checksum
+  #  id, signature, title, description, ingestWorkflow, user, address, checksum, authors, holding
   search: String
 }
 input ObjectInstanceListOptions {
@@ -175,7 +175,9 @@ enum ObjectSortKey {
   alternativeTitles,
   size,
   totalFileSize,
-  totalFileCount
+  totalFileCount,
+  holding,
+  authors
 }
 enum ObjectInstanceSortKey {
   id,

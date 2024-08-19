@@ -766,6 +766,8 @@ const (
 	ObjectSortKeySize              ObjectSortKey = "size"
 	ObjectSortKeyTotalFileSize     ObjectSortKey = "totalFileSize"
 	ObjectSortKeyTotalFileCount    ObjectSortKey = "totalFileCount"
+	ObjectSortKeyHolding           ObjectSortKey = "holding"
+	ObjectSortKeyAuthors           ObjectSortKey = "authors"
 )
 
 var AllObjectSortKey = []ObjectSortKey{
@@ -783,11 +785,13 @@ var AllObjectSortKey = []ObjectSortKey{
 	ObjectSortKeySize,
 	ObjectSortKeyTotalFileSize,
 	ObjectSortKeyTotalFileCount,
+	ObjectSortKeyHolding,
+	ObjectSortKeyAuthors,
 }
 
 func (e ObjectSortKey) IsValid() bool {
 	switch e {
-	case ObjectSortKeyID, ObjectSortKeySignature, ObjectSortKeyTitle, ObjectSortKeyDescription, ObjectSortKeyIngestWorkflow, ObjectSortKeyUser, ObjectSortKeyAddress, ObjectSortKeyChecksum, ObjectSortKeyKeywords, ObjectSortKeyIdentifiers, ObjectSortKeyAlternativeTitles, ObjectSortKeySize, ObjectSortKeyTotalFileSize, ObjectSortKeyTotalFileCount:
+	case ObjectSortKeyID, ObjectSortKeySignature, ObjectSortKeyTitle, ObjectSortKeyDescription, ObjectSortKeyIngestWorkflow, ObjectSortKeyUser, ObjectSortKeyAddress, ObjectSortKeyChecksum, ObjectSortKeyKeywords, ObjectSortKeyIdentifiers, ObjectSortKeyAlternativeTitles, ObjectSortKeySize, ObjectSortKeyTotalFileSize, ObjectSortKeyTotalFileCount, ObjectSortKeyHolding, ObjectSortKeyAuthors:
 		return true
 	}
 	return false
