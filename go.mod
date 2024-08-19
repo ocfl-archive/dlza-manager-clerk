@@ -1,6 +1,6 @@
 module github.com/ocfl-archive/dlza-manager-clerk
 
-go 1.23.0
+go 1.22.5
 
 require (
 	emperror.dev/emperror v0.33.0
