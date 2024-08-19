@@ -312,6 +312,9 @@ type Object implements Node {
   address: String!
   created: String!
   lastChanged: String!
+  expiration: String!
+  authors: [String!]!
+  holding: String!
   size: Int!
   collectionId: ID!
   collection: Collection!

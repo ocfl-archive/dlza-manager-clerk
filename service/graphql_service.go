@@ -1454,6 +1454,9 @@ func objectToGraphQlObject(objectPb *pb.Object) *model.Object {
 	object.Checksum = objectPb.Checksum
 	object.TotalFileSize = int(objectPb.TotalFileSize)
 	object.TotalFileCount = int(objectPb.TotalFileCount)
+	object.Authors = objectPb.Authors
+	object.Holding = objectPb.Holding
+	object.Expiration = objectPb.Expiration
 	return &object
 }
 

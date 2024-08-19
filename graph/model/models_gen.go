@@ -181,6 +181,9 @@ type Object struct {
 	Address           string              `json:"address"`
 	Created           string              `json:"created"`
 	LastChanged       string              `json:"lastChanged"`
+	Expiration        string              `json:"expiration"`
+	Authors           []string            `json:"authors"`
+	Holding           string              `json:"holding"`
 	Size              int                 `json:"size"`
 	CollectionID      string              `json:"collectionId"`
 	Collection        *Collection         `json:"collection"`

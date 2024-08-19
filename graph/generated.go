@@ -127,12 +127,15 @@ type ComplexityRoot struct {
 	Object struct {
 		Address           func(childComplexity int) int
 		AlternativeTitles func(childComplexity int) int
+		Authors           func(childComplexity int) int
 		Checksum          func(childComplexity int) int
 		Collection        func(childComplexity int) int
 		CollectionID      func(childComplexity int) int
 		Created           func(childComplexity int) int
 		Description       func(childComplexity int) int
+		Expiration        func(childComplexity int) int
 		Files             func(childComplexity int, options *model.FileListOptions) int
+		Holding           func(childComplexity int) int
 		ID                func(childComplexity int) int
 		Identifiers       func(childComplexity int) int
 		IngestWorkflow    func(childComplexity int) int
@@ -764,6 +767,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Object.AlternativeTitles(childComplexity), true
 
+	case "Object.authors":
+		if e.complexity.Object.Authors == nil {
+			break
+		}
+
+		return e.complexity.Object.Authors(childComplexity), true
+
 	case "Object.checksum":
 		if e.complexity.Object.Checksum == nil {
 			break
@@ -799,6 +809,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Object.Description(childComplexity), true
 
+	case "Object.expiration":
+		if e.complexity.Object.Expiration == nil {
+			break
+		}
+
+		return e.complexity.Object.Expiration(childComplexity), true
+
 	case "Object.files":
 		if e.complexity.Object.Files == nil {
 			break
@@ -810,6 +827,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Object.Files(childComplexity, args["options"].(*model.FileListOptions)), true
+
+	case "Object.holding":
+		if e.complexity.Object.Holding == nil {
+			break
+		}
+
+		return e.complexity.Object.Holding(childComplexity), true
 
 	case "Object.id":
 		if e.complexity.Object.ID == nil {
@@ -3817,6 +3841,12 @@ func (ec *executionContext) fieldContext_File_object(_ context.Context, field gr
 				return ec.fieldContext_Object_created(ctx, field)
 			case "lastChanged":
 				return ec.fieldContext_Object_lastChanged(ctx, field)
+			case "expiration":
+				return ec.fieldContext_Object_expiration(ctx, field)
+			case "authors":
+				return ec.fieldContext_Object_authors(ctx, field)
+			case "holding":
+				return ec.fieldContext_Object_holding(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -5632,6 +5662,138 @@ func (ec *executionContext) fieldContext_Object_lastChanged(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Object_expiration(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_expiration(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Expiration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_expiration(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Object_authors(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_authors(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Authors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_authors(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Object_holding(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_holding(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Holding, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_holding(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Object_size(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Object_size(ctx, field)
 	if err != nil {
@@ -6535,6 +6697,12 @@ func (ec *executionContext) fieldContext_ObjectInstance_object(_ context.Context
 				return ec.fieldContext_Object_created(ctx, field)
 			case "lastChanged":
 				return ec.fieldContext_Object_lastChanged(ctx, field)
+			case "expiration":
+				return ec.fieldContext_Object_expiration(ctx, field)
+			case "authors":
+				return ec.fieldContext_Object_authors(ctx, field)
+			case "holding":
+				return ec.fieldContext_Object_holding(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -7186,6 +7354,12 @@ func (ec *executionContext) fieldContext_ObjectList_items(_ context.Context, fie
 				return ec.fieldContext_Object_created(ctx, field)
 			case "lastChanged":
 				return ec.fieldContext_Object_lastChanged(ctx, field)
+			case "expiration":
+				return ec.fieldContext_Object_expiration(ctx, field)
+			case "authors":
+				return ec.fieldContext_Object_authors(ctx, field)
+			case "holding":
+				return ec.fieldContext_Object_holding(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -7939,6 +8113,12 @@ func (ec *executionContext) fieldContext_Query_object(ctx context.Context, field
 				return ec.fieldContext_Object_created(ctx, field)
 			case "lastChanged":
 				return ec.fieldContext_Object_lastChanged(ctx, field)
+			case "expiration":
+				return ec.fieldContext_Object_expiration(ctx, field)
+			case "authors":
+				return ec.fieldContext_Object_authors(ctx, field)
+			case "holding":
+				return ec.fieldContext_Object_holding(ctx, field)
 			case "size":
 				return ec.fieldContext_Object_size(ctx, field)
 			case "collectionId":
@@ -14734,6 +14914,21 @@ func (ec *executionContext) _Object(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "lastChanged":
 			out.Values[i] = ec._Object_lastChanged(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "expiration":
+			out.Values[i] = ec._Object_expiration(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "authors":
+			out.Values[i] = ec._Object_authors(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "holding":
+			out.Values[i] = ec._Object_holding(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
