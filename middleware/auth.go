@@ -31,7 +31,6 @@ func GenerateStateOauth() string {
 }
 
 func VerifyToken(ctx context.Context, keycloak models.Keycloak, verifier *oidc.IDTokenVerifier, oauth2Config oauth2.Config, domain string) gin.HandlerFunc {
-	fmt.Println("VerifyToken")
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 
@@ -213,7 +212,6 @@ func GetAuthCodeURL(c *gin.Context) (string, error) {
 }
 
 func Callback(ctx context.Context, c *gin.Context, code string) error {
-	fmt.Println("/auth/callback")
 	session := sessions.Default(c)
 	if session.Get("state") == nil {
 		c.Error(errors.Errorf("state is empty : %d", http.StatusBadRequest))
@@ -267,7 +265,6 @@ func Callback(ctx context.Context, c *gin.Context, code string) error {
 	session.Set("refresh_token", resp.OAuth2Token.RefreshToken)
 
 	var userClaim models.KeyCloakToken
-
 	_, err = jwt.ParseWithClaims(resp.OAuth2Token.AccessToken, &userClaim, nil)
 	if err != nil && err.Error() != "no Keyfunc was provided." {
 		return err
@@ -427,9 +424,10 @@ func GraphqlVerifyToken(ctx context.Context) error {
 	return nil
 }
 
-func TenantGroups(ctx context.Context) ([]string, []string, error) {
+func TenantGroups(ctx context.Context) ([]string, []models.Tenant, error) {
 	var keyCloakGroup []string
-	var tenantList []string
+	// var tenantList []string
+	var tenantList []models.Tenant
 	c, err := GinContextFromContext(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -439,7 +437,8 @@ func TenantGroups(ctx context.Context) ([]string, []string, error) {
 		keyCloakGroup = session.Get("keycloak_group").([]string)
 	}
 	if session.Get("tenant_list") != nil {
-		tenantList = session.Get("tenant_list").([]string)
+		// tenantList = session.Get("tenant_list").([]models.Teanntstring)
+		tenantList = session.Get("tenant_list").([]models.Tenant)
 	}
 
 	return keyCloakGroup, tenantList, nil

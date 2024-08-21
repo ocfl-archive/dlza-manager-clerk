@@ -17,6 +17,14 @@ type Keycloak struct {
 	AdminRole    string `yaml:"admin_role" toml:"adminRole"`
 }
 
+type Tenant struct {
+	Id     string `json:"id"`
+	Create bool   `json:"create"`
+	Delete bool   `json:"delete"`
+	Read   bool   `json:"read"`
+	Update bool   `json:"update"`
+}
+
 type KeyCloakToken struct {
 	jwt.RegisteredClaims
 	Jti               string                 `json:"jti,omitempty"`
@@ -46,7 +54,7 @@ type KeyCloakToken struct {
 	EmailVerified     bool                   `json:"email_verified,omitempty"`
 	Sid               string                 `json:"sid,omitempty"`
 	// Aud               string                 `json:"aud,omitempty"`
-	TenantList []string `json:"tenant_list,omitempty"`
+	TenantList []Tenant `json:"tenant_list,omitempty"`
 }
 
 type ServiceRole struct {

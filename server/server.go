@@ -102,6 +102,7 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 	// store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteLaxMode, HttpOnly: true})
 	store.Options(sessions.Options{Secure: true, SameSite: http.SameSiteNoneMode, HttpOnly: true})
 	gob.Register(models.KeyCloakToken{})
+	gob.Register([]models.Tenant{})
 	router.Use(sessions.Sessions("mysession", store))
 	// router.NoRoute(func(c *gin.Context) {
 	// 	fmt.Println("test")

@@ -30,7 +30,10 @@ func GetTenants(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerSe
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -191,7 +194,10 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pbHandler
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -365,7 +371,10 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -529,7 +538,10 @@ func GetObjectInstancesForObjectId(ctx context.Context, clientClerkHandler pbHan
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -606,7 +618,10 @@ func GetFilesForObjectId(ctx context.Context, clientClerkHandler pbHandler.Clerk
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -719,7 +734,10 @@ func GetObjectInstanceChecksForObjectInstanceId(ctx context.Context, clientClerk
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -787,7 +805,10 @@ func GetStorageLocationsForTenantOrCollectionId(ctx context.Context, clientClerk
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -872,7 +893,10 @@ func GetStoragePartitionsForLocationId(ctx context.Context, clientClerkHandler p
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -1030,7 +1054,10 @@ func GetTenantById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -1188,7 +1215,10 @@ func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pbHandl
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
@@ -1245,7 +1275,10 @@ func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 	if (len(tenantList) == 0) && (!slices.Contains(keyCloakGroup, "dlza-admin")) {
 		return nil, errors.New("You are not allowed to retrieve datas")
 	} else if len(tenantList) > 0 {
-		allowedTenants = tenantList
+		for _, tenant := range tenantList {
+			allowedTenants = append(allowedTenants, tenant.Id)
+		}
+		// allowedTenants = tenantList
 	}
 	if slices.Contains(keyCloakGroup, "dlza-admin") {
 		allowedTenants = []string{}
