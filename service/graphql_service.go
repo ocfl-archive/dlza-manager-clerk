@@ -428,9 +428,9 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 		}
 		object.Status = int(status.Size)
 		if collectionsMap[object.CollectionID] == nil {
-			collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: object.CollectionID})
+			collectionPb, err := clientClerkHandler.GetCollectionByIdFromMv(ctx, &pb.Id{Id: object.CollectionID})
 			if err != nil {
-				return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+				return nil, errors.Wrapf(err, "Could not GetCollectionByIdFromMv: %v", err)
 			}
 			collectionsMap[object.CollectionID] = collectionToGraphQlCollection(collectionPb)
 		}
@@ -1082,9 +1082,9 @@ func GetTenantById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 }
 
 func GetCollectionById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.Collection, error) {
-	collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: id})
+	collectionPb, err := clientClerkHandler.GetCollectionByIdFromMv(ctx, &pb.Id{Id: id})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetCollectionByIdFromMv: %v", err)
 	}
 	collection := collectionToGraphQlCollection(collectionPb)
 	amountOfErrors, err := clientClerkHandler.GetAmountOfErrorsByCollectionId(ctx, &pb.Id{Id: collection.ID})
@@ -1103,7 +1103,7 @@ func GetCollectionById(ctx context.Context, clientClerkHandler pbHandler.ClerkHa
 func GetObjectById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.Object, error) {
 	objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: id})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
 	}
 	object := objectToGraphQlObject(objectPb)
 	status, err := clientClerkHandler.GetStatusForObjectId(ctx, &pb.Id{Id: object.ID})
@@ -1111,9 +1111,9 @@ func GetObjectById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 		return nil, errors.Wrapf(err, "Could not GetStatusForObjectId: %v", err)
 	}
 	object.Status = int(status.Size)
-	collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: object.CollectionID})
+	collectionPb, err := clientClerkHandler.GetCollectionByIdFromMv(ctx, &pb.Id{Id: object.CollectionID})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetCollectionByIdFromMv: %v", err)
 	}
 	collection := collectionToGraphQlCollection(collectionPb)
 	object.Collection = collection
@@ -1128,7 +1128,7 @@ func GetObjectInstanceById(ctx context.Context, clientClerkHandler pbHandler.Cle
 	objectInstance := objectInstanceToGraphQlObjectInstance(objectInstancePb)
 	objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: objectInstance.ObjectID})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
 	}
 	object := objectToGraphQlObject(objectPb)
 	objectInstance.Object = object
@@ -1158,7 +1158,7 @@ func GetFileById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerS
 	file := fileToGraphQlFile(filePb)
 	objectPb, err := clientClerkHandler.GetObjectById(ctx, &pb.Id{Id: file.ObjectID})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetObjectById: %v", err)
 	}
 	object := objectToGraphQlObject(objectPb)
 	file.Object = object
@@ -1328,6 +1328,26 @@ func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 }
 
 func CreateCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.CollectionInput) (*model.Collection, error) {
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == input.TenantID {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with creating collection")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with creating collection")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with creating collection")
+	}
 	collectionPb := collectionInputToGrpcCollection(*input)
 	idPb, err := clientClerkHandler.CreateCollection(ctx, collectionPb)
 	if err != nil {
@@ -1339,8 +1359,28 @@ func CreateCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHan
 }
 
 func UpdateCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.CollectionInput) (*model.Collection, error) {
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == input.TenantID {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with updating collection")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with updating collection")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with updating collection")
+	}
 	collectionPb := collectionInputToGrpcCollection(*input)
-	_, err := clientClerkHandler.UpdateCollection(ctx, collectionPb)
+	_, err = clientClerkHandler.UpdateCollection(ctx, collectionPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not UpdateCollection: %v", err)
 	}
@@ -1348,11 +1388,32 @@ func UpdateCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHan
 	return collectionG, nil
 }
 
-func DeleteCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string, allowedTenants []string) (*model.Collection, error) {
-	collection, err := GetCollectionById(ctx, clientClerkHandler, id)
+func DeleteCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.Collection, error) {
+	collectionPb, err := clientClerkHandler.GetCollectionById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionById: %v", err)
 	}
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == collectionPb.TenantId {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with deleting the collection")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with deleting the collection")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with deleting the collection")
+	}
+	collection := collectionToGraphQlCollection(collectionPb)
 	_, err = clientClerkHandler.DeleteCollectionById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not DeleteCollection: %v", err)
@@ -1361,6 +1422,26 @@ func DeleteCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHan
 }
 
 func CreateStorageLocation(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == input.TenantID {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with creating storage location")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with creating storage location")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with creating storage location")
+	}
 	storageLocationPb := storageLocationInputToGrpcStorageLocation(input)
 	idPb, err := clientClerkHandler.SaveStorageLocation(ctx, storageLocationPb)
 	if err != nil {
@@ -1372,8 +1453,28 @@ func CreateStorageLocation(ctx context.Context, clientClerkHandler pbHandler.Cle
 }
 
 func UpdateStorageLocation(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == input.TenantID {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with updating storage location")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with updating storage location")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with updating storage location")
+	}
 	storageLocationPb := storageLocationInputToGrpcStorageLocation(input)
-	_, err := clientClerkHandler.UpdateStorageLocation(ctx, storageLocationPb)
+	_, err = clientClerkHandler.UpdateStorageLocation(ctx, storageLocationPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not UpdateStorageLocation: %v", err)
 	}
@@ -1382,6 +1483,30 @@ func UpdateStorageLocation(ctx context.Context, clientClerkHandler pbHandler.Cle
 }
 
 func DeleteStorageLocation(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.StorageLocation, error) {
+	StorageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: id})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
+	}
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == StorageLocationPb.TenantId {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with deleting the storage location")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with deleting the storage location")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with deleting the storage location")
+	}
 	storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: id})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
@@ -1395,6 +1520,30 @@ func DeleteStorageLocation(ctx context.Context, clientClerkHandler pbHandler.Cle
 }
 
 func CreateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: input.StorageLocationID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
+	}
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == storageLocationPb.TenantId {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with creating storage partition")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with updating storage partition")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with creating storage partition")
+	}
 	storagePartitionPb := storagePartitionInputToGrpcStoragePartition(input)
 	idPb, err := clientClerkHandler.CreateStoragePartition(ctx, storagePartitionPb)
 	if err != nil {
@@ -1406,8 +1555,32 @@ func CreateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.Cl
 }
 
 func UpdateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: input.StorageLocationID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
+	}
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == storageLocationPb.TenantId {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with updating storage partition")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with updating storage partition")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with updating storage partition")
+	}
 	storagePartitionPb := storagePartitionInputToGrpcStoragePartition(input)
-	_, err := clientClerkHandler.UpdateStoragePartition(ctx, storagePartitionPb)
+	_, err = clientClerkHandler.UpdateStoragePartition(ctx, storagePartitionPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not UpdateStoragePartition: %v", err)
 	}
@@ -1416,6 +1589,34 @@ func UpdateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.Cl
 }
 
 func DeleteStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, id string) (*model.StoragePartition, error) {
+	StoragePartitionPb, err := clientClerkHandler.GetStoragePartitionById(ctx, &pb.Id{Id: id})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStoragePartitionById: %v", err)
+	}
+	StorageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: StoragePartitionPb.StorageLocationId})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
+	}
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(tenantList) > 0 {
+		for count, tenant := range tenantList {
+			if tenant.Id == StorageLocationPb.TenantId {
+				if tenant.Create && tenant.Read && tenant.Delete {
+					break
+				} else {
+					return nil, errors.New("You are not allowed to proceed with deleting the storage partition")
+				}
+			}
+			if count == len(tenantList)-1 {
+				return nil, errors.New("You are not allowed to proceed with deleting the storage partition")
+			}
+		}
+	} else {
+		return nil, errors.New("You are not allowed to proceed with deleting the storage partition")
+	}
 	storagePartition, err := GetStoragePartitionById(ctx, clientClerkHandler, id)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStoragePartitionById: %v", err)
@@ -1425,6 +1626,26 @@ func DeleteStoragePartition(ctx context.Context, clientClerkHandler pbHandler.Cl
 		return nil, errors.Wrapf(err, "Could not DeleteStoragePartitionById: %v", err)
 	}
 	return storagePartition, nil
+}
+
+func GetTenantRights(ctx context.Context) (*model.TenantRightsList, error) {
+	_, tenantList, err := middleware.TenantGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var tenantRightsList model.TenantRightsList
+	if len(tenantList) > 0 {
+		for _, tenant := range tenantList {
+			var tenantRights model.TenantRights
+			tenantRights.ID = tenant.Id
+			tenantRights.Read = tenant.Read
+			tenantRights.Create = tenant.Create
+			tenantRights.Update = tenant.Update
+			tenantRights.Delete = tenant.Delete
+			tenantRightsList.List = append(tenantRightsList.List, &tenantRights)
+		}
+	}
+	return &tenantRightsList, nil
 }
 
 func tenantToGraphQlTenant(tenantPb *pb.Tenant) *model.Tenant {

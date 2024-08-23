@@ -72,6 +72,9 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 
 // CreateCollection is the resolver for the createCollection field.
 func (r *mutationResolver) CreateCollection(ctx context.Context, input *model.CollectionInput) (*model.Collection, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	collection, err := service.CreateCollection(ctx, r.ClientClerkHandler, input)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not CreateCollection: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -81,6 +84,9 @@ func (r *mutationResolver) CreateCollection(ctx context.Context, input *model.Co
 
 // UpdateCollection is the resolver for the updateCollection field.
 func (r *mutationResolver) UpdateCollection(ctx context.Context, input *model.CollectionInput) (*model.Collection, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	collection, err := service.UpdateCollection(ctx, r.ClientClerkHandler, input)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not UpdateCollection: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -90,7 +96,10 @@ func (r *mutationResolver) UpdateCollection(ctx context.Context, input *model.Co
 
 // DeleteCollection is the resolver for the deleteCollection field.
 func (r *mutationResolver) DeleteCollection(ctx context.Context, id string) (*model.Collection, error) {
-	collection, err := service.DeleteCollection(ctx, r.ClientClerkHandler, id, r.AllowedTenants)
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
+	collection, err := service.DeleteCollection(ctx, r.ClientClerkHandler, id)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not DeleteCollection: "+err.Error()), ctx, http.StatusInternalServerError)
 	}
@@ -99,6 +108,9 @@ func (r *mutationResolver) DeleteCollection(ctx context.Context, id string) (*mo
 
 // CreateStorageLocation is the resolver for the createStorageLocation field.
 func (r *mutationResolver) CreateStorageLocation(ctx context.Context, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	storageLocation, err := service.CreateStorageLocation(ctx, r.ClientClerkHandler, input)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not CreateStorageLocation: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -108,6 +120,9 @@ func (r *mutationResolver) CreateStorageLocation(ctx context.Context, input *mod
 
 // UpdateStorageLocation is the resolver for the updateStorageLocation field.
 func (r *mutationResolver) UpdateStorageLocation(ctx context.Context, input *model.StorageLocationInput) (*model.StorageLocation, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	storageLocation, err := service.UpdateStorageLocation(ctx, r.ClientClerkHandler, input)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not UpdateStorageLocation: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -117,6 +132,9 @@ func (r *mutationResolver) UpdateStorageLocation(ctx context.Context, input *mod
 
 // DeleteStorageLocation is the resolver for the deleteStorageLocation field.
 func (r *mutationResolver) DeleteStorageLocation(ctx context.Context, id string) (*model.StorageLocation, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	storageLocation, err := service.DeleteStorageLocation(ctx, r.ClientClerkHandler, id)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not DeleteStorageLocation: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -126,6 +144,9 @@ func (r *mutationResolver) DeleteStorageLocation(ctx context.Context, id string)
 
 // CreateStoragePartition is the resolver for the createStoragePartition field.
 func (r *mutationResolver) CreateStoragePartition(ctx context.Context, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	storagePartition, err := service.CreateStoragePartition(ctx, r.ClientClerkHandler, input)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not CreateStoragePartition: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -135,6 +156,9 @@ func (r *mutationResolver) CreateStoragePartition(ctx context.Context, input *mo
 
 // UpdateStoragePartition is the resolver for the updateStoragePartition field.
 func (r *mutationResolver) UpdateStoragePartition(ctx context.Context, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	storagePartition, err := service.UpdateStoragePartition(ctx, r.ClientClerkHandler, input)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not UpdateStoragePartition: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -144,6 +168,9 @@ func (r *mutationResolver) UpdateStoragePartition(ctx context.Context, input *mo
 
 // DeleteStoragePartition is the resolver for the deleteStoragePartition field.
 func (r *mutationResolver) DeleteStoragePartition(ctx context.Context, id string) (*model.StoragePartition, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
 	storagePartition, err := service.DeleteStoragePartition(ctx, r.ClientClerkHandler, id)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not DeleteStoragePartition: "+err.Error()), ctx, http.StatusInternalServerError)
@@ -236,6 +263,19 @@ func (r *queryResolver) Tenant(ctx context.Context, id string) (*model.Tenant, e
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not GetTenantById: "+err.Error()), ctx, http.StatusInternalServerError)
 	}
 	return tenant, nil
+}
+
+// TenantRights is the resolver for the tenantRights field.
+func (r *queryResolver) TenantRights(ctx context.Context) (*model.TenantRightsList, error) {
+	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
+		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
+	}
+	tenantRights, err := service.GetTenantRights(ctx)
+	if err != nil {
+		return nil, middleware.GraphqlErrorWrapper(err, ctx, http.StatusUnauthorized)
+	}
+
+	return tenantRights, nil
 }
 
 // Collections is the resolver for the collections field.

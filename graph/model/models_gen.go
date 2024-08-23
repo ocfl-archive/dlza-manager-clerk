@@ -511,6 +511,18 @@ type TenantListOptions struct {
 	Search        *string        `json:"search,omitempty"`
 }
 
+type TenantRights struct {
+	ID     string `json:"id"`
+	Create bool   `json:"create"`
+	Delete bool   `json:"delete"`
+	Read   bool   `json:"read"`
+	Update bool   `json:"update"`
+}
+
+type TenantRightsList struct {
+	List []*TenantRights `json:"list"`
+}
+
 type User struct {
 	Username string    `json:"username"`
 	Email    string    `json:"email"`
