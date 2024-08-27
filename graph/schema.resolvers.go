@@ -265,19 +265,6 @@ func (r *queryResolver) Tenant(ctx context.Context, id string) (*model.Tenant, e
 	return tenant, nil
 }
 
-// TenantRights is the resolver for the tenantRights field.
-func (r *queryResolver) TenantRights(ctx context.Context) (*model.TenantRightsList, error) {
-	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
-		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
-	}
-	tenantRights, err := service.GetTenantRights(ctx)
-	if err != nil {
-		return nil, middleware.GraphqlErrorWrapper(err, ctx, http.StatusUnauthorized)
-	}
-
-	return tenantRights, nil
-}
-
 // Collections is the resolver for the collections field.
 func (r *queryResolver) Collections(ctx context.Context, options *model.CollectionListOptions) (*model.CollectionList, error) {
 	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
@@ -554,13 +541,3 @@ type storageLocationResolver struct{ *Resolver }
 type storagePartitionResolver struct{ *Resolver }
 type tenantResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) StorageLocationsForCollectionID(ctx context.Context, options *model.StorageLocationListOptions) (*model.StorageLocationList, error) {
-	panic(fmt.Errorf("not implemented: StorageLocationsForCollectionID - storageLocationsForCollectionId"))
-}

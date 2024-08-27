@@ -208,6 +208,7 @@ type Tenant implements Node {
   totalAmountOfObjects: Int!
   collections(options: CollectionListOptions): CollectionList!
   storageLocations(options: StorageLocationListOptions): StorageLocationList!
+  permissions: [String!]
 }
 
 type Collection implements Node {
@@ -411,17 +412,6 @@ input PronomIdListOptions {
   sortKey: PronomIdSortKey
 }
 
-type TenantRights {
-  id:     String!
-  create: Boolean!
-  delete: Boolean!
-  read:   Boolean!
-  update: Boolean!
-}
-type TenantRightsList {
-  list: [TenantRights!]!
-}
-
 type User {
   username: String! 
   email: String!
@@ -437,7 +427,6 @@ type Query {
   user: User
   tenants(options: TenantListOptions): TenantList!
   tenant(id: ID!): Tenant
-  tenantRights: TenantRightsList!
 
   collections(options: CollectionListOptions): CollectionList!
   collection(id: ID!): Collection

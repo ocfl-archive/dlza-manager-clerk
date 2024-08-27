@@ -219,7 +219,6 @@ type ComplexityRoot struct {
 		StoragePartition     func(childComplexity int, id string) int
 		StoragePartitions    func(childComplexity int, options *model.StoragePartitionListOptions) int
 		Tenant               func(childComplexity int, id string) int
-		TenantRights         func(childComplexity int) int
 		Tenants              func(childComplexity int, options *model.TenantListOptions) int
 		User                 func(childComplexity int) int
 	}
@@ -274,6 +273,7 @@ type ComplexityRoot struct {
 		Email                func(childComplexity int) int
 		ID                   func(childComplexity int) int
 		Name                 func(childComplexity int) int
+		Permissions          func(childComplexity int) int
 		Person               func(childComplexity int) int
 		StorageLocations     func(childComplexity int, options *model.StorageLocationListOptions) int
 		TotalAmountOfObjects func(childComplexity int) int
@@ -283,18 +283,6 @@ type ComplexityRoot struct {
 	TenantList struct {
 		Items      func(childComplexity int) int
 		TotalItems func(childComplexity int) int
-	}
-
-	TenantRights struct {
-		Create func(childComplexity int) int
-		Delete func(childComplexity int) int
-		ID     func(childComplexity int) int
-		Read   func(childComplexity int) int
-		Update func(childComplexity int) int
-	}
-
-	TenantRightsList struct {
-		List func(childComplexity int) int
 	}
 
 	User struct {
@@ -334,7 +322,6 @@ type QueryResolver interface {
 	User(ctx context.Context) (*model.User, error)
 	Tenants(ctx context.Context, options *model.TenantListOptions) (*model.TenantList, error)
 	Tenant(ctx context.Context, id string) (*model.Tenant, error)
-	TenantRights(ctx context.Context) (*model.TenantRightsList, error)
 	Collections(ctx context.Context, options *model.CollectionListOptions) (*model.CollectionList, error)
 	Collection(ctx context.Context, id string) (*model.Collection, error)
 	Objects(ctx context.Context, options *model.ObjectListOptions) (*model.ObjectList, error)
@@ -1357,13 +1344,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Tenant(childComplexity, args["id"].(string)), true
 
-	case "Query.tenantRights":
-		if e.complexity.Query.TenantRights == nil {
-			break
-		}
-
-		return e.complexity.Query.TenantRights(childComplexity), true
-
 	case "Query.tenants":
 		if e.complexity.Query.Tenants == nil {
 			break
@@ -1657,6 +1637,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tenant.Name(childComplexity), true
 
+	case "Tenant.permissions":
+		if e.complexity.Tenant.Permissions == nil {
+			break
+		}
+
+		return e.complexity.Tenant.Permissions(childComplexity), true
+
 	case "Tenant.person":
 		if e.complexity.Tenant.Person == nil {
 			break
@@ -1703,48 +1690,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TenantList.TotalItems(childComplexity), true
-
-	case "TenantRights.create":
-		if e.complexity.TenantRights.Create == nil {
-			break
-		}
-
-		return e.complexity.TenantRights.Create(childComplexity), true
-
-	case "TenantRights.delete":
-		if e.complexity.TenantRights.Delete == nil {
-			break
-		}
-
-		return e.complexity.TenantRights.Delete(childComplexity), true
-
-	case "TenantRights.id":
-		if e.complexity.TenantRights.ID == nil {
-			break
-		}
-
-		return e.complexity.TenantRights.ID(childComplexity), true
-
-	case "TenantRights.read":
-		if e.complexity.TenantRights.Read == nil {
-			break
-		}
-
-		return e.complexity.TenantRights.Read(childComplexity), true
-
-	case "TenantRights.update":
-		if e.complexity.TenantRights.Update == nil {
-			break
-		}
-
-		return e.complexity.TenantRights.Update(childComplexity), true
-
-	case "TenantRightsList.list":
-		if e.complexity.TenantRightsList.List == nil {
-			break
-		}
-
-		return e.complexity.TenantRightsList.List(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -2972,6 +2917,8 @@ func (ec *executionContext) fieldContext_Collection_tenant(_ context.Context, fi
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
 				return ec.fieldContext_Tenant_storageLocations(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Tenant_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tenant", field.Name)
 		},
@@ -7888,6 +7835,8 @@ func (ec *executionContext) fieldContext_Query_tenant(ctx context.Context, field
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
 				return ec.fieldContext_Tenant_storageLocations(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Tenant_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tenant", field.Name)
 		},
@@ -7902,54 +7851,6 @@ func (ec *executionContext) fieldContext_Query_tenant(ctx context.Context, field
 	if fc.Args, err = ec.field_Query_tenant_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_tenantRights(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_tenantRights(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().TenantRights(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.TenantRightsList)
-	fc.Result = res
-	return ec.marshalNTenantRightsList2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantRightsList(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_tenantRights(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "list":
-				return ec.fieldContext_TenantRightsList_list(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type TenantRightsList", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -9743,6 +9644,8 @@ func (ec *executionContext) fieldContext_StorageLocation_tenant(_ context.Contex
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
 				return ec.fieldContext_Tenant_storageLocations(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Tenant_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tenant", field.Name)
 		},
@@ -11192,6 +11095,47 @@ func (ec *executionContext) fieldContext_Tenant_storageLocations(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Tenant_permissions(ctx context.Context, field graphql.CollectedField, obj *model.Tenant) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tenant_permissions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Permissions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tenant_permissions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tenant",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TenantList_items(ctx context.Context, field graphql.CollectedField, obj *model.TenantList) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_TenantList_items(ctx, field)
 	if err != nil {
@@ -11249,6 +11193,8 @@ func (ec *executionContext) fieldContext_TenantList_items(_ context.Context, fie
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
 				return ec.fieldContext_Tenant_storageLocations(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Tenant_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tenant", field.Name)
 		},
@@ -11295,282 +11241,6 @@ func (ec *executionContext) fieldContext_TenantList_totalItems(_ context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TenantRights_id(ctx context.Context, field graphql.CollectedField, obj *model.TenantRights) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TenantRights_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TenantRights_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TenantRights",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TenantRights_create(ctx context.Context, field graphql.CollectedField, obj *model.TenantRights) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TenantRights_create(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Create, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TenantRights_create(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TenantRights",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TenantRights_delete(ctx context.Context, field graphql.CollectedField, obj *model.TenantRights) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TenantRights_delete(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Delete, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TenantRights_delete(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TenantRights",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TenantRights_read(ctx context.Context, field graphql.CollectedField, obj *model.TenantRights) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TenantRights_read(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Read, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TenantRights_read(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TenantRights",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TenantRights_update(ctx context.Context, field graphql.CollectedField, obj *model.TenantRights) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TenantRights_update(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Update, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TenantRights_update(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TenantRights",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _TenantRightsList_list(ctx context.Context, field graphql.CollectedField, obj *model.TenantRightsList) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_TenantRightsList_list(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.List, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.TenantRights)
-	fc.Result = res
-	return ec.marshalNTenantRights2ᚕᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantRightsᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_TenantRightsList_list(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "TenantRightsList",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_TenantRights_id(ctx, field)
-			case "create":
-				return ec.fieldContext_TenantRights_create(ctx, field)
-			case "delete":
-				return ec.fieldContext_TenantRights_delete(ctx, field)
-			case "read":
-				return ec.fieldContext_TenantRights_read(ctx, field)
-			case "update":
-				return ec.fieldContext_TenantRights_update(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type TenantRights", field.Name)
 		},
 	}
 	return fc, nil
@@ -11765,6 +11435,8 @@ func (ec *executionContext) fieldContext_User_tenants(_ context.Context, field g
 				return ec.fieldContext_Tenant_collections(ctx, field)
 			case "storageLocations":
 				return ec.fieldContext_Tenant_storageLocations(ctx, field)
+			case "permissions":
+				return ec.fieldContext_Tenant_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Tenant", field.Name)
 		},
@@ -15949,28 +15621,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "tenantRights":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_tenantRights(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "collections":
 			field := field
 
@@ -16809,6 +16459,8 @@ func (ec *executionContext) _Tenant(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "permissions":
+			out.Values[i] = ec._Tenant_permissions(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16850,104 +16502,6 @@ func (ec *executionContext) _TenantList(ctx context.Context, sel ast.SelectionSe
 			}
 		case "totalItems":
 			out.Values[i] = ec._TenantList_totalItems(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var tenantRightsImplementors = []string{"TenantRights"}
-
-func (ec *executionContext) _TenantRights(ctx context.Context, sel ast.SelectionSet, obj *model.TenantRights) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, tenantRightsImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("TenantRights")
-		case "id":
-			out.Values[i] = ec._TenantRights_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "create":
-			out.Values[i] = ec._TenantRights_create(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "delete":
-			out.Values[i] = ec._TenantRights_delete(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "read":
-			out.Values[i] = ec._TenantRights_read(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "update":
-			out.Values[i] = ec._TenantRights_update(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var tenantRightsListImplementors = []string{"TenantRightsList"}
-
-func (ec *executionContext) _TenantRightsList(ctx context.Context, sel ast.SelectionSet, obj *model.TenantRightsList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, tenantRightsListImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("TenantRightsList")
-		case "list":
-			out.Values[i] = ec._TenantRightsList_list(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -18183,74 +17737,6 @@ func (ec *executionContext) marshalNTenantList2ᚖgithubᚗcomᚋocflᚑarchive�
 	return ec._TenantList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNTenantRights2ᚕᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantRightsᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TenantRights) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNTenantRights2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantRights(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNTenantRights2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantRights(ctx context.Context, sel ast.SelectionSet, v *model.TenantRights) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._TenantRights(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNTenantRightsList2githubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantRightsList(ctx context.Context, sel ast.SelectionSet, v model.TenantRightsList) graphql.Marshaler {
-	return ec._TenantRightsList(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNTenantRightsList2ᚖgithubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐTenantRightsList(ctx context.Context, sel ast.SelectionSet, v *model.TenantRightsList) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._TenantRightsList(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNUser2githubᚗcomᚋocflᚑarchiveᚋdlzaᚑmanagerᚑclerkᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
@@ -18879,6 +18365,44 @@ func (ec *executionContext) marshalOStoragePartitionSortKey2ᚖgithubᚗcomᚋoc
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

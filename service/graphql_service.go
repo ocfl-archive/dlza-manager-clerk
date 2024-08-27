@@ -79,6 +79,15 @@ func GetTenants(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerSe
 		}
 		tenant.TotalAmountOfObjects = int(amountAndSize.Amount)
 		tenant.TotalSize = int(amountAndSize.Size)
+		if len(tenantList) > 0 {
+			for _, tenantKL := range tenantList {
+				if tenantKL.Id == tenant.ID {
+					if tenantKL.Update && tenantKL.Delete && tenantKL.Create && tenantKL.Read {
+						tenant.Permissions = append(tenant.Permissions, "collection", "storageLocation", "storagePartition")
+					}
+				}
+			}
+		}
 		tenants = append(tenants, tenant)
 	}
 	return &model.TenantList{Items: tenants, TotalItems: int(tenantsPb.TotalItems)}, nil
@@ -1072,6 +1081,15 @@ func GetTenantById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
 	}
 	tenant := tenantToGraphQlTenant(tenantPb)
+	if len(tenantList) > 0 {
+		for _, tenantKL := range tenantList {
+			if tenantKL.Id == id {
+				if tenantKL.Update && tenantKL.Delete && tenantKL.Create && tenantKL.Read {
+					tenant.Permissions = append(tenant.Permissions, "collection", "storageLocation", "storagePartition")
+				}
+			}
+		}
+	}
 	amountAndSize, err := clientClerkHandler.GetAmountOfObjectsAndTotalSizeByTenantId(ctx, &pb.Id{Id: tenant.ID})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsAndTotalSizeByTenantId: %v", err)
@@ -1626,26 +1644,6 @@ func DeleteStoragePartition(ctx context.Context, clientClerkHandler pbHandler.Cl
 		return nil, errors.Wrapf(err, "Could not DeleteStoragePartitionById: %v", err)
 	}
 	return storagePartition, nil
-}
-
-func GetTenantRights(ctx context.Context) (*model.TenantRightsList, error) {
-	_, tenantList, err := middleware.TenantGroups(ctx)
-	if err != nil {
-		return nil, err
-	}
-	var tenantRightsList model.TenantRightsList
-	if len(tenantList) > 0 {
-		for _, tenant := range tenantList {
-			var tenantRights model.TenantRights
-			tenantRights.ID = tenant.Id
-			tenantRights.Read = tenant.Read
-			tenantRights.Create = tenant.Create
-			tenantRights.Update = tenant.Update
-			tenantRights.Delete = tenant.Delete
-			tenantRightsList.List = append(tenantRightsList.List, &tenantRights)
-		}
-	}
-	return &tenantRightsList, nil
 }
 
 func tenantToGraphQlTenant(tenantPb *pb.Tenant) *model.Tenant {
