@@ -79,6 +79,7 @@ func GetTenants(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerSe
 		}
 		tenant.TotalAmountOfObjects = int(amountAndSize.Amount)
 		tenant.TotalSize = int(amountAndSize.Size)
+		tenant.Permissions = make([]string, 0)
 		if len(tenantList) > 0 {
 			for _, tenantKL := range tenantList {
 				if tenantKL.Id == tenant.ID {
@@ -1081,6 +1082,7 @@ func GetTenantById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
 	}
 	tenant := tenantToGraphQlTenant(tenantPb)
+	tenant.Permissions = make([]string, 0)
 	if len(tenantList) > 0 {
 		for _, tenantKL := range tenantList {
 			if tenantKL.Id == id {
