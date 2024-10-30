@@ -59,21 +59,22 @@ type ComplexityRoot struct {
 	}
 
 	Collection struct {
-		Alias            func(childComplexity int) int
-		AmountOfErrors   func(childComplexity int) int
-		Description      func(childComplexity int) int
-		Files            func(childComplexity int, options *model.FileListOptions) int
-		ID               func(childComplexity int) int
-		Name             func(childComplexity int) int
-		Objects          func(childComplexity int, options *model.ObjectListOptions) int
-		Owner            func(childComplexity int) int
-		OwnerMail        func(childComplexity int) int
-		Quality          func(childComplexity int) int
-		Tenant           func(childComplexity int) int
-		TenantID         func(childComplexity int) int
-		TotalFileCount   func(childComplexity int) int
-		TotalFileSize    func(childComplexity int) int
-		TotalObjectCount func(childComplexity int) int
+		Alias                                func(childComplexity int) int
+		AmountOfErrors                       func(childComplexity int) int
+		Description                          func(childComplexity int) int
+		Files                                func(childComplexity int, options *model.FileListOptions) int
+		ID                                   func(childComplexity int) int
+		Name                                 func(childComplexity int) int
+		Objects                              func(childComplexity int, options *model.ObjectListOptions) int
+		Owner                                func(childComplexity int) int
+		OwnerMail                            func(childComplexity int) int
+		Quality                              func(childComplexity int) int
+		Tenant                               func(childComplexity int) int
+		TenantID                             func(childComplexity int) int
+		TotalFileCount                       func(childComplexity int) int
+		TotalFileSize                        func(childComplexity int) int
+		TotalObjectCount                     func(childComplexity int) int
+		TotalObjectSizeForAllObjectInstances func(childComplexity int) int
 	}
 
 	CollectionList struct {
@@ -493,6 +494,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Collection.TotalObjectCount(childComplexity), true
+
+	case "Collection.totalObjectSizeForAllObjectInstances":
+		if e.complexity.Collection.TotalObjectSizeForAllObjectInstances == nil {
+			break
+		}
+
+		return e.complexity.Collection.TotalObjectSizeForAllObjectInstances(childComplexity), true
 
 	case "CollectionList.items":
 		if e.complexity.CollectionList.Items == nil {
@@ -3074,9 +3082,9 @@ func (ec *executionContext) _Collection_totalFileSize(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Collection_totalFileSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3086,7 +3094,51 @@ func (ec *executionContext) fieldContext_Collection_totalFileSize(_ context.Cont
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collection_totalObjectSizeForAllObjectInstances(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_totalObjectSizeForAllObjectInstances(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalObjectSizeForAllObjectInstances, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_totalObjectSizeForAllObjectInstances(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3287,6 +3339,8 @@ func (ec *executionContext) fieldContext_CollectionList_items(_ context.Context,
 				return ec.fieldContext_Collection_files(ctx, field)
 			case "totalFileSize":
 				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalObjectSizeForAllObjectInstances":
+				return ec.fieldContext_Collection_totalObjectSizeForAllObjectInstances(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
@@ -4348,6 +4402,8 @@ func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.C
 				return ec.fieldContext_Collection_files(ctx, field)
 			case "totalFileSize":
 				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalObjectSizeForAllObjectInstances":
+				return ec.fieldContext_Collection_totalObjectSizeForAllObjectInstances(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
@@ -4435,6 +4491,8 @@ func (ec *executionContext) fieldContext_Mutation_updateCollection(ctx context.C
 				return ec.fieldContext_Collection_files(ctx, field)
 			case "totalFileSize":
 				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalObjectSizeForAllObjectInstances":
+				return ec.fieldContext_Collection_totalObjectSizeForAllObjectInstances(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
@@ -4522,6 +4580,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteCollection(ctx context.C
 				return ec.fieldContext_Collection_files(ctx, field)
 			case "totalFileSize":
 				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalObjectSizeForAllObjectInstances":
+				return ec.fieldContext_Collection_totalObjectSizeForAllObjectInstances(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
@@ -5955,6 +6015,8 @@ func (ec *executionContext) fieldContext_Object_collection(_ context.Context, fi
 				return ec.fieldContext_Collection_files(ctx, field)
 			case "totalFileSize":
 				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalObjectSizeForAllObjectInstances":
+				return ec.fieldContext_Collection_totalObjectSizeForAllObjectInstances(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
@@ -7976,6 +8038,8 @@ func (ec *executionContext) fieldContext_Query_collection(ctx context.Context, f
 				return ec.fieldContext_Collection_files(ctx, field)
 			case "totalFileSize":
 				return ec.fieldContext_Collection_totalFileSize(ctx, field)
+			case "totalObjectSizeForAllObjectInstances":
+				return ec.fieldContext_Collection_totalObjectSizeForAllObjectInstances(ctx, field)
 			case "totalFileCount":
 				return ec.fieldContext_Collection_totalFileCount(ctx, field)
 			case "totalObjectCount":
@@ -9723,9 +9787,9 @@ func (ec *executionContext) _StorageLocation_totalFilesSize(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StorageLocation_totalFilesSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9735,7 +9799,7 @@ func (ec *executionContext) fieldContext_StorageLocation_totalFilesSize(_ contex
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9767,9 +9831,9 @@ func (ec *executionContext) _StorageLocation_totalExistingVolume(ctx context.Con
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_StorageLocation_totalExistingVolume(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9779,7 +9843,7 @@ func (ec *executionContext) fieldContext_StorageLocation_totalExistingVolume(_ c
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -10911,9 +10975,9 @@ func (ec *executionContext) _Tenant_totalSize(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Tenant_totalSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10923,7 +10987,7 @@ func (ec *executionContext) fieldContext_Tenant_totalSize(_ context.Context, fie
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -14473,6 +14537,11 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "totalObjectSizeForAllObjectInstances":
+			out.Values[i] = ec._Collection_totalObjectSizeForAllObjectInstances(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "totalFileCount":
 			out.Values[i] = ec._Collection_totalFileCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -17106,6 +17175,21 @@ func (ec *executionContext) marshalNFileList2ᚖgithubᚗcomᚋocflᚑarchiveᚋ
 		return graphql.Null
 	}
 	return ec._FileList(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloatContext(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {

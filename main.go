@@ -75,23 +75,6 @@ func main() {
 		defer logFile.Close()
 	}
 
-	// logger, logStash, logFile := ubLogger.CreateUbMultiLogger(
-	// 	cfg.Logging.StashHost,
-	// 	cfg.Logging.StashPortNb,
-	// 	cfg.Logging.TraceLevel,
-	// 	cfg.Logging.StashTraceLevel,
-	// 	cfg.Logging.Filename,
-	// 	cfg.Logging.Filename)
-	// if logStash != nil {
-	// 	defer logStash.Close()
-	// }
-	// if logFile != nil {
-	// 	defer logFile.Close()
-	// }
-
-	// output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
-	// logger := zerolog.New(output).With().Str("timestamp", time.Now().String()).Logger()
-
 	// find static fs
 	var staticFS fs.FS
 	if conf.GraphQLConfig.WebStatic == "" {

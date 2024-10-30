@@ -78,7 +78,7 @@ func GetTenants(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerSe
 			return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsAndTotalSizeByTenantId: %v", err)
 		}
 		tenant.TotalAmountOfObjects = int(amountAndSize.Amount)
-		tenant.TotalSize = int(amountAndSize.Size)
+		tenant.TotalSize = float64(amountAndSize.Size)
 		tenant.Permissions = make([]string, 0)
 		if len(tenantList) > 0 {
 			for _, tenantKL := range tenantList {
@@ -1097,7 +1097,7 @@ func GetTenantById(ctx context.Context, clientClerkHandler pbHandler.ClerkHandle
 		return nil, errors.Wrapf(err, "Could not GetAmountOfObjectsAndTotalSizeByTenantId: %v", err)
 	}
 	tenant.TotalAmountOfObjects = int(amountAndSize.Amount)
-	tenant.TotalSize = int(amountAndSize.Size)
+	tenant.TotalSize = float64(amountAndSize.Size)
 	return tenant, err
 }
 
@@ -1117,6 +1117,11 @@ func GetCollectionById(ctx context.Context, clientClerkHandler pbHandler.ClerkHa
 		return nil, errors.Wrapf(err, "Could not FindTenantById: %v", err)
 	}
 	collection.Tenant = tenantToGraphQlTenant(tenant)
+	sizeForAllObjectInstances, err := clientClerkHandler.GetSizeForAllObjectInstancesByCollectionId(ctx, &pb.Id{Id: collection.ID})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not GetSizeForAllObjectInstances: %v", err)
+	}
+	collection.TotalObjectSizeForAllObjectInstances = float64(sizeForAllObjectInstances.Size)
 	return collection, err
 }
 
@@ -1668,7 +1673,7 @@ func collectionToGraphQlCollection(collectionPb *pb.Collection) *model.Collectio
 	collection.OwnerMail = collectionPb.OwnerMail
 	collection.Quality = int(collectionPb.Quality)
 	collection.TenantID = collectionPb.TenantId
-	collection.TotalFileSize = int(collectionPb.TotalFileSize)
+	collection.TotalFileSize = float64(collectionPb.TotalFileSize)
 	collection.TotalFileCount = int(collectionPb.TotalFileCount)
 	collection.TotalObjectCount = int(collectionPb.TotalObjectCount)
 	return &collection
@@ -1765,8 +1770,8 @@ func storageLocationToGraphQlStorageLocation(storageLocationPb *pb.StorageLocati
 	storageLocation.OcflType = storageLocationPb.OcflType
 	storageLocation.NumberOfThreads = int(storageLocationPb.NumberOfThreads)
 	storageLocation.TenantID = storageLocationPb.TenantId
-	storageLocation.TotalExistingVolume = int(storageLocationPb.TotalExistingVolume)
-	storageLocation.TotalFilesSize = int(storageLocationPb.TotalFilesSize)
+	storageLocation.TotalExistingVolume = float64(storageLocationPb.TotalExistingVolume)
+	storageLocation.TotalFilesSize = float64(storageLocationPb.TotalFilesSize)
 	return &storageLocation
 }
 

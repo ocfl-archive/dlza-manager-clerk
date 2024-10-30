@@ -204,7 +204,7 @@ type Tenant implements Node {
   alias: String!
   person: String!
   email: String!
-  totalSize: Int!
+  totalSize: Float!
   totalAmountOfObjects: Int!
   collections(options: CollectionListOptions): CollectionList!
   storageLocations(options: StorageLocationListOptions): StorageLocationList!
@@ -223,7 +223,8 @@ type Collection implements Node {
   tenant: Tenant!
   objects(options: ObjectListOptions): ObjectList!
   files(options: FileListOptions): FileList!
-  totalFileSize: Int!
+  totalFileSize: Float!
+  totalObjectSizeForAllObjectInstances: Float!
   totalFileCount: Int!
   totalObjectCount: Int!
   amountOfErrors: Int!
@@ -254,8 +255,8 @@ type StorageLocation implements Node {
   tenantId: ID!
   tenant: Tenant!
   numberOfThreads: Int!
-  totalFilesSize: Int!
-  totalExistingVolume: Int!
+  totalFilesSize: Float!
+  totalExistingVolume: Float!
   storagePartitions(options: StoragePartitionListOptions): StoragePartitionList!
   amountOfErrors: Int!
   amountOfObjects: Int!

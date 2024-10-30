@@ -1,6 +1,6 @@
 module github.com/ocfl-archive/dlza-manager-clerk
 
-go 1.23.0
+go 1.23.2
 
 require (
 	emperror.dev/emperror v0.33.0
@@ -15,7 +15,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/jinzhu/configor v1.2.2
 	github.com/ocfl-archive/dlza-manager v0.0.6
-	github.com/ocfl-archive/dlza-manager-handler v0.0.8
+	github.com/ocfl-archive/dlza-manager-handler v0.0.9
 	github.com/ocfl-archive/dlza-manager-storage-handler v0.0.4
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

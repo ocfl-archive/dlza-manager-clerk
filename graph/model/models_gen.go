@@ -24,21 +24,22 @@ type Auth struct {
 }
 
 type Collection struct {
-	ID               string      `json:"id"`
-	Alias            string      `json:"alias"`
-	Description      string      `json:"description"`
-	Owner            string      `json:"owner"`
-	OwnerMail        string      `json:"ownerMail"`
-	Name             string      `json:"name"`
-	Quality          int         `json:"quality"`
-	TenantID         string      `json:"tenantId"`
-	Tenant           *Tenant     `json:"tenant"`
-	Objects          *ObjectList `json:"objects"`
-	Files            *FileList   `json:"files"`
-	TotalFileSize    int         `json:"totalFileSize"`
-	TotalFileCount   int         `json:"totalFileCount"`
-	TotalObjectCount int         `json:"totalObjectCount"`
-	AmountOfErrors   int         `json:"amountOfErrors"`
+	ID                                   string      `json:"id"`
+	Alias                                string      `json:"alias"`
+	Description                          string      `json:"description"`
+	Owner                                string      `json:"owner"`
+	OwnerMail                            string      `json:"ownerMail"`
+	Name                                 string      `json:"name"`
+	Quality                              int         `json:"quality"`
+	TenantID                             string      `json:"tenantId"`
+	Tenant                               *Tenant     `json:"tenant"`
+	Objects                              *ObjectList `json:"objects"`
+	Files                                *FileList   `json:"files"`
+	TotalFileSize                        float64     `json:"totalFileSize"`
+	TotalObjectSizeForAllObjectInstances float64     `json:"totalObjectSizeForAllObjectInstances"`
+	TotalFileCount                       int         `json:"totalFileCount"`
+	TotalObjectCount                     int         `json:"totalObjectCount"`
+	AmountOfErrors                       int         `json:"amountOfErrors"`
 }
 
 func (Collection) IsNode()            {}
@@ -362,8 +363,8 @@ type StorageLocation struct {
 	TenantID            string                `json:"tenantId"`
 	Tenant              *Tenant               `json:"tenant"`
 	NumberOfThreads     int                   `json:"numberOfThreads"`
-	TotalFilesSize      int                   `json:"totalFilesSize"`
-	TotalExistingVolume int                   `json:"totalExistingVolume"`
+	TotalFilesSize      float64               `json:"totalFilesSize"`
+	TotalExistingVolume float64               `json:"totalExistingVolume"`
 	StoragePartitions   *StoragePartitionList `json:"storagePartitions"`
 	AmountOfErrors      int                   `json:"amountOfErrors"`
 	AmountOfObjects     int                   `json:"amountOfObjects"`
@@ -476,7 +477,7 @@ type Tenant struct {
 	Alias                string               `json:"alias"`
 	Person               string               `json:"person"`
 	Email                string               `json:"email"`
-	TotalSize            int                  `json:"totalSize"`
+	TotalSize            float64              `json:"totalSize"`
 	TotalAmountOfObjects int                  `json:"totalAmountOfObjects"`
 	Collections          *CollectionList      `json:"collections"`
 	StorageLocations     *StorageLocationList `json:"storageLocations"`
