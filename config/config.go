@@ -1,38 +1,52 @@
 package config
 
 import (
-	"github.com/jinzhu/configor"
+	"emperror.dev/errors"
+	"github.com/BurntSushi/toml"
+	"github.com/je4/utils/v2/pkg/config"
+	"github.com/je4/utils/v2/pkg/stashconfig"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
-	"log"
+	"go.ub.unibas.ch/cloud/certloader/v2/pkg/loader"
+	"io/fs"
 	"os"
 )
 
-type Service struct {
-	ServiceName string `yaml:"service_name" toml:"ServiceName"`
-	Host        string `yaml:"host" toml:"Host"`
-	Port        int    `yaml:"port" toml:"Port"`
-}
-
 type Config struct {
-	GraphQLConfig  models.GraphQLConfig `yaml:"graphql_config" toml:"GraphQLConfig"`
-	Handler        Service              `yaml:"handler" toml:"Handler"`
-	StorageHandler Service              `yaml:"storage-handler" toml:"StorageHandler"`
-	Clerk          Service              `yaml:"clerk" toml:"Clerk"`
-	Jwt            string               `yaml:"jwt-key" toml:"JwtKey"`
+	GraphQLConfig           models.GraphQLConfig `toml:"graphqlconfig"`
+	LocalAddr               string               `toml:"localaddr"`
+	Domain                  string               `toml:"domain"`
+	ExternalAddr            string               `toml:"externaladdr"`
+	Bearer                  string               `toml:"bearer"`
+	ResolverAddr            string               `toml:"resolveraddr"`
+	ResolverTimeout         config.Duration      `toml:"resolvertimeout"`
+	ResolverNotFoundTimeout config.Duration      `toml:"resolvernotfoundtimeout"`
+	ActionTimeout           config.Duration      `toml:"actiontimeout"`
+	ServerTLS               *loader.Config       `toml:"server"`
+	ClientTLS               *loader.Config       `toml:"client"`
+	GRPCClient              map[string]string    `toml:"grpcclient"`
+	Log                     stashconfig.Config   `toml:"log"`
+	Jwt                     string               `toml:"jwt"`
 }
 
-// GetConfig creates a new config from a given environment
-func GetConfig(configFile string) Config {
-	conf := Config{}
-	if configFile == "" {
-		configFile = "config.yml"
+func LoadConfig(fSys fs.FS, fp string, conf *Config) error {
+	if _, err := fs.Stat(fSys, fp); err != nil {
+		path, err := os.Getwd()
+		if err != nil {
+			return errors.Wrap(err, "cannot get current working directory")
+		}
+		fSys = os.DirFS(path)
+		fp = "clerk.toml"
 	}
-	err := configor.Load(&conf, configFile)
+	data, err := fs.ReadFile(fSys, fp)
 	if err != nil {
-		log.Fatal(err)
+		return errors.Wrapf(err, "cannot read file [%v] %s", fSys, fp)
+	}
+	_, err = toml.Decode(string(data), conf)
+	if err != nil {
+		return errors.Wrapf(err, "error loading config file %v", fp)
 	}
 	if conf.Jwt == "" {
 		conf.Jwt = os.Getenv("JWT_KEY")
 	}
-	return conf
+	return nil
 }

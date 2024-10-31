@@ -19,16 +19,16 @@ import (
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/je4/utils/v2/pkg/zLogger"
 	"github.com/ocfl-archive/dlza-manager-clerk/constants"
 	"github.com/ocfl-archive/dlza-manager-clerk/graph"
 	"github.com/ocfl-archive/dlza-manager-clerk/middleware"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	pb "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
-	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
 	"golang.org/x/net/http2"
 )
 
-func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger *ubLogger.Logger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, router *gin.Engine, domain string) (*Server, error) {
+func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger zLogger.ZLogger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, router *gin.Engine, domain string) (*Server, error) {
 	server := &Server{
 		addr:               addr,
 		extAddr:            extAddr,
@@ -51,7 +51,7 @@ type Server struct {
 	addr               string
 	cert               tls.Certificate
 	addCAs             []*x509.Certificate
-	logger             *ubLogger.Logger
+	logger             zLogger.ZLogger
 	keycloak           models.Keycloak
 	ClientClerkHandler pb.ClerkHandlerServiceClient
 	router             *gin.Engine

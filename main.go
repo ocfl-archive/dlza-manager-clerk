@@ -9,27 +9,30 @@ import (
 	"encoding/pem"
 	"flag"
 	"fmt"
+	configutil "github.com/je4/utils/v2/pkg/config"
+	"github.com/je4/utils/v2/pkg/zLogger"
+	"github.com/ocfl-archive/dlza-manager-clerk/certs"
 	"github.com/ocfl-archive/dlza-manager-clerk/config"
 	"github.com/ocfl-archive/dlza-manager-clerk/controller"
-	"github.com/ocfl-archive/dlza-manager-clerk/data/certs"
 	"github.com/ocfl-archive/dlza-manager-clerk/data/web"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	"github.com/ocfl-archive/dlza-manager-clerk/router"
 	graphqlServer "github.com/ocfl-archive/dlza-manager-clerk/server"
-	handlerClient "github.com/ocfl-archive/dlza-manager-handler/client"
-	storageHandlerClient "github.com/ocfl-archive/dlza-manager-storage-handler/client"
-	ubLogger "gitlab.switch.ch/ub-unibas/go-ublogger"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	handlerClientProto "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	ublogger "gitlab.switch.ch/ub-unibas/go-ublogger/v2"
+	"go.ub.unibas.ch/cloud/certloader/v2/pkg/loader"
+	"go.ub.unibas.ch/cloud/miniresolver/v2/pkg/resolver"
+	"io"
 	"io/fs"
 	"log"
 	"os"
 	"os/signal"
-	"strconv"
+	"path/filepath"
 	"syscall"
+	"time"
 )
 
-var configParam = flag.String("config", "", "config file in toml format, no need for filetype for this param")
+var configFile = flag.String("config", "", "config file in toml format")
 
 //go:embed all:dlza-frontend/build
 var uiFS embed.FS
@@ -40,40 +43,101 @@ var schemaFS embed.FS
 func main() {
 
 	flag.Parse()
-	conf := config.GetConfig(*configParam)
 
-	//////ClerkStorageHandler gRPC connection
-	clerkStorageHandlerServiceClient, connectionClerkStorageHandler, err := storageHandlerClient.NewStorageHandlerClerkClient(conf.StorageHandler.Host+":"+strconv.Itoa(conf.StorageHandler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+	var cfgFS fs.FS
+	var cfgFile string
+	if *configFile != "" {
+		cfgFS = os.DirFS(filepath.Dir(*configFile))
+		cfgFile = filepath.Base(*configFile)
+	} else {
+		cfgFS = config.ConfigFS
+		cfgFile = "clerk.toml"
 	}
-	defer connectionClerkStorageHandler.Close()
+
+	conf := &config.Config{
+		LocalAddr: "localhost:8443",
+		//ResolverTimeout: config.Duration(10 * time.Minute),
+		ExternalAddr:            "https://localhost:8443",
+		ResolverTimeout:         configutil.Duration(10 * time.Minute),
+		ResolverNotFoundTimeout: configutil.Duration(10 * time.Second),
+		ServerTLS: &loader.Config{
+			Type: "DEV",
+		},
+		ClientTLS: &loader.Config{
+			Type: "DEV",
+		},
+	}
+	if err := config.LoadConfig(cfgFS, cfgFile, conf); err != nil {
+		log.Fatalf("cannot load toml from [%v] %s: %v", cfgFS, cfgFile, err)
+	}
+	// create logger instance
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatalf("cannot get hostname: %v", err)
+	}
+
+	var loggerTLSConfig *tls.Config
+	var loggerLoader io.Closer
+	if conf.Log.Stash.TLS != nil {
+		loggerTLSConfig, loggerLoader, err = loader.CreateClientLoader(conf.Log.Stash.TLS, nil)
+		if err != nil {
+			log.Fatalf("cannot create client loader: %v", err)
+		}
+		defer loggerLoader.Close()
+	}
+
+	_logger, _logstash, _logfile, err := ublogger.CreateUbMultiLoggerTLS(conf.Log.Level, conf.Log.File,
+		ublogger.SetDataset(conf.Log.Stash.Dataset),
+		ublogger.SetLogStash(conf.Log.Stash.LogstashHost, conf.Log.Stash.LogstashPort, conf.Log.Stash.Namespace, conf.Log.Stash.LogstashTraceLevel),
+		ublogger.SetTLS(conf.Log.Stash.TLS != nil),
+		ublogger.SetTLSConfig(loggerTLSConfig),
+	)
+	if err != nil {
+		log.Fatalf("cannot create logger: %v", err)
+	}
+	if _logstash != nil {
+		defer _logstash.Close()
+	}
+
+	if _logfile != nil {
+		defer _logfile.Close()
+	}
+
+	l2 := _logger.With().Timestamp().Str("host", hostname).Logger() //.Output(output)
+	var logger zLogger.ZLogger = &l2
+
+	clientCert, clientLoader, err := loader.CreateClientLoader(conf.ClientTLS, logger)
+	if err != nil {
+		logger.Panic().Msgf("cannot create client loader: %v", err)
+	}
+	defer clientLoader.Close()
+
+	logger.Info().Msgf("resolver address is %s", conf.ResolverAddr)
+	resolverClient, err := resolver.NewMiniresolverClient(conf.ResolverAddr, conf.GRPCClient, clientCert, nil, time.Duration(conf.ResolverTimeout), time.Duration(conf.ResolverNotFoundTimeout), logger)
+	if err != nil {
+		logger.Fatal().Msgf("cannot create resolver client: %v", err)
+	}
+	defer resolverClient.Close()
 
 	//////ClerkHandler gRPC connection
-	clerkHandlerServiceClient, connectionClerkHandler, err := handlerClient.NewClerkHandlerClient(conf.Handler.Host+":"+strconv.Itoa(conf.Handler.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	clientClerkHandler, err := resolver.NewClient[handlerClientProto.ClerkHandlerServiceClient](
+		resolverClient,
+		handlerClientProto.NewClerkHandlerServiceClient,
+		handlerClientProto.ClerkHandlerService_ServiceDesc.ServiceName, conf.Domain)
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		logger.Panic().Msgf("cannot create clientClerkHandler grpc client: %v", err)
 	}
-	defer connectionClerkHandler.Close()
 
-	tenantController := controller.NewTenantController(clerkHandlerServiceClient)
-	storageLocationController := controller.NewStorageLocationController(clerkHandlerServiceClient)
-	storagePartitionController := controller.NewStoragePartitionController(clerkStorageHandlerServiceClient)
-	collectionController := controller.NewCollectionController(clerkHandlerServiceClient)
-	statusController := controller.NewStatusController(clerkHandlerServiceClient)
-	objectInstanceController := controller.NewObjectInstanceController(clerkHandlerServiceClient)
-	objectController := controller.NewObjectController(clerkHandlerServiceClient)
-	routes := router.NewRouter(conf.Jwt, tenantController, storageLocationController, collectionController, storagePartitionController, statusController, objectInstanceController, objectController)
+	resolver.DoPing(clientClerkHandler, logger)
 
-	logger, logStash, logFile := ubLogger.CreateUbMultiLoggerTLS(
-		conf.GraphQLConfig.Logging.TraceLevel, conf.GraphQLConfig.Logging.Filename,
-		ubLogger.SetLogStash(conf.GraphQLConfig.Logging.StashHost, conf.GraphQLConfig.Logging.StashPortNb, conf.GraphQLConfig.Logging.Namespace, conf.GraphQLConfig.Logging.StashTraceLevel))
-	if logStash != nil {
-		defer logStash.Close()
-	}
-	if logFile != nil {
-		defer logFile.Close()
-	}
+	tenantController := controller.NewTenantController(clientClerkHandler)
+	storageLocationController := controller.NewStorageLocationController(clientClerkHandler)
+	collectionController := controller.NewCollectionController(clientClerkHandler)
+	statusController := controller.NewStatusController(clientClerkHandler)
+	objectInstanceController := controller.NewObjectInstanceController(clientClerkHandler)
+	objectController := controller.NewObjectController(clientClerkHandler)
+	routes := router.NewRouter(conf.Jwt, tenantController, storageLocationController, collectionController, statusController, objectInstanceController, objectController)
 
 	// find static fs
 	var staticFS fs.FS
@@ -144,7 +208,7 @@ func main() {
 		Callback:     conf.GraphQLConfig.Keycloak.Callback,
 		ClientId:     conf.GraphQLConfig.Keycloak.ClientId,
 		ClientSecret: conf.GraphQLConfig.Keycloak.ClientSecret,
-	}, clerkHandlerServiceClient, routes, conf.GraphQLConfig.Domain)
+	}, clientClerkHandler, routes, conf.GraphQLConfig.Domain)
 	if err != nil {
 		emperror.Panic(errors.Wrap(err, "cannot create server"))
 	}

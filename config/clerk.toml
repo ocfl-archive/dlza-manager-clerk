@@ -1,0 +1,62 @@
+#localaddr = ":8789"
+localaddr = ":0"
+#domains = ["ubmedia", "mediathek"]
+domain = "ubdlza"
+bearer = "grmbl"
+resolveraddr = "[::1]:7777"
+#resolveraddr = "127.0.0.1:7777"
+resolvertimeout = "10m"
+actiontimeout = "15m"
+resolvernotfoundtimeout = "10s"
+externaladdr = "https://localhost:8765"
+
+#[grpcclient]
+#mediaserverdb = "localhost:7653"
+
+[client]
+type = "minivault"
+initialtimeout = "1h"
+[client.minivault]
+baseurl = "https://localhost:8759/api/v1"
+parenttoken = "pa.222d079b91534247.759c6ecfc76d0632" #pa.2dc483e73851c137.15d94e61e0b377f1
+tokentype = "client_cert"
+tokenpolicies = ["ubdlza.clerk"]
+tokeninterval = "48h"
+tokenttl = "96h"
+certtype = "client_cert"
+dnss = []
+uris = ["grpc:miniresolverproto.MiniResolver", "grpc:ubdlza.handlerproto.ClerkHandlerService"]
+ips = []
+certinterval = "24h"
+certttl = "48h"
+ca = ["certs/minivault.ca.pem"]
+usesystempool = false
+
+[log]
+level = "debug"
+
+[log.stash]
+#logstash_host="sb-uwf4.swissbib.unibas.ch"
+logstashhost="localhost"
+logstashport=5046
+logstashtracelevel="ERROR"
+namespace="miniresolver"
+dataset=""
+#dataset="logs-mediaserver"
+[log.stash.tls]
+type="file"
+ca=["certs/ca.crt"]
+interval="1h"
+[log.stash.tls.file]
+cert="certs/ub-log.ub.unibas.ch.cert.pem"
+key="certs/ub-log.ub.unibas.ch.key.pem"
+
+[graphqlconfig]
+addr = "localhost:9087"
+extaddr = "https://localhost:9087"
+domain = "localhost"
+[graphqlconfig.keycloak]
+realm = "test"
+addr = "https://auth.ub.unibas.ch/realms/"
+callback = "https://localhost:9087/"
+clientId = "graphql-demo"
