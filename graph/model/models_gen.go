@@ -185,13 +185,13 @@ type Object struct {
 	Expiration        string              `json:"expiration"`
 	Authors           []string            `json:"authors"`
 	Holding           string              `json:"holding"`
-	Size              int                 `json:"size"`
+	Size              float64             `json:"size"`
 	CollectionID      string              `json:"collectionId"`
 	Collection        *Collection         `json:"collection"`
 	Checksum          string              `json:"checksum"`
 	ObjectInstances   *ObjectInstanceList `json:"objectInstances"`
 	Files             *FileList           `json:"files"`
-	TotalFileSize     int                 `json:"totalFileSize"`
+	TotalFileSize     float64             `json:"totalFileSize"`
 	TotalFileCount    int                 `json:"totalFileCount"`
 	Status            int                 `json:"status"`
 }

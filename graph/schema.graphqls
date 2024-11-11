@@ -319,13 +319,13 @@ type Object implements Node {
   expiration: String!
   authors: [String!]!
   holding: String!
-  size: Int!
+  size: Float!
   collectionId: ID!
   collection: Collection!
   checksum: String!
   objectInstances(options: ObjectInstanceListOptions): ObjectInstanceList!
   files(options: FileListOptions): FileList!
-  totalFileSize: Int!
+  totalFileSize: Float!
   totalFileCount: Int!
   status: Int!
 }
