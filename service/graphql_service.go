@@ -1707,11 +1707,11 @@ func objectToGraphQlObject(objectPb *pb.Object) *model.Object {
 	object.Address = objectPb.Address
 	object.Created = objectPb.Created
 	object.LastChanged = objectPb.LastChanged
-	object.Size = int(objectPb.Size)
+	object.Size = float64(objectPb.Size)
 	object.ID = objectPb.Id
 	object.CollectionID = objectPb.CollectionId
 	object.Checksum = objectPb.Checksum
-	object.TotalFileSize = int(objectPb.TotalFileSize)
+	object.TotalFileSize = float64(objectPb.TotalFileSize)
 	object.TotalFileCount = int(objectPb.TotalFileCount)
 	object.Authors = objectPb.Authors
 	object.Holding = objectPb.Holding
