@@ -14,7 +14,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/jinzhu/configor v1.2.2
-	github.com/ocfl-archive/dlza-manager v0.0.9
+	github.com/ocfl-archive/dlza-manager v0.0.10
 	github.com/ocfl-archive/dlza-manager-handler v0.0.10
 	github.com/ocfl-archive/dlza-manager-storage-handler v0.0.6
 	github.com/swaggo/files v1.0.1
