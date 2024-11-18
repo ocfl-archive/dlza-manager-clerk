@@ -14,7 +14,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/jinzhu/configor v1.2.2
-	github.com/ocfl-archive/dlza-manager v0.0.6
+	github.com/ocfl-archive/dlza-manager v0.0.9
 	github.com/ocfl-archive/dlza-manager-handler v0.0.9
 	github.com/ocfl-archive/dlza-manager-storage-handler v0.0.4
 	github.com/swaggo/files v1.0.1
@@ -25,7 +25,7 @@ require (
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
 	golang.org/x/net v0.30.0
 	golang.org/x/oauth2 v0.22.0
-	google.golang.org/grpc v1.67.0
+	google.golang.org/grpc v1.67.1
 )
 
 require (

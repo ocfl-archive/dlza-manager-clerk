@@ -2,17 +2,15 @@ package service
 
 import (
 	"context"
+	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
 	"regexp"
 	"strings"
-
-	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
-
-	"slices"
 
 	"emperror.dev/errors"
 	"github.com/ocfl-archive/dlza-manager-clerk/graph/model"
 	"github.com/ocfl-archive/dlza-manager-clerk/middleware"
 	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	"slices"
 )
 
 const (
@@ -1716,6 +1714,8 @@ func objectToGraphQlObject(objectPb *pb.Object) *model.Object {
 	object.Authors = objectPb.Authors
 	object.Holding = objectPb.Holding
 	object.Expiration = objectPb.Expiration
+	object.Head = objectPb.Head
+	object.Versions = objectPb.Versions
 	return &object
 }
 
@@ -1762,7 +1762,7 @@ func storageLocationToGraphQlStorageLocation(storageLocationPb *pb.StorageLocati
 	storageLocation.Alias = storageLocationPb.Alias
 	storageLocation.Type = storageLocationPb.Type
 	storageLocation.Vault = storageLocationPb.Vault
-	storageLocation.Connection = storageLocationPb.Connection
+	storageLocation.Connection = "xxxxxxxxxxxxxx"
 	storageLocation.Quality = int(storageLocationPb.Quality)
 	storageLocation.Price = int(storageLocationPb.Price)
 	storageLocation.SecurityCompliency = storageLocationPb.SecurityCompliency

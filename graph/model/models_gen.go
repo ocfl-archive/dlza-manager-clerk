@@ -189,6 +189,8 @@ type Object struct {
 	CollectionID      string              `json:"collectionId"`
 	Collection        *Collection         `json:"collection"`
 	Checksum          string              `json:"checksum"`
+	Head              string              `json:"head"`
+	Versions          string              `json:"versions"`
 	ObjectInstances   *ObjectInstanceList `json:"objectInstances"`
 	Files             *FileList           `json:"files"`
 	TotalFileSize     float64             `json:"totalFileSize"`
