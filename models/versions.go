@@ -1,4 +1,4 @@
-package graph
+package models
 
 type Version struct {
 	Name    string
