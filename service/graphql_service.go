@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/ocfl-archive/dlza-manager-clerk/graph"
 	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
+	"golang.org/x/exp/maps"
 	"regexp"
 	"strings"
 
@@ -1715,7 +1718,17 @@ func objectToGraphQlObject(objectPb *pb.Object) *model.Object {
 	object.Holding = objectPb.Holding
 	object.Expiration = objectPb.Expiration
 	object.Head = objectPb.Head
-	object.Versions = objectPb.Versions
+	var versionsMap graph.Versions
+	err := json.Unmarshal([]byte(objectPb.Versions), &versionsMap)
+	if err != nil {
+		object.Versions = objectPb.Versions
+	} else {
+		var versionsString string
+		for _, version := range maps.Keys(versionsMap) {
+			versionsString = versionsString + version + " : " + versionsMap[version].Created + "\n"
+		}
+		object.Versions = versionsString
+	}
 	return &object
 }
 
