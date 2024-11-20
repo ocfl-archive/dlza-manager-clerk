@@ -323,6 +323,8 @@ type Object implements Node {
   collectionId: ID!
   collection: Collection!
   checksum: String!
+  head: String!
+  versions: String!
   objectInstances(options: ObjectInstanceListOptions): ObjectInstanceList!
   files(options: FileListOptions): FileList!
   totalFileSize: Float!

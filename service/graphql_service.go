@@ -2,17 +2,18 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/ocfl-archive/dlza-manager-clerk/models"
+	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
+	"golang.org/x/exp/maps"
 	"regexp"
 	"strings"
-
-	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
-
-	"slices"
 
 	"emperror.dev/errors"
 	"github.com/ocfl-archive/dlza-manager-clerk/graph/model"
 	"github.com/ocfl-archive/dlza-manager-clerk/middleware"
 	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	"slices"
 )
 
 const (
@@ -1716,6 +1717,26 @@ func objectToGraphQlObject(objectPb *pb.Object) *model.Object {
 	object.Authors = objectPb.Authors
 	object.Holding = objectPb.Holding
 	object.Expiration = objectPb.Expiration
+	object.Head = objectPb.Head
+	var versionsMap models.Versions
+	err := json.Unmarshal([]byte(objectPb.Versions), &versionsMap)
+	if err != nil {
+		object.Versions = objectPb.Versions
+	} else {
+		var versionsString string
+		for _, version := range maps.Keys(versionsMap) {
+			var coma string
+			var created string
+			if versionsMap[version].Created != "" {
+				created = " : " + versionsMap[version].Created
+			}
+			if versionsString != "" {
+				coma = ", "
+			}
+			versionsString = versionsString + version + created + coma
+		}
+		object.Versions = versionsString
+	}
 	return &object
 }
 
@@ -1762,7 +1783,7 @@ func storageLocationToGraphQlStorageLocation(storageLocationPb *pb.StorageLocati
 	storageLocation.Alias = storageLocationPb.Alias
 	storageLocation.Type = storageLocationPb.Type
 	storageLocation.Vault = storageLocationPb.Vault
-	storageLocation.Connection = storageLocationPb.Connection
+	storageLocation.Connection = "xxxxxxxxxxxxxx"
 	storageLocation.Quality = int(storageLocationPb.Quality)
 	storageLocation.Price = int(storageLocationPb.Price)
 	storageLocation.SecurityCompliency = storageLocationPb.SecurityCompliency

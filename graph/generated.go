@@ -136,6 +136,7 @@ type ComplexityRoot struct {
 		Description       func(childComplexity int) int
 		Expiration        func(childComplexity int) int
 		Files             func(childComplexity int, options *model.FileListOptions) int
+		Head              func(childComplexity int) int
 		Holding           func(childComplexity int) int
 		ID                func(childComplexity int) int
 		Identifiers       func(childComplexity int) int
@@ -152,6 +153,7 @@ type ComplexityRoot struct {
 		TotalFileCount    func(childComplexity int) int
 		TotalFileSize     func(childComplexity int) int
 		User              func(childComplexity int) int
+		Versions          func(childComplexity int) int
 	}
 
 	ObjectInstance struct {
@@ -837,6 +839,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Object.Files(childComplexity, args["options"].(*model.FileListOptions)), true
 
+	case "Object.head":
+		if e.complexity.Object.Head == nil {
+			break
+		}
+
+		return e.complexity.Object.Head(childComplexity), true
+
 	case "Object.holding":
 		if e.complexity.Object.Holding == nil {
 			break
@@ -953,6 +962,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Object.User(childComplexity), true
+
+	case "Object.versions":
+		if e.complexity.Object.Versions == nil {
+			break
+		}
+
+		return e.complexity.Object.Versions(childComplexity), true
 
 	case "ObjectInstance.created":
 		if e.complexity.ObjectInstance.Created == nil {
@@ -3919,6 +3935,10 @@ func (ec *executionContext) fieldContext_File_object(_ context.Context, field gr
 				return ec.fieldContext_Object_collection(ctx, field)
 			case "checksum":
 				return ec.fieldContext_Object_checksum(ctx, field)
+			case "head":
+				return ec.fieldContext_Object_head(ctx, field)
+			case "versions":
+				return ec.fieldContext_Object_versions(ctx, field)
 			case "objectInstances":
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
@@ -6074,6 +6094,94 @@ func (ec *executionContext) fieldContext_Object_checksum(_ context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Object_head(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_head(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Head, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_head(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Object_versions(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Object_versions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Versions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Object_versions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Object",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Object_objectInstances(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Object_objectInstances(ctx, field)
 	if err != nil {
@@ -6783,6 +6891,10 @@ func (ec *executionContext) fieldContext_ObjectInstance_object(_ context.Context
 				return ec.fieldContext_Object_collection(ctx, field)
 			case "checksum":
 				return ec.fieldContext_Object_checksum(ctx, field)
+			case "head":
+				return ec.fieldContext_Object_head(ctx, field)
+			case "versions":
+				return ec.fieldContext_Object_versions(ctx, field)
 			case "objectInstances":
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
@@ -7440,6 +7552,10 @@ func (ec *executionContext) fieldContext_ObjectList_items(_ context.Context, fie
 				return ec.fieldContext_Object_collection(ctx, field)
 			case "checksum":
 				return ec.fieldContext_Object_checksum(ctx, field)
+			case "head":
+				return ec.fieldContext_Object_head(ctx, field)
+			case "versions":
+				return ec.fieldContext_Object_versions(ctx, field)
 			case "objectInstances":
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
@@ -8203,6 +8319,10 @@ func (ec *executionContext) fieldContext_Query_object(ctx context.Context, field
 				return ec.fieldContext_Object_collection(ctx, field)
 			case "checksum":
 				return ec.fieldContext_Object_checksum(ctx, field)
+			case "head":
+				return ec.fieldContext_Object_head(ctx, field)
+			case "versions":
+				return ec.fieldContext_Object_versions(ctx, field)
 			case "objectInstances":
 				return ec.fieldContext_Object_objectInstances(ctx, field)
 			case "files":
@@ -15077,6 +15197,16 @@ func (ec *executionContext) _Object(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "checksum":
 			out.Values[i] = ec._Object_checksum(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "head":
+			out.Values[i] = ec._Object_head(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "versions":
+			out.Values[i] = ec._Object_versions(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
