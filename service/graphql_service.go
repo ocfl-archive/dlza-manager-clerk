@@ -127,7 +127,7 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pbHand
 			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
-	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
+	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantOrCollectionIdPaginated(ctx, &optionsPb)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantID: %v", err)
 	}
@@ -859,13 +859,8 @@ func GetStorageLocationsForTenantOrCollectionId(ctx context.Context, clientClerk
 		}
 	}
 	var storageLocationsPb *pb.StorageLocations
-	if optionsPb.Id != "" {
-		storageLocationsPb, err = clientClerkHandler.GetStorageLocationsByTenantIdPaginated(ctx, &optionsPb)
-	} else {
-		if optionsPb.SecondId != "" {
-			storageLocationsPb, err = clientClerkHandler.GetStorageLocationsByCollectionIdPaginated(ctx, &optionsPb)
-		}
-	}
+	storageLocationsPb, err = clientClerkHandler.GetStorageLocationsByTenantOrCollectionIdPaginated(ctx, &optionsPb)
+
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationsForTenantOrCollectionId: %v", err)
 	}
