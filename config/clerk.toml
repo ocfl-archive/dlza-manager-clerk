@@ -18,7 +18,7 @@ type = "minivault"
 initialtimeout = "1h"
 [client.minivault]
 baseurl = "https://localhost:8759/api/v1"
-parenttoken = "pa.222d079b91534247.759c6ecfc76d0632" #pa.2dc483e73851c137.15d94e61e0b377f1
+parenttoken = "pa.2224c93926b24edb.c52500c6f73a70c1" #pa.2dc483e73851c137.15d94e61e0b377f1
 tokentype = "client_cert"
 tokenpolicies = ["ubdlza.clerk"]
 tokeninterval = "48h"
