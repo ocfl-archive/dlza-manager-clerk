@@ -13,7 +13,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.1
-	github.com/je4/utils/v2 v2.0.54
+	github.com/je4/utils/v2 v2.0.56
 	github.com/ocfl-archive/dlza-manager v0.0.11
 	github.com/ocfl-archive/dlza-manager-handler v0.0.12
 	github.com/swaggo/files v1.0.1
@@ -22,7 +22,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.20
 	gitlab.switch.ch/ub-unibas/go-ublogger v1.0.0
 	gitlab.switch.ch/ub-unibas/go-ublogger/v2 v2.0.1
-	go.ub.unibas.ch/cloud/certloader/v2 v2.0.16
+	go.ub.unibas.ch/cloud/certloader/v2 v2.0.18
 	go.ub.unibas.ch/cloud/miniresolver/v2 v2.0.31
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
 	golang.org/x/net v0.31.0
@@ -84,7 +84,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	go.step.sm/crypto v0.54.2 // indirect
 	go.ub.unibas.ch/cloud/genericproto/v2 v2.0.4 // indirect
-	go.ub.unibas.ch/cloud/minivault/v2 v2.0.13 // indirect
+	go.ub.unibas.ch/cloud/minivault/v2 v2.0.15 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.12.0 // indirect
 	golang.org/x/crypto v0.29.0 // indirect
