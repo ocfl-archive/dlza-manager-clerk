@@ -1,4 +1,4 @@
-FROM golang:1.23.0 as builder
+FROM golang:1.23.2 as builder
 
 WORKDIR /dlza-manager-clerk
 ARG SSH_PUBLIC_KEY=$SSH_PUBLIC_KEY
@@ -25,9 +25,9 @@ RUN apt-get update && \
         openssh-client \
         ca-certificates \
         protobuf-compiler \
-        nodejs \ 
+        nodejs \
         npm
-# RUN apk add --no-cache ca-certificates git openssh-client 
+# RUN apk add --no-cache ca-certificates git openssh-client
 # RUN 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
 RUN eval $(ssh-agent -s)
 RUN mkdir -p ~/.ssh
@@ -50,7 +50,7 @@ RUN git config --global --add url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitla
 # RUN --mount=type=ssh go mod download
 RUN go mod download
 # RUN git clone https://${GITLAB_USER}:${GITLAB_PASS}@gitlab.switch.ch/ub-unibas/dlza/microservices/pbtypes /pbtypes
-# RUN go get google.golang.org/protobuf/protoc-gen-go 
+# RUN go get google.golang.org/protobuf/protoc-gen-go
 # RUN go get google.golang.org/protobuf
 # RUN go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
 # RUN bash ./build.sh
@@ -58,11 +58,12 @@ RUN go mod download
 
 # RUN git clone -b develop https://gitlab.switch.ch/ub-unibas/dlza/dlza-frontend.git
 RUN npm i -g vite
+RUN npm install husky
 RUN git clone -b develop git@gitlab.switch.ch:ub-unibas/dlza/dlza-frontend.git
 ## to override hardcode in frontend that targets "ub-dlza-test" namespace
 # RUN sed -i "s|dlza-manager.ub-dlza-test.k8s-001.unibas.ch|dlza-manager.ub-dlza-stage.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
 # RUN sed -i "s|env.PUBLIC_BACKEND_URL|dlza-manager.ub-dlza-prod.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
-RUN cd dlza-frontend  && echo "PUBLIC_BACKEND_URL=https://dlza-manager.ub-dlza-prod.k8s-001.unibas.ch/graphql" >> .env && npm install && npm run build
+RUN cd dlza-frontend  && echo "PUBLIC_BACKEND_URL=https://dlza-manager.ub-dlza-test.k8s-001.unibas.ch/graphql" >> .env && npm install && npm run build
 
 # RUN npm run build dlza-frontend
 # RUN cd ..
