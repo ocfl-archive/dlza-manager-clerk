@@ -40,6 +40,7 @@ build-develop-image:
     - develop
     - dev_png
     - keycloak_backend
+    - dismantling-uploader
 
 build-prod-image:
   extends: .build-image
