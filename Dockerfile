@@ -48,8 +48,8 @@ RUN git config --global --add url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitla
 
 # with DOCKER_BUILDKIT=1 for ssh
 # RUN --mount=type=ssh go mod download
-# RUN go mod download
-RUN echo "machine gitlab.switch.ch\n\tlogin $GITLAB_USER\n\tpassword $GITLAB_PASS" >> ~/.netrc && go mod download
+RUN go mod download
+# RUN echo "machine gitlab.switch.ch\n\tlogin $GITLAB_USER\n\tpassword $GITLAB_PASS" >> ~/.netrc && go mod download
 # RUN git clone https://${GITLAB_USER}:${GITLAB_PASS}@gitlab.switch.ch/ub-unibas/dlza/microservices/pbtypes /pbtypes
 # RUN go get google.golang.org/protobuf/protoc-gen-go
 # RUN go get google.golang.org/protobuf
@@ -69,7 +69,7 @@ RUN cd dlza-frontend  && echo "PUBLIC_BACKEND_URL=https://dlza-manager.ub-dlza-t
 # RUN npm run build dlza-frontend
 # RUN cd ..
 RUN go build 
-RUN rm  ~/.netrc 
+# RUN rm  ~/.netrc 
 
 FROM alpine:latest
 RUN apk update && apk add tzdata ca-certificates
