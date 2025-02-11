@@ -26,7 +26,9 @@ RUN apt-get update && \
         ca-certificates \
         protobuf-compiler \
         nodejs \
-        npm
+        npm \
+RUN npm install -g npm@10.9.1
+RUN npm install -g node@22.9.0
 # RUN apk add --no-cache ca-certificates git openssh-client
 # RUN 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
 RUN eval $(ssh-agent -s)
