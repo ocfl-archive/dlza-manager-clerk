@@ -9,7 +9,7 @@ resolvertimeout = "10m"
 actiontimeout = "15m"
 resolvernotfoundtimeout = "10s"
 externaladdr = "https://localhost:8765"
-jwt = "%%JWT_KEY%%"
+jwt = ""
 
 #[grpcclient]
 #mediaserverdb = "localhost:7653"
