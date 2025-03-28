@@ -1282,7 +1282,7 @@ func GetMimeTypesForCollectionId(ctx context.Context, clientClerkHandler pbHandl
 
 	mimeTypes := make([]*model.MimeType, 0)
 	for _, mimeTypePb := range mimeTypesPb.MimeTypes {
-		mimeType := model.MimeType{ID: mimeTypePb.Id, FileCount: int(mimeTypePb.FileCount)}
+		mimeType := model.MimeType{ID: mimeTypePb.Id, FileCount: int(mimeTypePb.FileCount), FilesSize: float64(mimeTypePb.FilesSize)}
 		mimeTypes = append(mimeTypes, &mimeType)
 	}
 	return &model.MimeTypeList{Items: mimeTypes, TotalItems: int(mimeTypesPb.TotalItems)}, nil
@@ -1342,7 +1342,7 @@ func GetPronomsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 
 	pronoms := make([]*model.PronomID, 0)
 	for _, pronomPb := range pronomsPb.Pronoms {
-		pronom := model.PronomID{ID: pronomPb.Id, FileCount: int(pronomPb.FileCount)}
+		pronom := model.PronomID{ID: pronomPb.Id, FileCount: int(pronomPb.FileCount), FilesSize: float64(pronomPb.FilesSize)}
 		pronoms = append(pronoms, &pronom)
 	}
 	return &model.PronomIDList{Items: pronoms, TotalItems: int(pronomsPb.TotalItems)}, nil

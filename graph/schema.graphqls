@@ -369,6 +369,7 @@ type ObjectInstanceCheck implements Node {
 type MimeType implements Node {
   id: ID!
   fileCount: Int!
+  filesSize: Float!
 }
 
 type MimeTypeList implements PaginatedList {
@@ -378,6 +379,7 @@ type MimeTypeList implements PaginatedList {
 enum MimeTypeSortKey {
   id
   fileCount
+  filesSize
 }
 
 input MimeTypeListOptions {
@@ -392,6 +394,7 @@ input MimeTypeListOptions {
 type PronomId implements Node {
   id: ID!
   fileCount: Int!
+  filesSize: Float!
 }
 
 type PronomIdList implements PaginatedList {
@@ -403,6 +406,7 @@ type PronomIdList implements PaginatedList {
 enum PronomIdSortKey {
   id
   fileCount
+  filesSize
 }
 
 input PronomIdListOptions {
