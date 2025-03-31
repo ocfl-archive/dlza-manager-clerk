@@ -15,7 +15,7 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt"
 	"github.com/ocfl-archive/dlza-manager-clerk/constants"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	"github.com/vektah/gqlparser/v2/gqlerror"
