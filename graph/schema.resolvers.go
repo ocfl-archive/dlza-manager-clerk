@@ -296,7 +296,7 @@ func (r *queryResolver) Objects(ctx context.Context, options *model.ObjectListOp
 	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
 		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
 	}
-	objects, err := service.GetObjectsForCollectionId(ctx, r.ClientClerkHandler, options, r.AllowedTenants)
+	objects, err := service.GetObjectsForCollectionId(ctx, r.ClientClerkHandler, options, r.AllowedTenants, r.Logger)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not GetObjectsForCollectionId: "+err.Error()), ctx, http.StatusInternalServerError)
 	}

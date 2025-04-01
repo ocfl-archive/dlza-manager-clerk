@@ -378,7 +378,7 @@ func GetFilesForCollection(ctx context.Context, clientClerkHandler pbHandler.Cle
 	return &model.FileList{Items: files, TotalItems: int(filesPb.TotalItems)}, nil
 }
 
-func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.ObjectListOptions, allowedTenants []string) (*model.ObjectList, error) {
+func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, options *model.ObjectListOptions, allowedTenants []string, logger zLogger.ZLogger) (*model.ObjectList, error) {
 	keyCloakGroup, tenantList, err := middleware.TenantGroups(ctx)
 	if err != nil {
 		return nil, err
@@ -428,7 +428,9 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
+	logger.Debug().Msg("grpc function calling objects were executed")
 	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &optionsPb)
+	logger.Debug().Msg("grpc function calling objects returned objects")
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -452,6 +454,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 		object.Collection = collectionsMap[object.CollectionID]
 		objects = append(objects, object)
 	}
+	logger.Debug().Msg("returning list of objects in service method")
 	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
 }
 
