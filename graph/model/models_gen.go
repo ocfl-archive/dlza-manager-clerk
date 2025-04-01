@@ -130,8 +130,9 @@ type FileListOptions struct {
 }
 
 type MimeType struct {
-	ID        string `json:"id"`
-	FileCount int    `json:"fileCount"`
+	ID        string  `json:"id"`
+	FileCount int     `json:"fileCount"`
+	FilesSize float64 `json:"filesSize"`
 }
 
 func (MimeType) IsNode()            {}
@@ -314,8 +315,9 @@ type ObjectListOptions struct {
 }
 
 type PronomID struct {
-	ID        string `json:"id"`
-	FileCount int    `json:"fileCount"`
+	ID        string  `json:"id"`
+	FileCount int     `json:"fileCount"`
+	FilesSize float64 `json:"filesSize"`
 }
 
 func (PronomID) IsNode()            {}
@@ -560,7 +562,7 @@ func (e CollectionSortKey) String() string {
 	return string(e)
 }
 
-func (e *CollectionSortKey) UnmarshalGQL(v interface{}) error {
+func (e *CollectionSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -609,7 +611,7 @@ func (e FileSortKey) String() string {
 	return string(e)
 }
 
-func (e *FileSortKey) UnmarshalGQL(v interface{}) error {
+func (e *FileSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -631,16 +633,18 @@ type MimeTypeSortKey string
 const (
 	MimeTypeSortKeyID        MimeTypeSortKey = "id"
 	MimeTypeSortKeyFileCount MimeTypeSortKey = "fileCount"
+	MimeTypeSortKeyFilesSize MimeTypeSortKey = "filesSize"
 )
 
 var AllMimeTypeSortKey = []MimeTypeSortKey{
 	MimeTypeSortKeyID,
 	MimeTypeSortKeyFileCount,
+	MimeTypeSortKeyFilesSize,
 }
 
 func (e MimeTypeSortKey) IsValid() bool {
 	switch e {
-	case MimeTypeSortKeyID, MimeTypeSortKeyFileCount:
+	case MimeTypeSortKeyID, MimeTypeSortKeyFileCount, MimeTypeSortKeyFilesSize:
 		return true
 	}
 	return false
@@ -650,7 +654,7 @@ func (e MimeTypeSortKey) String() string {
 	return string(e)
 }
 
-func (e *MimeTypeSortKey) UnmarshalGQL(v interface{}) error {
+func (e *MimeTypeSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -693,7 +697,7 @@ func (e ObjectInstanceCheckSortKey) String() string {
 	return string(e)
 }
 
-func (e *ObjectInstanceCheckSortKey) UnmarshalGQL(v interface{}) error {
+func (e *ObjectInstanceCheckSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -736,7 +740,7 @@ func (e ObjectInstanceSortKey) String() string {
 	return string(e)
 }
 
-func (e *ObjectInstanceSortKey) UnmarshalGQL(v interface{}) error {
+func (e *ObjectInstanceSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -805,7 +809,7 @@ func (e ObjectSortKey) String() string {
 	return string(e)
 }
 
-func (e *ObjectSortKey) UnmarshalGQL(v interface{}) error {
+func (e *ObjectSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -827,16 +831,18 @@ type PronomIDSortKey string
 const (
 	PronomIDSortKeyID        PronomIDSortKey = "id"
 	PronomIDSortKeyFileCount PronomIDSortKey = "fileCount"
+	PronomIDSortKeyFilesSize PronomIDSortKey = "filesSize"
 )
 
 var AllPronomIDSortKey = []PronomIDSortKey{
 	PronomIDSortKeyID,
 	PronomIDSortKeyFileCount,
+	PronomIDSortKeyFilesSize,
 }
 
 func (e PronomIDSortKey) IsValid() bool {
 	switch e {
-	case PronomIDSortKeyID, PronomIDSortKeyFileCount:
+	case PronomIDSortKeyID, PronomIDSortKeyFileCount, PronomIDSortKeyFilesSize:
 		return true
 	}
 	return false
@@ -846,7 +852,7 @@ func (e PronomIDSortKey) String() string {
 	return string(e)
 }
 
-func (e *PronomIDSortKey) UnmarshalGQL(v interface{}) error {
+func (e *PronomIDSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -887,7 +893,7 @@ func (e SortDirection) String() string {
 	return string(e)
 }
 
-func (e *SortDirection) UnmarshalGQL(v interface{}) error {
+func (e *SortDirection) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -934,7 +940,7 @@ func (e StorageLocationSortKey) String() string {
 	return string(e)
 }
 
-func (e *StorageLocationSortKey) UnmarshalGQL(v interface{}) error {
+func (e *StorageLocationSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -977,7 +983,7 @@ func (e StoragePartitionSortKey) String() string {
 	return string(e)
 }
 
-func (e *StoragePartitionSortKey) UnmarshalGQL(v interface{}) error {
+func (e *StoragePartitionSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -1024,7 +1030,7 @@ func (e TenantSortKey) String() string {
 	return string(e)
 }
 
-func (e *TenantSortKey) UnmarshalGQL(v interface{}) error {
+func (e *TenantSortKey) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
