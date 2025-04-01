@@ -221,7 +221,7 @@ func (srv *Server) graphqlHandler(clientClerkHandler pb.ClerkHandlerServiceClien
 	// NewExecutableSchema and Config are in the generated.go file
 	// Resolver is in the resolver.go file
 
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{ClientClerkHandler: clientClerkHandler}}))
+	h := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{ClientClerkHandler: clientClerkHandler, Logger: srv.logger}}))
 	return func(c *gin.Context) {
 		// fmt.Println("test before")
 		// c.Header("Access-Control-Allow-Origin", "https://localhost:9087")

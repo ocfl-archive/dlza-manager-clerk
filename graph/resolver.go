@@ -1,6 +1,9 @@
 package graph
 
-import pb "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+import (
+	"github.com/je4/utils/v2/pkg/zLogger"
+	pb "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -9,4 +12,5 @@ import pb "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
 type Resolver struct {
 	AllowedTenants     []string
 	ClientClerkHandler pb.ClerkHandlerServiceClient
+	Logger             zLogger.ZLogger
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"github.com/je4/utils/v2/pkg/zLogger"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
 	"golang.org/x/exp/maps"
@@ -271,7 +272,7 @@ func GetCollectionsForTenantId(ctx context.Context, clientClerkHandler pbHandler
 	return &model.CollectionList{Items: collections, TotalItems: int(collectionsPb.TotalItems)}, nil
 }
 
-func GetObjectsForCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Collection, options *model.ObjectListOptions) (*model.ObjectList, error) {
+func GetObjectsForCollection(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, obj *model.Collection, options *model.ObjectListOptions, logger zLogger.ZLogger) (*model.ObjectList, error) {
 	optionsPb := pb.Pagination{
 		Take:          10,
 		SortDirection: sortDirectionAscending,
@@ -303,7 +304,9 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pbHandler.C
 			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
+	logger.Debug().Msg("grpc function calling objects were executed")
 	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &optionsPb)
+	logger.Debug().Msg("grpc function calling objects returned objects")
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetObjectsByCollectionIdPaginated: %v", err)
 	}
@@ -318,6 +321,7 @@ func GetObjectsForCollection(ctx context.Context, clientClerkHandler pbHandler.C
 		object.Collection = obj
 		objects = append(objects, object)
 	}
+	logger.Debug().Msg("returning list of objects in service method")
 	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
 }
 

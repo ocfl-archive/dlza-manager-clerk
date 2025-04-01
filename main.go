@@ -129,8 +129,6 @@ func main() {
 		logger.Panic().Msgf("cannot create clientClerkHandler grpc client: %v", err)
 	}
 
-	resolver.DoPing(clientClerkHandler, logger)
-
 	tenantController := controller.NewTenantController(clientClerkHandler)
 	storageLocationController := controller.NewStorageLocationController(clientClerkHandler)
 	collectionController := controller.NewCollectionController(clientClerkHandler)

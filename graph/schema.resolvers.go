@@ -17,10 +17,12 @@ import (
 
 // Objects is the resolver for the objects field.
 func (r *collectionResolver) Objects(ctx context.Context, obj *model.Collection, options *model.ObjectListOptions) (*model.ObjectList, error) {
-	collections, err := service.GetObjectsForCollection(ctx, r.ClientClerkHandler, obj, options)
+	r.Logger.Debug().Msg("Objects function in resolver was called")
+	collections, err := service.GetObjectsForCollection(ctx, r.ClientClerkHandler, obj, options, r.Logger)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not GetObjectsForCollection: "+err.Error()), ctx, http.StatusInternalServerError)
 	}
+	r.Logger.Debug().Msg("Objects function in resolver returns objects")
 	return collections, nil
 }
 
