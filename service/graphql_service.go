@@ -9,6 +9,7 @@ import (
 	"golang.org/x/exp/maps"
 	"regexp"
 	"strings"
+	"time"
 
 	"emperror.dev/errors"
 	"github.com/ocfl-archive/dlza-manager-clerk/graph/model"
@@ -428,9 +429,9 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 			optionsPb.SearchField = strings.ToLower(*options.Search)
 		}
 	}
-	logger.Debug().Msg("grpc function calling objects were executed")
+	logger.Debug().Msgf("grpc function calling objects were executed %s", time.Now())
 	objectsPb, err := clientClerkHandler.GetObjectsByCollectionIdPaginated(ctx, &optionsPb)
-	logger.Debug().Msg("grpc function calling objects returned objects")
+	logger.Debug().Msgf("grpc function calling objects returned objects%s", time.Now())
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetCollectionsByTenantID: %v", err)
 	}
@@ -454,7 +455,7 @@ func GetObjectsForCollectionId(ctx context.Context, clientClerkHandler pbHandler
 		object.Collection = collectionsMap[object.CollectionID]
 		objects = append(objects, object)
 	}
-	logger.Debug().Msg("returning list of objects in service method")
+	logger.Debug().Msgf("returning list of objects in service method%s", time.Now())
 	return &model.ObjectList{Items: objects, TotalItems: int(objectsPb.TotalItems)}, nil
 }
 
