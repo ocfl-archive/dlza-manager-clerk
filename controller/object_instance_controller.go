@@ -13,7 +13,7 @@ type ObjectInstanceController struct {
 
 func (o *ObjectInstanceController) InitRoutes(StorageInfoRouter *gin.RouterGroup) {
 	StorageInfoRouter.GET("/:name", o.ObjectInstanceWithNameExists)
-	StorageInfoRouter.GET("/alias-and-location/:alias/:locations-name", o.GetObjectInstancesBySignatureAndLocationsPathName)
+	StorageInfoRouter.GET("/signature-and-location/:signature/:locations-name", o.GetObjectInstancesBySignatureAndLocationsPathName)
 }
 
 func (o *ObjectInstanceController) Path() string {
@@ -45,18 +45,18 @@ func (o *ObjectInstanceController) ObjectInstanceWithNameExists(ctx *gin.Context
 }
 
 // GetObjectInstancesBySignatureAndLocationsPathName godoc
-// @Summary		Getting object instance by alias of object and storage locations name
-// @Description	Getting object instance by alias of object and storage locations name
+// @Summary		Getting object instance by signature of object and storage locations name
+// @Description	Getting object instance by signature of object and storage locations name
 // @Security 	ApiKeyAuth
-// @ID 			object-instance-by-alias-and-locations-name
+// @ID 			object-instance-by-signature-and-locations-name
 // @Produce		json
 // @Success		200
 // @Failure 	400
-// @Router		/object-instance/alias-and-location/{alias}/{locations-name} [get]
+// @Router		/object-instance/signature-and-location/{signature}/{locations-name} [get]
 func (o *ObjectInstanceController) GetObjectInstancesBySignatureAndLocationsPathName(ctx *gin.Context) {
-	alias := ctx.Param("alias")
+	signature := ctx.Param("signature")
 	locationsName := ctx.Param("locations-name")
-	objectInstance, err := o.ClientClerkHandlerService.GetObjectInstancesBySignatureAndLocationsPathName(ctx, &pb.AliasAndLocationsName{Alias: alias, LocationsName: locationsName})
+	objectInstance, err := o.ClientClerkHandlerService.GetObjectInstancesBySignatureAndLocationsPathName(ctx, &pb.AliasAndLocationsName{Alias: signature, LocationsName: locationsName})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "request failed"})
 		return
