@@ -119,15 +119,18 @@ func (s *StorageLocationController) GetStorageLocationsByTenantId(ctx *gin.Conte
 // @Produce		json
 // @Success		200
 // @Failure 	400
-// @Router		/storage-location/collection/{alias}/{size} [get]
+// @Router		/storage-location/collection/{alias}/{size}/{signature}/{head} [get]
 func (s *StorageLocationController) GetStorageLocationsStatusForCollectionAlias(ctx *gin.Context) {
 	c := context.Background()
 	cont, cancel := context.WithTimeout(c, 10000*time.Second)
 	defer cancel()
 	alias := ctx.Param("alias")
 	size := ctx.Param("size")
+	signature := ctx.Param("signature")
+	head := ctx.Param("head")
 	sizeInt64, _ := strconv.ParseInt(size, 10, 64)
-	status, err := s.ClientClerkHandler.GetStorageLocationsStatusForCollectionAlias(cont, &pb.SizeAndId{Id: alias, Size: sizeInt64})
+	objectPb := &pb.Object{Signature: signature, Head: head}
+	status, err := s.ClientClerkHandler.GetStorageLocationsStatusForCollectionAlias(cont, &pb.SizeAndId{Id: alias, Size: sizeInt64, Object: objectPb})
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
