@@ -15,6 +15,7 @@ func (o *ObjectController) InitRoutes(StorageInfoRouter *gin.RouterGroup) {
 	StorageInfoRouter.GET("/:checksum", o.GetObjectsByChecksum)
 	StorageInfoRouter.GET("/resulting-quality/:id", o.GetResultingQualityForObject)
 	StorageInfoRouter.GET("/needed-quality/:id", o.GetNeededQualityForObject)
+	StorageInfoRouter.GET("/signature/:signature", o.GetObjectBySignature)
 }
 
 func (o *ObjectController) Path() string {
@@ -38,6 +39,26 @@ func (o *ObjectController) GetObjectsByChecksum(ctx *gin.Context) {
 
 	checksum := ctx.Param("checksum")
 	objects, err := o.ClientClerkHandlerService.GetObjectsByChecksum(ctx, &pb.Id{Id: checksum})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "request failed"})
+		return
+	}
+	ctx.JSON(http.StatusOK, objects)
+}
+
+// GetObjectBySignature godoc
+// @Summary		Getting objects by signature
+// @Description	Getting objects by signature
+// @Security 	ApiKeyAuth
+// @ID 			objects-by-signature
+// @Produce		json
+// @Success		200
+// @Failure 	400
+// @Router		/object/signature/{signature} [get]
+func (o *ObjectController) GetObjectBySignature(ctx *gin.Context) {
+
+	signature := ctx.Param("signature")
+	objects, err := o.ClientClerkHandlerService.GetObjectBySignature(ctx, &pb.Id{Id: signature})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "request failed"})
 		return

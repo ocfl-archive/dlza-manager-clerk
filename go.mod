@@ -14,7 +14,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/je4/utils/v2 v2.0.58
 	github.com/ocfl-archive/dlza-manager v1.0.0-beta8
-	github.com/ocfl-archive/dlza-manager-handler v1.0.0-beta7
+	github.com/ocfl-archive/dlza-manager-handler v1.0.0-beta8
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.4

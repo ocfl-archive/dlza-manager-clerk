@@ -138,8 +138,8 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/ocfl-archive/dlza-manager v1.0.0-beta8 h1:v9p7RsGnWdwPW69L44NDsutj6tXo9EGWzwjqMU6ANqc=
 github.com/ocfl-archive/dlza-manager v1.0.0-beta8/go.mod h1:HNhklzYXMaczGD12XTyEtmFPa5LPyvYfNs14W26x+0Y=
-github.com/ocfl-archive/dlza-manager-handler v1.0.0-beta7 h1:8H+Bduq4mNvSc/jry7mOiTEJW+2HybInwj67MDj0RHI=
-github.com/ocfl-archive/dlza-manager-handler v1.0.0-beta7/go.mod h1:UdSLk4h2avGnWCGK2Q3eDtADuO+ptmQdoD675okdhG0=
+github.com/ocfl-archive/dlza-manager-handler v1.0.0-beta8 h1:undZiIEobEMaWYrYwsAt/0MoQp37eYKGI0GtTfXXb3w=
+github.com/ocfl-archive/dlza-manager-handler v1.0.0-beta8/go.mod h1:obDFBGlbQPlYfOa8ehO/1BT7A62D6sLdrpza+KXaaJU=
 github.com/pelletier/go-toml/v2 v2.2.3 h1:YmeHyLY8mFWbdkNWwpr+qIL2bEqT0o95WSdkNHvL12M=
 github.com/pelletier/go-toml/v2 v2.2.3/go.mod h1:MfCQTFTvCcUyyvvwm1+G6H/jORL20Xlb6rzQu9GuUkc=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
