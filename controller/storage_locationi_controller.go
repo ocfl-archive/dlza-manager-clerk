@@ -19,7 +19,7 @@ type StorageLocationController struct {
 }
 
 func (s *StorageLocationController) InitRoutes(storageLocationRouter *gin.RouterGroup) {
-	storageLocationRouter.GET("/collection/:alias/:size", s.GetStorageLocationsStatusForCollectionAlias)
+	storageLocationRouter.GET("/collection/:alias/:size/:signature/:head", s.GetStorageLocationsStatusForCollectionAlias)
 	storageLocationRouter.GET("/:id", s.GetStorageLocationsByTenantId)
 	storageLocationRouter.POST("", s.SaveStorageLocation)
 	storageLocationRouter.DELETE("/:id", s.DeleteStorageLocationById)
