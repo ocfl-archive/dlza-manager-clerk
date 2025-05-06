@@ -1,0 +1,542 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for DLZA-archive",
+        "title": "DLZA-archive API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8081",
+    "basePath": "/api",
+    "paths": {
+        "/collection": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add a new collection",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create collection",
+                "operationId": "create-collection",
+                "parameters": [
+                    {
+                        "description": "Create collection",
+                        "name": "collection's",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Collection"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update a collection",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update collection",
+                "operationId": "update-collection",
+                "parameters": [
+                    {
+                        "description": "Update collection",
+                        "name": "collection's",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Collection"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/collection/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Finding collections by tenant id",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find collections by tenant id",
+                "operationId": "find-collections-tenant-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tenant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Collection"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a collection",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete collection",
+                "operationId": "delete-collection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "collection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/order": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Copying all files from request",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Copy files",
+                "operationId": "copy-files",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/storage-location": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add a new storageLocation",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create storageLocation",
+                "operationId": "create-storageLocation",
+                "parameters": [
+                    {
+                        "description": "Create storageLocation",
+                        "name": "storageLocation's",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.StorageLocation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/storage-location/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Finding all storageLocations for tenant ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find all storageLocations for tenant ID",
+                "operationId": "find-all-storageLocations-for-tenant-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tenant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.StorageLocation"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a storageLocation",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete storageLocation",
+                "operationId": "delete-storageLocation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "storage-location ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/tenant": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Finding all tenants",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find all tenants",
+                "operationId": "find-all-tenants",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Tenant"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add a new tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create tenant",
+                "operationId": "create-tenant",
+                "parameters": [
+                    {
+                        "description": "Create tenant",
+                        "name": "tenant's",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Tenant"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update a tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update tenant",
+                "operationId": "update-tenant",
+                "parameters": [
+                    {
+                        "description": "Update tenant",
+                        "name": "tenant's",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Tenant"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/tenant/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Finding a tenant by id",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find tenant by id",
+                "operationId": "find-tenant-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tenant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tenant"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a tenant",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete tenant",
+                "operationId": "delete-tenant",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tenant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Collection": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "ownerMail": {
+                    "type": "string"
+                },
+                "quality": {
+                    "type": "integer"
+                },
+                "tenantId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.StorageLocation": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "connection": {
+                    "type": "string"
+                },
+                "fillFirst": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "numberOfThreads": {
+                    "type": "integer"
+                },
+                "ocflType": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "quality": {
+                    "type": "integer"
+                },
+                "securityCompliency": {
+                    "type": "string"
+                },
+                "tenantId": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "vault": {
+                    "$ref": "#/definitions/sql.NullString"
+                }
+            }
+        },
+        "models.Tenant": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "person": {
+                    "type": "string"
+                }
+            }
+        },
+        "sql.NullString": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if String is not NULL",
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "Bearer Authentication with JWT",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
