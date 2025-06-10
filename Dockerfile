@@ -1,4 +1,4 @@
-FROM golang:1.24.1 as builder
+FROM golang:1.24.3 as builder
 
 WORKDIR /dlza-manager-clerk
 ARG SSH_PUBLIC_KEY=$SSH_PUBLIC_KEY
