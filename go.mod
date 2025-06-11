@@ -8,8 +8,8 @@ require (
 	github.com/99designs/gqlgen v0.17.74
 	github.com/BurntSushi/toml v1.5.0
 	github.com/coreos/go-oidc v2.3.0+incompatible
-	github.com/gin-contrib/sessions v1.0.2
-	github.com/gin-contrib/static v1.1.3
+	github.com/gin-contrib/sessions v1.0.4
+	github.com/gin-contrib/static v1.1.5
 	github.com/gin-gonic/gin v1.10.1
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/je4/utils/v2 v2.0.60
