@@ -372,7 +372,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
+func (e *executableSchema) Complexity(ctx context.Context, typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
@@ -410,7 +410,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Collection_files_args(context.TODO(), rawArgs)
+		args, err := ec.field_Collection_files_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -436,7 +436,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Collection_objects_args(context.TODO(), rawArgs)
+		args, err := ec.field_Collection_objects_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -651,7 +651,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_createCollection_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createCollection_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -663,7 +663,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_createStorageLocation_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createStorageLocation_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -675,7 +675,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_createStoragePartition_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createStoragePartition_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -687,7 +687,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteCollection_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteCollection_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -699,7 +699,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteStorageLocation_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteStorageLocation_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -711,7 +711,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteStoragePartition_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteStoragePartition_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -723,7 +723,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_login_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_login_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -742,7 +742,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_updateCollection_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateCollection_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -754,7 +754,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_updateStorageLocation_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateStorageLocation_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -766,7 +766,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_updateStoragePartition_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateStoragePartition_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -841,7 +841,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Object_files_args(context.TODO(), rawArgs)
+		args, err := ec.field_Object_files_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -902,7 +902,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Object_objectInstances_args(context.TODO(), rawArgs)
+		args, err := ec.field_Object_objectInstances_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1012,7 +1012,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ObjectInstance_objectInstanceChecks_args(context.TODO(), rawArgs)
+		args, err := ec.field_ObjectInstance_objectInstanceChecks_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1185,7 +1185,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_collection_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_collection_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1197,7 +1197,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_collections_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_collections_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1209,7 +1209,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_file_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_file_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1221,7 +1221,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_files_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_files_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1233,7 +1233,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_mimeTypes_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_mimeTypes_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1245,7 +1245,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_object_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_object_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1257,7 +1257,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_objectInstance_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_objectInstance_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1269,7 +1269,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_objectInstanceCheck_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_objectInstanceCheck_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1281,7 +1281,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_objectInstanceChecks_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_objectInstanceChecks_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1293,7 +1293,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_objectInstances_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_objectInstances_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1305,7 +1305,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_objects_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_objects_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1317,7 +1317,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_pronomIds_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_pronomIds_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1329,7 +1329,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_storageLocation_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_storageLocation_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1341,7 +1341,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_storageLocations_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_storageLocations_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1353,7 +1353,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_storagePartition_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_storagePartition_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1365,7 +1365,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_storagePartitions_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_storagePartitions_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1377,7 +1377,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_tenant_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_tenant_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1389,7 +1389,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_tenants_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_tenants_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1485,7 +1485,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_StorageLocation_storagePartitions_args(context.TODO(), rawArgs)
+		args, err := ec.field_StorageLocation_storagePartitions_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1602,7 +1602,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_StoragePartition_objectInstances_args(context.TODO(), rawArgs)
+		args, err := ec.field_StoragePartition_objectInstances_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1649,7 +1649,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Tenant_collections_args(context.TODO(), rawArgs)
+		args, err := ec.field_Tenant_collections_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1696,7 +1696,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Tenant_storageLocations_args(context.TODO(), rawArgs)
+		args, err := ec.field_Tenant_storageLocations_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -18041,6 +18041,7 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (
 }
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalBoolean(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18196,6 +18197,7 @@ func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) 
 }
 
 func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalFloatContext(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18211,6 +18213,7 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (str
 }
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalID(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18226,6 +18229,7 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, 
 }
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18725,6 +18729,7 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) 
 }
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18900,6 +18905,7 @@ func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Con
 }
 
 func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -19088,6 +19094,7 @@ func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v a
 }
 
 func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -19103,6 +19110,8 @@ func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (
 }
 
 func (ec *executionContext) marshalOBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalBoolean(v)
 	return res
 }
@@ -19119,6 +19128,8 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
 }
@@ -19205,6 +19216,8 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalID(*v)
 	return res
 }
@@ -19221,6 +19234,8 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalInt(*v)
 	return res
 }
@@ -19508,6 +19523,8 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalString(*v)
 	return res
 }
