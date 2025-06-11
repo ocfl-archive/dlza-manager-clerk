@@ -145,12 +145,13 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 		graphql.POST("", srv.graphqlHandler(srv.ClientClerkHandler))
 		graphql.OPTIONS("", srv.graphqlHandler(srv.ClientClerkHandler))
 	}
-	embedFolder, err := static.EmbedFolder(UiFS, "dlza-frontend/build")
 
-	router.Use(static.Serve("/", embedFolder))
+	embedFolder, err := static.EmbedFolder(UiFS, "dlza-frontend/build")
 	if err != nil {
 		panic("cannot embed dlza-frontend folder")
 	}
+
+	router.Use(static.Serve("/", embedFolder))
 	router.Use(func(ctx *gin.Context) {
 		// if ctx.Request.URL.Path == "/playground" {
 		// 	ctx.Next()
