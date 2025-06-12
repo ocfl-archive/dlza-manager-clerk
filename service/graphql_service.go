@@ -6,7 +6,9 @@ import (
 	"github.com/je4/utils/v2/pkg/zLogger"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
+	dlzamodels "github.com/ocfl-archive/dlza-manager/models"
 	"golang.org/x/exp/maps"
+	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -15,6 +17,7 @@ import (
 	"github.com/ocfl-archive/dlza-manager-clerk/graph/model"
 	"github.com/ocfl-archive/dlza-manager-clerk/middleware"
 	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	pbStorageHandler "github.com/ocfl-archive/dlza-manager-storage-handler/storagehandlerproto"
 	"slices"
 )
 
@@ -1548,7 +1551,7 @@ func DeleteStorageLocation(ctx context.Context, clientClerkHandler pbHandler.Cle
 	return storageLocationG, nil
 }
 
-func CreateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
+func CreateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.ClerkHandlerServiceClient, clientClerkStorageHandler pbStorageHandler.ClerkStorageHandlerServiceClient, input *model.StoragePartitionInput) (*model.StoragePartition, error) {
 	storageLocationPb, err := clientClerkHandler.GetStorageLocationById(ctx, &pb.Id{Id: input.StorageLocationID})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not GetStorageLocationById: %v", err)
@@ -1572,6 +1575,18 @@ func CreateStoragePartition(ctx context.Context, clientClerkHandler pbHandler.Cl
 		}
 	} else {
 		return nil, errors.New("You are not allowed to proceed with creating storage partition")
+	}
+	connection := dlzamodels.Connection{}
+	if err = json.Unmarshal([]byte(storageLocationPb.Connection), &connection); err != nil {
+		return nil, errors.Wrapf(err, "error mapping storageLocation json for storageLocation ID: %s", storageLocationPb.Id)
+	}
+	aliasParts := strings.Split(input.Alias, "/")
+	if len(aliasParts) != 2 {
+		return nil, errors.New("alias should have right format 'part1/part2'")
+	}
+	pathString := path.Join(connection.Folder, aliasParts[0])
+	if _, err := clientClerkStorageHandler.CreateFolder(ctx, &pb.Id{Id: pathString}); err != nil {
+		return nil, errors.Wrapf(err, "Could not CreateFolder with path: %s", pathString)
 	}
 	storagePartitionPb := storagePartitionInputToGrpcStoragePartition(input)
 	idPb, err := clientClerkHandler.CreateStoragePartition(ctx, storagePartitionPb)

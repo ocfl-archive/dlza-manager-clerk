@@ -149,7 +149,7 @@ func (r *mutationResolver) CreateStoragePartition(ctx context.Context, input *mo
 	if errM := middleware.GraphqlVerifyToken(ctx); errM != nil {
 		return nil, middleware.GraphqlErrorWrapper(errM, ctx, http.StatusUnauthorized)
 	}
-	storagePartition, err := service.CreateStoragePartition(ctx, r.ClientClerkHandler, input)
+	storagePartition, err := service.CreateStoragePartition(ctx, r.ClientClerkHandler, r.ClientClerkStorageHandler, input)
 	if err != nil {
 		return nil, middleware.GraphqlErrorWrapper(errors.New("Could not CreateStoragePartition: "+err.Error()), ctx, http.StatusInternalServerError)
 	}
