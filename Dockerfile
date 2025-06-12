@@ -66,14 +66,10 @@ RUN npm install husky
 ## to override hardcode in frontend that targets "ub-dlza-test" namespace
 # RUN sed -i "s|dlza-manager.ub-dlza-test.k8s-001.unibas.ch|dlza-manager.ub-dlza-stage.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
 # RUN sed -i "s|env.PUBLIC_BACKEND_URL|dlza-manager.ub-dlza-prod.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
-RUN npm --version
-RUN node --version
-RUN vite --version
-RUN npm show husky version
 RUN rm package-lock.json && echo "PUBLIC_BACKEND_URL=https://dlza-manager.ub-dlza-stage.k8s-001.unibas.ch/graphql" >> .env && npm install && npm run build
 
 # RUN npm run build dlza-frontend
-# RUN cd ..
+RUN cd ..
 RUN go build
 
 
