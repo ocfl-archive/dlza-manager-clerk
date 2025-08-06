@@ -25,37 +25,40 @@ import (
 	"github.com/ocfl-archive/dlza-manager-clerk/middleware"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	pb "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	storagepb "github.com/ocfl-archive/dlza-manager-storage-handler/storagehandlerproto"
 	"golang.org/x/net/http2"
 )
 
-func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger zLogger.ZLogger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, router *gin.Engine, domain string) (*Server, error) {
+func NewServer(addr, extAddr string, cert tls.Certificate, addCAs []*x509.Certificate, staticFS fs.FS, logger zLogger.ZLogger, keycloak models.Keycloak, clientClerkHandler pb.ClerkHandlerServiceClient, clientClerkStorageHandler storagepb.ClerkStorageHandlerServiceClient, router *gin.Engine, domain string) (*Server, error) {
 	server := &Server{
-		addr:               addr,
-		extAddr:            extAddr,
-		cert:               cert,
-		addCAs:             addCAs,
-		staticFS:           staticFS,
-		logger:             logger,
-		keycloak:           keycloak,
-		ClientClerkHandler: clientClerkHandler,
-		router:             router,
-		domain:             domain,
+		addr:                      addr,
+		extAddr:                   extAddr,
+		cert:                      cert,
+		addCAs:                    addCAs,
+		staticFS:                  staticFS,
+		logger:                    logger,
+		keycloak:                  keycloak,
+		ClientClerkHandler:        clientClerkHandler,
+		ClientClerkStorageHandler: clientClerkStorageHandler,
+		router:                    router,
+		domain:                    domain,
 	}
 	return server, nil
 }
 
 type Server struct {
-	extAddr            string
-	server             http.Server
-	staticFS           fs.FS
-	addr               string
-	cert               tls.Certificate
-	addCAs             []*x509.Certificate
-	logger             zLogger.ZLogger
-	keycloak           models.Keycloak
-	ClientClerkHandler pb.ClerkHandlerServiceClient
-	router             *gin.Engine
-	domain             string
+	extAddr                   string
+	server                    http.Server
+	staticFS                  fs.FS
+	addr                      string
+	cert                      tls.Certificate
+	addCAs                    []*x509.Certificate
+	logger                    zLogger.ZLogger
+	keycloak                  models.Keycloak
+	ClientClerkHandler        pb.ClerkHandlerServiceClient
+	ClientClerkStorageHandler storagepb.ClerkStorageHandlerServiceClient
+	router                    *gin.Engine
+	domain                    string
 }
 
 var UiFS embed.FS
@@ -142,12 +145,16 @@ func (srv *Server) Startup() (context.CancelFunc, error) {
 
 	graphql := router.Group("/graphql")
 	{
-		graphql.POST("", srv.graphqlHandler(srv.ClientClerkHandler))
-		graphql.OPTIONS("", srv.graphqlHandler(srv.ClientClerkHandler))
+		graphql.POST("", srv.graphqlHandler(srv.ClientClerkHandler, srv.ClientClerkStorageHandler))
+		graphql.OPTIONS("", srv.graphqlHandler(srv.ClientClerkHandler, srv.ClientClerkStorageHandler))
 	}
 
-	router.Use(static.Serve("/", static.EmbedFolder(UiFS, "dlza-frontend/build")))
+	embedFolder, err := static.EmbedFolder(UiFS, "dlza-frontend/build")
+	if err != nil {
+		panic("cannot embed dlza-frontend folder")
+	}
 
+	router.Use(static.Serve("/", embedFolder))
 	router.Use(func(ctx *gin.Context) {
 		// if ctx.Request.URL.Path == "/playground" {
 		// 	ctx.Next()
@@ -217,11 +224,11 @@ func playgroundHandler() gin.HandlerFunc {
 }
 
 // Defining the Graphql handler
-func (srv *Server) graphqlHandler(clientClerkHandler pb.ClerkHandlerServiceClient) gin.HandlerFunc {
+func (srv *Server) graphqlHandler(clientClerkHandler pb.ClerkHandlerServiceClient, clientClerkStorageHandler storagepb.ClerkStorageHandlerServiceClient) gin.HandlerFunc {
 	// NewExecutableSchema and Config are in the generated.go file
 	// Resolver is in the resolver.go file
 
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{ClientClerkHandler: clientClerkHandler, Logger: srv.logger}}))
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{ClientClerkHandler: clientClerkHandler, ClientClerkStorageHandler: clientClerkStorageHandler, Logger: srv.logger}}))
 	return func(c *gin.Context) {
 		// fmt.Println("test before")
 		// c.Header("Access-Control-Allow-Origin", "https://localhost:9087")

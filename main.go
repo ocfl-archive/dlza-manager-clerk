@@ -19,6 +19,7 @@ import (
 	"github.com/ocfl-archive/dlza-manager-clerk/router"
 	graphqlServer "github.com/ocfl-archive/dlza-manager-clerk/server"
 	handlerClientProto "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
+	storageHandlerClientProto "github.com/ocfl-archive/dlza-manager-storage-handler/storagehandlerproto"
 	ublogger "gitlab.switch.ch/ub-unibas/go-ublogger/v2"
 	"go.ub.unibas.ch/cloud/certloader/v2/pkg/loader"
 	"go.ub.unibas.ch/cloud/miniresolver/v2/pkg/resolver"
@@ -129,6 +130,16 @@ func main() {
 		logger.Panic().Msgf("cannot create clientClerkHandler grpc client: %v", err)
 	}
 
+	//////ClerkStorageHandler gRPC connection
+
+	clientClerkStorageHandler, err := resolver.NewClient[storageHandlerClientProto.ClerkStorageHandlerServiceClient](
+		resolverClient,
+		storageHandlerClientProto.NewClerkStorageHandlerServiceClient,
+		storageHandlerClientProto.ClerkStorageHandlerService_ServiceDesc.ServiceName, conf.Domain)
+	if err != nil {
+		logger.Panic().Msgf("cannot create clientClerkStorageHandler grpc client: %v", err)
+	}
+
 	tenantController := controller.NewTenantController(clientClerkHandler)
 	storageLocationController := controller.NewStorageLocationController(clientClerkHandler)
 	collectionController := controller.NewCollectionController(clientClerkHandler)
@@ -206,7 +217,7 @@ func main() {
 		Callback:     conf.GraphQLConfig.Keycloak.Callback,
 		ClientId:     conf.GraphQLConfig.Keycloak.ClientId,
 		ClientSecret: conf.GraphQLConfig.Keycloak.ClientSecret,
-	}, clientClerkHandler, routes, conf.GraphQLConfig.Domain)
+	}, clientClerkHandler, clientClerkStorageHandler, routes, conf.GraphQLConfig.Domain)
 	if err != nil {
 		emperror.Panic(errors.Wrap(err, "cannot create server"))
 	}
