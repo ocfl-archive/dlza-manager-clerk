@@ -134,7 +134,7 @@ func GetStorageLocationsForTenant(ctx context.Context, clientClerkHandler pbHand
 	}
 	storageLocationsPb, err := clientClerkHandler.GetStorageLocationsByTenantOrCollectionIdPaginated(ctx, &optionsPb)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantID: %v", err)
+		return nil, errors.Wrapf(err, "Could not GetStorageLocationsByTenantOrCollectionIdPaginated: %v", err)
 	}
 	storageLocations := make([]*model.StorageLocation, 0)
 	for _, storageLocationPb := range storageLocationsPb.StorageLocations {
