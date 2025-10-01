@@ -4,11 +4,20 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"embed"
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
 	"encoding/pem"
 	"flag"
 	"fmt"
+	"io"
+	"io/fs"
+	"log"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"syscall"
+	"time"
+
+	"emperror.dev/emperror"
+	"emperror.dev/errors"
 	configutil "github.com/je4/utils/v2/pkg/config"
 	"github.com/je4/utils/v2/pkg/zLogger"
 	"github.com/ocfl-archive/dlza-manager-clerk/certs"
@@ -23,14 +32,6 @@ import (
 	ublogger "gitlab.switch.ch/ub-unibas/go-ublogger/v2"
 	"go.ub.unibas.ch/cloud/certloader/v2/pkg/loader"
 	"go.ub.unibas.ch/cloud/miniresolver/v2/pkg/resolver"
-	"io"
-	"io/fs"
-	"log"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"syscall"
-	"time"
 )
 
 var configFile = flag.String("config", "", "config file in toml format")
@@ -114,7 +115,7 @@ func main() {
 	defer clientLoader.Close()
 
 	logger.Info().Msgf("resolver address is %s", conf.ResolverAddr)
-	resolverClient, err := resolver.NewMiniresolverClient(conf.ResolverAddr, conf.GRPCClient, clientCert, nil, time.Duration(conf.ResolverTimeout), time.Duration(conf.ResolverNotFoundTimeout), logger)
+	resolverClient, err := resolver.NewMiniresolverClientNet(conf.ResolverAddr, conf.NetName, conf.GRPCClient, clientCert, nil, time.Duration(conf.ResolverTimeout), time.Duration(conf.ResolverNotFoundTimeout), logger)
 	if err != nil {
 		logger.Fatal().Msgf("cannot create resolver client: %v", err)
 	}

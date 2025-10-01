@@ -1,14 +1,15 @@
 package config
 
 import (
+	"io/fs"
+	"os"
+
 	"emperror.dev/errors"
 	"github.com/BurntSushi/toml"
 	"github.com/je4/utils/v2/pkg/config"
 	"github.com/je4/utils/v2/pkg/stashconfig"
 	"github.com/ocfl-archive/dlza-manager-clerk/models"
 	"go.ub.unibas.ch/cloud/certloader/v2/pkg/loader"
-	"io/fs"
-	"os"
 )
 
 type Config struct {
@@ -24,6 +25,8 @@ type Config struct {
 	ServerTLS               *loader.Config       `toml:"server"`
 	ClientTLS               *loader.Config       `toml:"client"`
 	GRPCClient              map[string]string    `toml:"grpcclient"`
+	Addresses               map[string]string    `toml:"addresses"`
+	NetName                 string               `toml:"netname"`
 	Log                     stashconfig.Config   `toml:"log"`
 	Jwt                     string               `toml:"jwt"`
 }
