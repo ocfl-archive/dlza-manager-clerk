@@ -13,9 +13,9 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/je4/utils/v2 v2.0.60
-	github.com/ocfl-archive/dlza-manager v1.0.2
-	github.com/ocfl-archive/dlza-manager-handler v1.0.2
-	github.com/ocfl-archive/dlza-manager-storage-handler v1.0.3
+	github.com/ocfl-archive/dlza-manager v1.0.3
+	github.com/ocfl-archive/dlza-manager-handler v1.0.3
+	github.com/ocfl-archive/dlza-manager-storage-handler v1.0.4
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
@@ -23,8 +23,8 @@ require (
 	gitlab.switch.ch/ub-unibas/go-ublogger v1.0.0
 	gitlab.switch.ch/ub-unibas/go-ublogger/v2 v2.0.2-0.20250331093945-4f0f0ce8c72d
 	go.ub.unibas.ch/cloud/certloader/v2 v2.0.22
-	go.ub.unibas.ch/cloud/miniresolver/v2 v2.0.50
-	golang.org/x/exp v0.0.0-20250911091902-df9299821621
+	go.ub.unibas.ch/cloud/miniresolver/v2 v2.0.51
+	golang.org/x/exp v0.0.0-20251002181428-27f1f14c8bb9
 	golang.org/x/net v0.44.0
 	golang.org/x/oauth2 v0.31.0
 )
@@ -117,9 +117,9 @@ require (
 	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/tools v0.37.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251002232023-7c0ddcbb5797 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
-	google.golang.org/protobuf v1.36.9 // indirect
+	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
