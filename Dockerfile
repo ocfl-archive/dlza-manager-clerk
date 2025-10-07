@@ -1,4 +1,4 @@
-FROM golang:1.24.4 as builder
+FROM golang:1.25.1 as builder
 
 WORKDIR /dlza-manager-clerk
 ARG SSH_PUBLIC_KEY=$SSH_PUBLIC_KEY
@@ -63,8 +63,7 @@ RUN git clone -b develop git@gitlab.switch.ch:ub-unibas/dlza/dlza-frontend.git
 ## to override hardcode in frontend that targets "ub-dlza-test" namespace
 # RUN sed -i "s|dlza-manager.ub-dlza-test.k8s-001.unibas.ch|dlza-manager.ub-dlza-stage.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
 # RUN sed -i "s|env.PUBLIC_BACKEND_URL|dlza-manager.ub-dlza-prod.k8s-001.unibas.ch|g" dlza-frontend/src/client.ts
-RUN cd dlza-frontend && npm i -g vite && npm install husky  && rm package-lock.json && echo "PUBLIC_BACKEND_URL=https://dlza-manager.ub-dlza-prod.k8s-001.unibas.ch/graphql" >> .env && npm install && npm run build
-
+RUN cd dlza-frontend && npm i -g vite && npm install husky  && rm package-lock.json && echo "PUBLIC_BACKEND_URL=https://dlza-manager.ub-dlza-stage.k8s-001.unibas.ch/graphql" >> .env && npm install && npm run build
 # RUN npm run build dlza-frontend
 # RUN cd ..
 RUN go build
