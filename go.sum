@@ -233,8 +233,6 @@ github.com/vektah/gqlparser/v2 v2.5.31/go.mod h1:c1I28gSOVNzlfc4WuDlqU7voQnsqI6O
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 gitlab.switch.ch/ub-unibas/go-testhelpers v0.0.0-20231004070116-a92f04ad03a5 h1:+89nmZvA6q0f9KCb06cKxiLzH3I3OiYvakwbdcFe170=
 gitlab.switch.ch/ub-unibas/go-testhelpers v0.0.0-20231004070116-a92f04ad03a5/go.mod h1:5CiTAKHNkvIYjvDJiXjGG662QdWsY6gLmnsdEKbwQKA=
-gitlab.switch.ch/ub-unibas/go-ublogger v1.0.0 h1:NLP24ZlRzzp1fI3zFlXgAyMjBvUsmn5ca7ddoLExofM=
-gitlab.switch.ch/ub-unibas/go-ublogger v1.0.0/go.mod h1:LiuJgHzbImEO1WcPQ2UaMRGLOZA24a79AnPnICp8JOQ=
 gitlab.switch.ch/ub-unibas/go-ublogger/v2 v2.0.2-0.20250331093945-4f0f0ce8c72d h1:zMDZBlY8+uHH7QXEpmFw4Zs91VFBQbP9x7w5TIFQYiI=
 gitlab.switch.ch/ub-unibas/go-ublogger/v2 v2.0.2-0.20250331093945-4f0f0ce8c72d/go.mod h1:A9W/cBMpdDDiuGCeNiTS9JRlCLRxApXEhi1q/j/mAws=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=

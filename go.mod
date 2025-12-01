@@ -20,7 +20,6 @@ require (
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
 	github.com/vektah/gqlparser/v2 v2.5.31
-	gitlab.switch.ch/ub-unibas/go-ublogger v1.0.0
 	gitlab.switch.ch/ub-unibas/go-ublogger/v2 v2.0.2-0.20250331093945-4f0f0ce8c72d
 	go.ub.unibas.ch/cloud/certloader/v2 v2.0.24
 	go.ub.unibas.ch/cloud/miniresolverclient v1.0.0
