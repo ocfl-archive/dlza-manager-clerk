@@ -6,7 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 
-	ub_logger "gitlab.switch.ch/ub-unibas/go-ublogger"
+	ub_logger "gitlab.switch.ch/ub-unibas/go-ublogger/v2"
 )
 
 type Server struct {

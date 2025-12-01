@@ -31,7 +31,7 @@ import (
 	storageHandlerClientProto "github.com/ocfl-archive/dlza-manager-storage-handler/storagehandlerproto"
 	ublogger "gitlab.switch.ch/ub-unibas/go-ublogger/v2"
 	"go.ub.unibas.ch/cloud/certloader/v2/pkg/loader"
-	"go.ub.unibas.ch/cloud/miniresolver/v2/pkg/resolver"
+	"go.ub.unibas.ch/cloud/miniresolverclient/pkg/miniresolverclient"
 )
 
 var configFile = flag.String("config", "", "config file in toml format")
@@ -115,7 +115,7 @@ func main() {
 	defer clientLoader.Close()
 
 	logger.Info().Msgf("resolver address is %s", conf.ResolverAddr)
-	resolverClient, err := resolver.NewMiniresolverClientNet(conf.ResolverAddr, conf.NetName, conf.GRPCClient, clientCert, nil, time.Duration(conf.ResolverTimeout), time.Duration(conf.ResolverNotFoundTimeout), logger)
+	resolverClient, err := miniresolverclient.NewMiniresolverClientNet(conf.ResolverAddr, conf.NetName, conf.GRPCClient, clientCert, nil, time.Duration(conf.ResolverTimeout), time.Duration(conf.ResolverNotFoundTimeout), logger)
 	if err != nil {
 		logger.Fatal().Msgf("cannot create resolver client: %v", err)
 	}
@@ -123,7 +123,7 @@ func main() {
 
 	//////ClerkHandler gRPC connection
 
-	clientClerkHandler, err := resolver.NewClient[handlerClientProto.ClerkHandlerServiceClient](
+	clientClerkHandler, err := miniresolverclient.NewClient[handlerClientProto.ClerkHandlerServiceClient](
 		resolverClient,
 		handlerClientProto.NewClerkHandlerServiceClient,
 		handlerClientProto.ClerkHandlerService_ServiceDesc.ServiceName, conf.Domain)
@@ -133,7 +133,7 @@ func main() {
 
 	//////ClerkStorageHandler gRPC connection
 
-	clientClerkStorageHandler, err := resolver.NewClient[storageHandlerClientProto.ClerkStorageHandlerServiceClient](
+	clientClerkStorageHandler, err := miniresolverclient.NewClient[storageHandlerClientProto.ClerkStorageHandlerServiceClient](
 		resolverClient,
 		storageHandlerClientProto.NewClerkStorageHandlerServiceClient,
 		storageHandlerClientProto.ClerkStorageHandlerService_ServiceDesc.ServiceName, conf.Domain)
