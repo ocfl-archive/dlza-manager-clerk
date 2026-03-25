@@ -1,11 +1,10 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	pbHandler "github.com/ocfl-archive/dlza-manager-handler/handlerproto"
 	pb "github.com/ocfl-archive/dlza-manager/dlzamanagerproto"
+	"net/http"
 )
 
 type ObjectController struct {
@@ -17,7 +16,6 @@ func (o *ObjectController) InitRoutes(StorageInfoRouter *gin.RouterGroup) {
 	StorageInfoRouter.GET("/resulting-quality/:id", o.GetResultingQualityForObject)
 	StorageInfoRouter.GET("/needed-quality/:id", o.GetNeededQualityForObject)
 	StorageInfoRouter.GET("/signature/:signature", o.GetObjectBySignature)
-	StorageInfoRouter.POST("/create", o.CreateObjectAndInstance)
 }
 
 func (o *ObjectController) Path() string {
@@ -106,30 +104,4 @@ func (o *ObjectController) GetNeededQualityForObject(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, quality)
-}
-
-// CreateObjectAndInstance godoc
-// @Summary		Create object with instance
-// @Description	Creating object with instance
-// @Security 	ApiKeyAuth
-// @ID 			create-object-with-instance
-// @Produce		json
-// @Success		200
-// @Failure 	400
-// @Router		/object/create [post]
-func (o *ObjectController) CreateObjectAndInstance(ctx *gin.Context) {
-	//statusId field is used to transfer partition id
-	object := pb.ObjectAndFile{}
-	err := ctx.ShouldBindJSON(&object)
-	if err != nil {
-		ctx.IndentedJSON(http.StatusUnprocessableEntity, gin.H{"message": "request failed"})
-		return
-	}
-	_, err = o.ClientClerkHandlerService.CreateObjectAndInstance(ctx, &object)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "request failed"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"message": "success"})
 }
